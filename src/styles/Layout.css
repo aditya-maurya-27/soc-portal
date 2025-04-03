@@ -1,0 +1,121 @@
+/* Global Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Container */
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-image {
+    width: 40px;
+    height: auto;
+    margin-right: 10px;
+}
+
+.logo-text{
+    font-family: Calibri, sans-serif;
+    font-weight: lighter;
+    font-size: 29px;
+    padding: 0;
+    margin: 0;
+}
+
+.navbar {
+    background: #2b144d;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+}
+
+.login-btn {
+    background: rgb(24, 156, 24);
+    color: white;
+    margin-top: 0;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.login-btn:hover {
+    background: rgb(16, 86, 9);
+}
+
+.register-btn {
+    background: rgb(23, 99, 215);
+    color: white;
+    margin-top: 0;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.register-btn:hover {
+    background: rgb(22, 56, 156);
+}
+
+/* Logout Button */
+.logout-btn {
+    background: red;
+    color: white;
+    margin-top: 0;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background: darkred;
+}
+
+/* Main Content */
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    background: #f4f4f4;
+}
+
+/* Footer */
+.footer {
+    background: #2b144d;
+    color: white;
+    text-align: center;
+    padding: 8px;
+    font-size: 16px;
+}
+
+/* Navigation Links Styling */
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    padding: 0;
+    align-items: center;
+  }
+  
+  .nav-links li {
+    margin: 0;
+  }
+  
+  .nav-links a {
+    text-decoration: none;
+    color: white;
+    font-size: 16px; /* Standard professional size */
+    font-weight: 500; /* Medium weight */
+    background: none; /* No background */
+    border: none; /* No border */
+    padding: 0; /* No extra padding */
+  }

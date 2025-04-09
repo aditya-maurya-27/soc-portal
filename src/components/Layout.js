@@ -3,7 +3,6 @@ import { useAuth } from "../context/AuthContext";
 import { useEffect } from "react";
 import "../styles/Layout.css";
 
-// Move protectedRoutes outside the component to prevent re-renders
 const protectedRoutes = [
   "/dashboard",
   "/shifts",
@@ -28,17 +27,15 @@ function Layout() {
 
   const handleLogout = () => {
     logout();
-    navigate("/", { replace: true }); // Redirect and prevent back navigation
+    navigate("/", { replace: true });
   };
 
-  // If a logged-out user is in a protected route, send them to "/"
   useEffect(() => {
     if (!isAuthenticated && protectedRoutes.includes(location.pathname)) {
       navigate("/", { replace: true });
     }
-  }, [isAuthenticated, location.pathname, navigate]); // No ESLint warning now
+  }, [isAuthenticated, location.pathname, navigate]);
 
-  // If a logged-in user is on the landing page ("/"), redirect to Dashboard
   useEffect(() => {
     if (isAuthenticated && location.pathname === "/") {
       navigate("/dashboard", { replace: true });
@@ -65,11 +62,31 @@ function Layout() {
               </>
             ) : (
               <>
-                <li><Link to="/dashboard">Dashboard</Link></li>
-                <li><Link to="/shifts">Shifts</Link></li>
-                <li><Link to="/knowledge_base">Knowledge Base</Link></li>
-                <li><Link to="/operation_runbook">Operation Runbook</Link></li>
-                <li><Link to="/advisory_system">Advisory System</Link></li>
+                <li>
+                  <Link to="/dashboard" className={location.pathname === "/dashboard" ? "active" : ""}>
+                    Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/shifts" className={location.pathname === "/shifts" ? "active" : ""}>
+                    Shifts
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/knowledge_base" className={location.pathname === "/knowledge_base" ? "active" : ""}>
+                    Knowledge Base
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/operation_runbook" className={location.pathname === "/operation_runbook" ? "active" : ""}>
+                    Operation Runbook
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/advisory_system" className={location.pathname === "/advisory_system" ? "active" : ""}>
+                    Advisory System
+                  </Link>
+                </li>
                 <li>
                   <button onClick={handleLogout} className="logout-btn">Logout</button>
                 </li>

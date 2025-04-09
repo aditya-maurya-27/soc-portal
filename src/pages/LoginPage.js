@@ -21,11 +21,10 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const success = await login(credentials.username, credentials.password);
-    if (success) {
-      navigate("/dashboard", { replace: true });
-    } else {
+    if (!success) {
       alert("Invalid username or password!");
     }
+    // Don't need to redirect again here — useEffect already handles it
   };
 
   return (

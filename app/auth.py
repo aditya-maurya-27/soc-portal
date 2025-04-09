@@ -4,13 +4,14 @@ from app.db import get_db_connection
 def authenticate_user(username, password):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
+    cursor.execute("SELECT id, username, password FROM users WHERE username = %s", (username,))
     user = cursor.fetchone()
     conn.close()
     if user:
-        stored_hashed_password = user[0]
-        return bcrypt.checkpw(password.encode('utf-8'), stored_hashed_password.encode('utf-8'))
-    return False
+        stored_hashed_password = user[2]
+        if bcrypt.checkpw(password.encode('utf-8'), stored_hashed_password.encode('utf-8')):
+            return {"id": user[0], "username": user[1]} 
+    return None
 
 def register_user(username, password):
     conn = get_db_connection()

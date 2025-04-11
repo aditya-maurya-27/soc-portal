@@ -71,7 +71,6 @@
     background: rgb(252, 204, 255);
 }
 
-/* Logout Button */
 .logout-btn {
     background: red;
     color: white;
@@ -86,14 +85,12 @@
     background: darkred;
 }
 
-/* Main Content */
 .content {
     flex-grow: 1;
     padding: 0px;
     background: #f4f4f4;
 }
 
-/* Footer */
 .footer {
     background: #2b144d;
     color: white;
@@ -102,7 +99,6 @@
     font-size: 16px;
 }
 
-/* Navigation Links Styling */
 .nav-links {
     list-style: none;
     display: flex;

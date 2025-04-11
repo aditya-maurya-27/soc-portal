@@ -1,7 +1,19 @@
+.header-container{
+    font-family: Calibri, sans-serif;
+    display: flex;
+    width: 100%;
+    justify-content: left;
+    align-items: center;
+    font-size: 22px;
+    height: 30px;
+    background-color: rgb(239, 209, 255);
+    padding-left: 10px;
+}
+
 .dashboard-container{
     display: flex;
+    font-family: Calibri, sans-serif;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+    height: 100%;
 }
+

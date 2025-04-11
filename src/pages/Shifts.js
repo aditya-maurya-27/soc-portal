@@ -3,7 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import Modal from "react-modal"; // ✅ Modal added
+import Modal from "react-modal";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import "../styles/Shifts.css";
 
@@ -19,39 +19,13 @@ const Shifts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const sampleShifts = [
-      {
-        id: 1,
-        title: "Morning Shift - A",
-        start: "2025-04-07T06:00:00",
-        end: "2025-04-07T13:59:59",
-        backgroundColor: "#28a745",
-        borderColor: "#28a745",
-        textColor: "#fff"
-
-      },
-      {
-        id: 2,
-        title: "Afternoon Shift - B",
-        start: "2025-04-07T14:00:00",
-        end: "2025-04-07T21:59:59",
-        backgroundColor: "#ffc107",
-        borderColor: "#ffc107",
-        textColor: "#fff"
-
-      },
-      {
-        id: 3,
-        title: "Evening Shift - C",
-        start: "2025-04-07T22:00:00",
-        end: "2025-04-08T05:59:59",
-        backgroundColor: "#007bff",
-        borderColor: "#007bff",
-        textColor: "#fff"
-
-      },
-    ];
-    setShifts(sampleShifts);
+    fetch("http://192.168.1.49:5000/api/shifts")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Rendered Shifts:", data);
+        setShifts(data); // ⛔️ Don't reformat, use directly
+      })
+      .catch((err) => console.error("Failed to fetch shifts:", err));
   }, []);
 
   const handleEventClick = (info) => {
@@ -81,13 +55,15 @@ const Shifts = () => {
 
   return (
     <div className="shifts-wrapper">
+      {console.log("Rendered Shifts: ", shifts)}
       <div className="shifts-calendar">
         <FullCalendar
           plugins={[interactionPlugin, dayGridPlugin, timeGridPlugin]}
           allDaySlot={false}
           initialView="timeGridDay"
-          slotMinTime={"00:00:00"}
-          slotMaxTime={"24:00:00"}
+          scrollTime="00:00:00" // ✅ Ensures night shifts at midnight are visible
+          slotMinTime="00:00:00"
+          slotMaxTime="24:00:00"
           headerToolbar={{
             left: "prev,next today",
             center: "title",
@@ -103,7 +79,6 @@ const Shifts = () => {
         />
       </div>
 
-      {/* ✅ Analyst Comments Modal */}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}

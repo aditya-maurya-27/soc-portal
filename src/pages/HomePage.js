@@ -9,7 +9,7 @@ function HomePage() {
             <div className="worm" key={i}></div>
           ))}
         </div>
-        <h1>Welcome to the SOC Portal</h1>
+        <h1>Welcome to <b><i className="gradient-text">#GT Bharat</i></b> Cyber Vigiliance Centre</h1>
       </div>
 
       <div className="main-content">

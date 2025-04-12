@@ -3,6 +3,7 @@ from app.auth import authenticate_user
 from app.db import get_db_connection
 from datetime import datetime, timedelta
 import bcrypt
+import mysql.connector
 from app.token_utils import generate_token
 from app.token_utils import validate_token as verify_token
 from datetime import datetime
@@ -28,12 +29,14 @@ def setup_routes(app):
             return jsonify({
                 "message": "Login successful!",
                 "token": token,
-                "username": user["username"],   # ✅ send username
-                "user_id": user["id"]           # ✅ send user_id
+                "username": user["username"],
+                "user_id": user["id"],
+                "role": user["role"]  # ✅ Add role to the response
             }), 200
         else:
             print("Login failed:", username)
             return jsonify({"error": "Invalid credentials"}), 401
+
 
     @app.route("/api/register", methods=["POST"])
     def register():
@@ -158,3 +161,146 @@ def setup_routes(app):
 
         return jsonify(shifts)
 
+    @app.route("/api/analysts")
+    def get_analysts():
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT id, username FROM users WHERE role = 'analyst'")
+            analysts = cur.fetchall()
+            result = []
+
+            if analysts:
+                result = [{"id": a[0], "username": a[1]} for a in analysts]
+                print(result)
+
+            return jsonify(result)
+
+        except Exception as e:
+            print("Error fetching analysts:", e)
+            return jsonify({"error": "Failed to fetch analysts"}), 500
+
+        finally:
+            if conn:
+                conn.close()
+
+    @app.route('/api/create_shift', methods=['POST'])
+    def create_shift():
+        data = request.get_json()
+        date = data.get("date")
+        shift_type = data.get("shift_type")
+        employee_id = data.get("employee_id")
+
+        shift_times = {
+            "morning": ("08:00:00", "16:00:00"),
+            "evening": ("16:00:00", "00:00:00"),
+            "night": ("00:00:00", "08:00:00"),
+        }
+
+        if shift_type not in shift_times:
+            return jsonify({"error": "Invalid shift type"}), 400
+
+        start_time, end_time = shift_times[shift_type]
+
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO shift_assignments (date, shift_type, start_time, end_time)
+                VALUES (%s, %s, %s, %s)
+            """, (date, shift_type, start_time, end_time))
+            conn.commit()
+
+            shift_id = cursor.lastrowid
+
+            # Link employee to shift
+            cursor.execute("""
+                INSERT INTO shift_employee_map (shift_id, employee_id)
+                VALUES (%s, %s)
+            """, (shift_id, employee_id))
+            conn.commit()
+
+            return jsonify({"message": "Shift created", "shift_id": shift_id}), 201
+
+        except mysql.connector.Error as err:
+            conn.rollback()
+            return jsonify({"error": str(err)}), 500
+
+    # Edit Route
+    @app.route('/api/edit_shift', methods=['PUT'])
+    def edit_shift():
+        data = request.get_json()
+        shift_id = data.get('shift_id')
+        date = data.get('date')  # format: 'YYYY-MM-DD'
+        shift_type = data.get('shift_type')  # e.g., 'morning'
+        new_employee_id = data.get('employee_id')  # new employee reassignment
+
+        if not all([shift_id, date, shift_type, new_employee_id]):
+            return jsonify({'error': 'Missing required parameters'}), 400
+
+        # Define start/end times for shift types
+        shift_times = {
+            'morning': ('08:00:00', '16:00:00'),
+            'evening': ('16:00:00', '00:00:00'),
+            'night': ('00:00:00', '08:00:00'),
+        }
+        if shift_type not in shift_times:
+            return jsonify({'error': 'Invalid shift type'}), 400
+
+        start_time, end_time = shift_times[shift_type]
+
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            # Update shift_assignments
+            cursor.execute("""
+                UPDATE shift_assignments
+                SET date = %s,
+                    shift_type = %s,
+                    start_time = %s,
+                    end_time = %s
+                WHERE id = %s
+            """, (date, shift_type, start_time, end_time, shift_id))
+
+            # Update assigned employee
+            cursor.execute("""
+                UPDATE shift_employee_map
+                SET employee_id = %s
+                WHERE shift_id = %s
+            """, (new_employee_id, shift_id))
+
+            conn.commit()
+            conn.close()
+
+            return jsonify({'message': 'Shift updated and reassigned successfully'}), 200
+
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+    
+
+    # Delete Route
+    @app.route('/api/delete_shift', methods=['DELETE'])
+    def delete_shift():
+        data = request.get_json()
+        shift_id = data.get('shift_id')
+
+        if not shift_id:
+            return jsonify({'error': 'Missing shift_id'}), 400
+
+        try:
+            conn=get_db_connection()
+            cursor=conn.cursor()
+
+            # First delete from dependent table
+            cursor.execute("DELETE FROM shift_employee_map WHERE shift_id = %s", (shift_id,))
+
+            # Then delete the shift itself
+            cursor.execute("DELETE FROM shift_assignments WHERE id = %s", (shift_id,))
+            conn.commit()
+            conn.close()
+            return jsonify({'message': 'Shift deleted successfully'}), 200
+
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500

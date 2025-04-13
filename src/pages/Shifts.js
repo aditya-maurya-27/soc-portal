@@ -26,7 +26,6 @@ const Shifts = () => {
   const [comment, setComment] = useState("");
   const [commentsMap, setCommentsMap] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newShiftDate, setNewShiftDate] = useState("");
   const [newShiftType, setNewShiftType] = useState("Morning");
@@ -53,13 +52,14 @@ const Shifts = () => {
     const shift = info.event;
     setSelectedShift(shift);
     setComment(commentsMap[shift.id] || "");
+
     if (isAdmin) {
       const date = shift.start.toISOString().slice(0, 10);
-      // More robust shift type extraction
-      let shiftType = "Morning"; // default
+      let shiftType = "Morning";
       if (shift.title.includes("Morning")) shiftType = "Morning";
       else if (shift.title.includes("Evening")) shiftType = "Evening";
       else if (shift.title.includes("Night")) shiftType = "Night";
+
       const employeeName = shift.title.split(" - ")[0];
       const matchedEmp = analysts.find((emp) => emp.username === employeeName);
 
@@ -67,6 +67,7 @@ const Shifts = () => {
       setEditShiftDate(date);
       setEditEmployeeId(matchedEmp?.id || "");
     }
+
     setIsModalOpen(true);
   };
 
@@ -106,6 +107,26 @@ const Shifts = () => {
     const shiftType = newShiftType.toLowerCase();
     const employeeId = selectedAnalyst.id;
 
+    // Build shift timing
+    const { start, end } = shiftTimeMapping[newShiftType];
+    const startDateTime = new Date(`${newShiftDate}T${start}`);
+    let endDateTime = new Date(`${newShiftDate}T${end}`);
+    if (end === "00:00") {
+      endDateTime.setDate(endDateTime.getDate() + 1);
+    }
+
+    // 🛑 Check for duplicates
+    const isDuplicate = shifts.some(
+      (shift) =>
+        new Date(shift.start).getTime() === startDateTime.getTime() &&
+        new Date(shift.end).getTime() === endDateTime.getTime()
+    );
+
+    if (isDuplicate) {
+      alert("A shift already exists at this time.");
+      return;
+    }
+
     try {
       const response = await fetch(
         "http://192.168.29.194:5000/api/create_shift",
@@ -127,13 +148,6 @@ const Shifts = () => {
         return;
       }
 
-      const { start, end } = shiftTimeMapping[newShiftType];
-      const startDateTime = new Date(`${newShiftDate}T${start}`);
-      let endDateTime = new Date(`${newShiftDate}T${end}`);
-      if (end === "00:00") {
-        endDateTime.setDate(endDateTime.getDate() + 1);
-      }
-
       const newShiftEvent = {
         title: newEmployeeUsername + " - " + newShiftType,
         start: startDateTime.toISOString(),
@@ -152,8 +166,28 @@ const Shifts = () => {
 
   const handleEditShift = async () => {
     try {
-      const shiftType = editShiftType.toLowerCase(); // ✅ lowercase for backend
+      const shiftType = editShiftType.toLowerCase();
       const shiftId = selectedShift.id;
+
+      const { start, end } = shiftTimeMapping[capitalize(shiftType)];
+      const startDateTime = new Date(`${editShiftDate}T${start}`);
+      let endDateTime = new Date(`${editShiftDate}T${end}`);
+      if (end === "00:00") {
+        endDateTime.setDate(endDateTime.getDate() + 1);
+      }
+
+      // 🛑 Check for duplicates excluding the current shift
+      const isDuplicate = shifts.some(
+        (shift) =>
+          shift.id !== shiftId &&
+          new Date(shift.start).getTime() === startDateTime.getTime() &&
+          new Date(shift.end).getTime() === endDateTime.getTime()
+      );
+
+      if (isDuplicate) {
+        alert("A shift already exists at this time.");
+        return;
+      }
 
       const response = await fetch(
         "http://192.168.29.194:5000/api/edit_shift",
@@ -180,21 +214,14 @@ const Shifts = () => {
         analysts.find((emp) => emp.id === editEmployeeId)?.username ||
         selectedShift.title.split(" - ")[0];
 
-      const { start, end } = shiftTimeMapping[capitalize(shiftType)];
-      const startDateTime = new Date(`${editShiftDate}T${start}`);
-      let endDateTime = new Date(`${editShiftDate}T${end}`);
-      if (end === "00:00") {
-        endDateTime.setDate(endDateTime.getDate() + 1);
-      }
-
       const updatedShifts = shifts.map((shift) =>
         shift.id === shiftId
           ? {
-              ...shift,
-              title: newUsername + " - " + capitalize(shiftType),
-              start: startDateTime.toISOString(),
-              end: endDateTime.toISOString(),
-            }
+            ...shift,
+            title: newUsername + " - " + capitalize(shiftType),
+            start: startDateTime.toISOString(),
+            end: endDateTime.toISOString(),
+          }
           : shift
       );
 
@@ -202,7 +229,6 @@ const Shifts = () => {
       setIsModalOpen(false);
       alert("Shift updated successfully!");
     } catch (err) {
-      console.log(err);
       console.error(err);
       alert("Failed to edit shift.");
     }
@@ -268,6 +294,7 @@ const Shifts = () => {
         />
       </div>
 
+      {/* Edit Shift Modal */}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}

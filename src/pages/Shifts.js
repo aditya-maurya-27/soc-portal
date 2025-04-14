@@ -15,8 +15,6 @@ const shiftTimeMapping = {
   Night: { start: "00:00", end: "08:00" },
 };
 
-
-
 const Shifts = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
@@ -29,7 +27,7 @@ const Shifts = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newShiftDate, setNewShiftDate] = useState("");
   const [newShiftType, setNewShiftType] = useState("Morning");
-  const [newEmployeeUsername, setNewEmployeeUsername] = useState("");
+  const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [analysts, setAnalysts] = useState([]);
 
   const [editShiftType, setEditShiftType] = useState("Morning");
@@ -48,6 +46,14 @@ const Shifts = () => {
       .catch((err) => console.error("Failed to fetch analysts:", err));
   }, []);
 
+  const handleEmployeeToggle = (username) => {
+    setSelectedEmployees((prev) =>
+      prev.includes(username)
+        ? prev.filter((u) => u !== username)
+        : [...prev, username]
+    );
+  };
+
   const handleEventClick = (info) => {
     const shift = info.event;
     setSelectedShift(shift);
@@ -60,8 +66,8 @@ const Shifts = () => {
       else if (shift.title.includes("Evening")) shiftType = "Evening";
       else if (shift.title.includes("Night")) shiftType = "Night";
 
-      const employeeName = shift.title.split(" - ")[0];
-      const matchedEmp = analysts.find((emp) => emp.username === employeeName);
+      const firstEmp = shift.title.split(" - ")[0].split(", ")[0];
+      const matchedEmp = analysts.find((emp) => emp.username === firstEmp);
 
       setEditShiftType(shiftType);
       setEditShiftDate(date);
@@ -90,24 +96,11 @@ const Shifts = () => {
   };
 
   const handleAddShift = async () => {
-    if (!newEmployeeUsername || !newShiftDate || !newShiftType) {
+    if (selectedEmployees.length === 0 || !newShiftDate || !newShiftType) {
       alert("Please fill all fields.");
       return;
     }
 
-    const selectedAnalyst = analysts.find(
-      (emp) => emp.username === newEmployeeUsername
-    );
-
-    if (!selectedAnalyst) {
-      alert("Invalid employee selected.");
-      return;
-    }
-
-    const shiftType = newShiftType.toLowerCase();
-    const employeeId = selectedAnalyst.id;
-
-    // Build shift timing
     const { start, end } = shiftTimeMapping[newShiftType];
     const startDateTime = new Date(`${newShiftDate}T${start}`);
     let endDateTime = new Date(`${newShiftDate}T${end}`);
@@ -115,31 +108,34 @@ const Shifts = () => {
       endDateTime.setDate(endDateTime.getDate() + 1);
     }
 
-    // 🛑 Check for duplicates
+    const usernames = selectedEmployees.join(", ");
+
     const isDuplicate = shifts.some(
       (shift) =>
         new Date(shift.start).getTime() === startDateTime.getTime() &&
-        new Date(shift.end).getTime() === endDateTime.getTime()
+        new Date(shift.end).getTime() === endDateTime.getTime() &&
+        shift.title === `${usernames} - ${newShiftType}`
     );
 
     if (isDuplicate) {
-      alert("A shift already exists at this time.");
+      alert("This shift already exists with selected employees.");
       return;
     }
 
     try {
-      const response = await fetch(
-        "http://192.168.1.49:5000/api/create_shift",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            date: newShiftDate,
-            shift_type: shiftType,
-            employee_id: employeeId,
-          }),
-        }
-      );
+      const employeeIds = analysts
+        .filter((emp) => selectedEmployees.includes(emp.username))
+        .map((emp) => emp.id);
+
+      const response = await fetch("http://192.168.1.49:5000/api/create_shift", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: newShiftDate,
+          shift_type: newShiftType.toLowerCase(),
+          employee_ids: employeeIds,
+        }),
+      });
 
       const data = await response.json();
 
@@ -149,50 +145,48 @@ const Shifts = () => {
       }
 
       const newShiftEvent = {
-        title: newEmployeeUsername + " - " + newShiftType,
+        title: usernames + " - " + newShiftType,
         start: startDateTime.toISOString(),
         end: endDateTime.toISOString(),
         id: data.shift_id,
       };
 
       setShifts((prev) => [...prev, newShiftEvent]);
-      setIsAddModalOpen(false);
-      alert("Shift created successfully!");
     } catch (err) {
       console.error(err);
       alert("Failed to create shift.");
     }
+
+    setIsAddModalOpen(false);
+    setSelectedEmployees([]);
+    alert("Shift created successfully!");
   };
 
   const handleEditShift = async () => {
     try {
       const shiftId = selectedShift.id;
-  
+
       const { start, end } = shiftTimeMapping[editShiftType];
       const startDateTime = new Date(`${editShiftDate}T${start}`);
       let endDateTime = new Date(`${editShiftDate}T${end}`);
       if (end === "00:00") {
         endDateTime.setDate(endDateTime.getDate() + 1);
       }
-  
-      // ✅ Ignore the current shift in duplicate check
+
       const isDuplicate = shifts.some((shift) => {
         const sameStart = new Date(shift.start).getTime() === startDateTime.getTime();
         const sameEnd = new Date(shift.end).getTime() === endDateTime.getTime();
-      
         const selectedUsername = analysts.find((emp) => emp.id === editEmployeeId)?.username || "";
-        const sameEmployee = shift.title.startsWith(selectedUsername);
-      
-        const differentShift = String(shift.id) !== String(shiftId); // 🔑 Ensure same type
-      
+        const sameEmployee = shift.title.includes(selectedUsername);
+        const differentShift = String(shift.id) !== String(shiftId);
         return differentShift && sameStart && sameEnd && sameEmployee;
       });
-      
+
       if (isDuplicate) {
         alert("Another shift already exists in that slot!");
         return;
       }
-  
+
       const response = await fetch("http://192.168.1.49:5000/api/edit_shift", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -203,18 +197,18 @@ const Shifts = () => {
           employee_id: editEmployeeId,
         }),
       });
-  
+
       const result = await response.json();
-  
+
       if (!response.ok) {
         alert("Error: " + result.error);
         return;
       }
-  
+
       const newUsername =
         analysts.find((emp) => emp.id === editEmployeeId)?.username ||
         selectedShift.title.split(" - ")[0];
-  
+
       const updatedShifts = shifts.map((shift) =>
         shift.id === shiftId
           ? {
@@ -225,7 +219,7 @@ const Shifts = () => {
             }
           : shift
       );
-  
+
       setShifts(updatedShifts);
       setIsModalOpen(false);
       alert("Shift updated successfully!");
@@ -234,18 +228,14 @@ const Shifts = () => {
       alert("Failed to edit shift.");
     }
   };
-  
 
   const handleDeleteShift = async () => {
     try {
-      const response = await fetch(
-        "http://192.168.1.49:5000/api/delete_shift",
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ shift_id: selectedShift.id }),
-        }
-      );
+      const response = await fetch("http://192.168.1.49:5000/api/delete_shift", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ shift_id: selectedShift.id }),
+      });
 
       const result = await response.json();
 
@@ -266,10 +256,7 @@ const Shifts = () => {
   return (
     <div className="shifts-wrapper">
       {isAdmin && (
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          style={{ marginBottom: "10px" }}
-        >
+        <button onClick={() => setIsAddModalOpen(true)} style={{ marginBottom: "10px" }}>
           Add Shift
         </button>
       )}
@@ -300,7 +287,6 @@ const Shifts = () => {
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
-        contentLabel="Shift Details"
         className="modal"
         overlayClassName="overlay"
       >
@@ -308,27 +294,17 @@ const Shifts = () => {
           <>
             <h2>Edit Shift (Admin)</h2>
             <label>Shift Type:</label>
-            <select
-              value={editShiftType}
-              onChange={(e) => setEditShiftType(e.target.value)}
-            >
+            <select value={editShiftType} onChange={(e) => setEditShiftType(e.target.value)}>
               <option value="Morning">Morning</option>
               <option value="Evening">Evening</option>
               <option value="Night">Night</option>
             </select>
 
             <label>Date:</label>
-            <input
-              type="date"
-              value={editShiftDate}
-              onChange={(e) => setEditShiftDate(e.target.value)}
-            />
+            <input type="date" value={editShiftDate} onChange={(e) => setEditShiftDate(e.target.value)} />
 
             <label>Reassign to:</label>
-            <select
-              value={editEmployeeId}
-              onChange={(e) => setEditEmployeeId(e.target.value)}
-            >
+            <select value={editEmployeeId} onChange={(e) => setEditEmployeeId(e.target.value)}>
               <option value="">-- Select Employee --</option>
               {analysts.map((emp) => (
                 <option key={emp.id} value={emp.id}>
@@ -361,11 +337,7 @@ const Shifts = () => {
               disabled={!isWithinShift()}
             />
             <div style={{ marginTop: "10px" }}>
-              <button
-                onClick={handleSave}
-                disabled={!isWithinShift()}
-                style={{ marginRight: "10px" }}
-              >
+              <button onClick={handleSave} disabled={!isWithinShift()} style={{ marginRight: "10px" }}>
                 Save
               </button>
               <button onClick={() => setIsModalOpen(false)}>Close</button>
@@ -383,40 +355,34 @@ const Shifts = () => {
       <Modal
         isOpen={isAddModalOpen}
         onRequestClose={() => setIsAddModalOpen(false)}
-        contentLabel="Add Shift"
         className="modal"
         overlayClassName="overlay"
       >
         <h2>Create Shift</h2>
-        <label>Employee (Username):</label>
-        <select
-          value={newEmployeeUsername}
-          onChange={(e) => setNewEmployeeUsername(e.target.value)}
-        >
-          <option value="">-- Select Employee --</option>
+
+        <label>Select Employees:</label>
+        <div style={{ border: "1px solid #ccc", padding: "10px", maxHeight: "150px", overflowY: "scroll" }}>
           {analysts.map((emp) => (
-            <option key={emp.id} value={emp.username}>
-              {emp.username}
-            </option>
+            <div key={emp.id}>
+              <input
+                type="checkbox"
+                checked={selectedEmployees.includes(emp.username)}
+                onChange={() => handleEmployeeToggle(emp.username)}
+              />
+              <label style={{ marginLeft: "8px" }}>{emp.username}</label>
+            </div>
           ))}
-        </select>
+        </div>
 
         <label>Shift Type:</label>
-        <select
-          value={newShiftType}
-          onChange={(e) => setNewShiftType(e.target.value)}
-        >
+        <select value={newShiftType} onChange={(e) => setNewShiftType(e.target.value)}>
           <option value="Morning">Morning</option>
           <option value="Evening">Evening</option>
           <option value="Night">Night</option>
         </select>
 
         <label>Date:</label>
-        <input
-          type="date"
-          value={newShiftDate}
-          onChange={(e) => setNewShiftDate(e.target.value)}
-        />
+        <input type="date" value={newShiftDate} onChange={(e) => setNewShiftDate(e.target.value)} />
 
         <div style={{ marginTop: "10px" }}>
           <button onClick={handleAddShift} style={{ marginRight: "10px" }}>

@@ -189,7 +189,7 @@ def setup_routes(app):
         data = request.get_json()
         date = data.get("date")
         shift_type = data.get("shift_type")
-        employee_id = data.get("employee_id")
+        employee_ids = data.get("employee_ids")  # Adjusted to handle multiple employees
 
         shift_times = {
             "morning": ("08:00:00", "16:00:00"),
@@ -205,6 +205,8 @@ def setup_routes(app):
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
+
+            # Insert shift into the shift_assignments table
             cursor.execute("""
                 INSERT INTO shift_assignments (date, shift_type, start_time, end_time)
                 VALUES (%s, %s, %s, %s)
@@ -213,18 +215,24 @@ def setup_routes(app):
 
             shift_id = cursor.lastrowid
 
-            # Link employee to shift
-            cursor.execute("""
-                INSERT INTO shift_employee_map (shift_id, employee_id)
-                VALUES (%s, %s)
-            """, (shift_id, employee_id))
-            conn.commit()
+            # Check if employee_ids is a list and contains valid employee IDs
+            if isinstance(employee_ids, list) and all(isinstance(employee_id, int) for employee_id in employee_ids):
+                # Link employees to the shift
+                for employee_id in employee_ids:
+                    cursor.execute("""
+                        INSERT INTO shift_employee_map (shift_id, employee_id)
+                        VALUES (%s, %s)
+                    """, (shift_id, employee_id))
+                conn.commit()
 
-            return jsonify({"message": "Shift created", "shift_id": shift_id}), 201
+                return jsonify({"message": "Shift created successfully", "shift_id": shift_id}), 201
+            else:
+                return jsonify({"error": "Invalid employee IDs"}), 400
 
         except mysql.connector.Error as err:
             conn.rollback()
             return jsonify({"error": str(err)}), 500
+
 
     # Edit Route
     @app.route('/api/edit_shift', methods=['PUT'])

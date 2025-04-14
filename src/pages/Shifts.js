@@ -15,7 +15,7 @@ const shiftTimeMapping = {
   Night: { start: "00:00", end: "08:00" },
 };
 
-const capitalize = (s) => s && s[0].toUpperCase() + s.slice(1);
+
 
 const Shifts = () => {
   const { user } = useAuth();
@@ -37,12 +37,12 @@ const Shifts = () => {
   const [editEmployeeId, setEditEmployeeId] = useState("");
 
   useEffect(() => {
-    fetch("http://192.168.29.194:5000/api/shifts")
+    fetch("http://192.168.1.49:5000/api/shifts")
       .then((res) => res.json())
       .then((data) => setShifts(data))
       .catch((err) => console.error("Failed to fetch shifts:", err));
 
-    fetch("http://192.168.29.194:5000/api/analysts")
+    fetch("http://192.168.1.49:5000/api/analysts")
       .then((res) => res.json())
       .then((data) => setAnalysts(data))
       .catch((err) => console.error("Failed to fetch analysts:", err));
@@ -129,7 +129,7 @@ const Shifts = () => {
 
     try {
       const response = await fetch(
-        "http://192.168.29.194:5000/api/create_shift",
+        "http://192.168.1.49:5000/api/create_shift",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -166,65 +166,66 @@ const Shifts = () => {
 
   const handleEditShift = async () => {
     try {
-      const shiftType = editShiftType.toLowerCase();
       const shiftId = selectedShift.id;
-
-      const { start, end } = shiftTimeMapping[capitalize(shiftType)];
+  
+      const { start, end } = shiftTimeMapping[editShiftType];
       const startDateTime = new Date(`${editShiftDate}T${start}`);
       let endDateTime = new Date(`${editShiftDate}T${end}`);
       if (end === "00:00") {
         endDateTime.setDate(endDateTime.getDate() + 1);
       }
-
-      // 🛑 Check for duplicates excluding the current shift
-      const isDuplicate = shifts.some(
-        (shift) =>
-          shift.id !== shiftId &&
-          new Date(shift.start).getTime() === startDateTime.getTime() &&
-          new Date(shift.end).getTime() === endDateTime.getTime()
-      );
-
+  
+      // ✅ Ignore the current shift in duplicate check
+      const isDuplicate = shifts.some((shift) => {
+        const sameStart = new Date(shift.start).getTime() === startDateTime.getTime();
+        const sameEnd = new Date(shift.end).getTime() === endDateTime.getTime();
+      
+        const selectedUsername = analysts.find((emp) => emp.id === editEmployeeId)?.username || "";
+        const sameEmployee = shift.title.startsWith(selectedUsername);
+      
+        const differentShift = String(shift.id) !== String(shiftId); // 🔑 Ensure same type
+      
+        return differentShift && sameStart && sameEnd && sameEmployee;
+      });
+      
       if (isDuplicate) {
-        alert("A shift already exists at this time.");
+        alert("Another shift already exists in that slot!");
         return;
       }
-
-      const response = await fetch(
-        "http://192.168.29.194:5000/api/edit_shift",
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            shift_id: shiftId,
-            date: editShiftDate,
-            shift_type: shiftType,
-            employee_id: editEmployeeId,
-          }),
-        }
-      );
-
+  
+      const response = await fetch("http://192.168.1.49:5000/api/edit_shift", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          shift_id: shiftId,
+          date: editShiftDate,
+          shift_type: editShiftType.toLowerCase(),
+          employee_id: editEmployeeId,
+        }),
+      });
+  
       const result = await response.json();
-
+  
       if (!response.ok) {
         alert("Error: " + result.error);
         return;
       }
-
+  
       const newUsername =
         analysts.find((emp) => emp.id === editEmployeeId)?.username ||
         selectedShift.title.split(" - ")[0];
-
+  
       const updatedShifts = shifts.map((shift) =>
         shift.id === shiftId
           ? {
-            ...shift,
-            title: newUsername + " - " + capitalize(shiftType),
-            start: startDateTime.toISOString(),
-            end: endDateTime.toISOString(),
-          }
+              ...shift,
+              title: newUsername + " - " + editShiftType,
+              start: startDateTime.toISOString(),
+              end: endDateTime.toISOString(),
+            }
           : shift
       );
-
+  
       setShifts(updatedShifts);
       setIsModalOpen(false);
       alert("Shift updated successfully!");
@@ -233,11 +234,12 @@ const Shifts = () => {
       alert("Failed to edit shift.");
     }
   };
+  
 
   const handleDeleteShift = async () => {
     try {
       const response = await fetch(
-        "http://192.168.29.194:5000/api/delete_shift",
+        "http://192.168.1.49:5000/api/delete_shift",
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },

@@ -1,0 +1,45 @@
+-- Table: users
+CREATE TABLE users (
+    id INT NOT NULL AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT 'analyst',
+    PRIMARY KEY (id)
+);
+
+-- Table: shift_assignments
+CREATE TABLE shift_assignments (
+    id INT NOT NULL AUTO_INCREMENT,
+    date DATE NOT NULL,
+    shift_type ENUM('morning', 'evening', 'night') NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+-- Table: shift_employee_map
+CREATE TABLE shift_employee_map (
+    id INT NOT NULL AUTO_INCREMENT,
+    shift_id INT NOT NULL,
+    employee_id INT NOT NULL,
+    PRIMARY KEY (id),
+    INDEX (shift_id),
+    INDEX (employee_id),
+    FOREIGN KEY (shift_id) REFERENCES shift_assignments(id),
+    FOREIGN KEY (employee_id) REFERENCES users(id)
+);
+
+-- Table: handover_notes
+CREATE TABLE handover_notes (
+    id INT NOT NULL AUTO_INCREMENT,
+    shift_id INT NOT NULL,
+    employee_id INT NOT NULL,
+    note TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX (shift_id),
+    INDEX (employee_id),
+    FOREIGN KEY (shift_id) REFERENCES shift_assignments(id),
+    FOREIGN KEY (employee_id) REFERENCES users(id)
+);

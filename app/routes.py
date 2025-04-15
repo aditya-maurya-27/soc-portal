@@ -31,7 +31,7 @@ def setup_routes(app):
                 "token": token,
                 "username": user["username"],
                 "user_id": user["id"],
-                "role": user["role"]  # ✅ Add role to the response
+                "role": user["role"] 
             }), 200
         else:
             print("Login failed:", username)
@@ -153,10 +153,10 @@ def setup_routes(app):
         for shift in raw_shifts:
             shifts.append({
                 "id": shift["id"],
-                "date": shift["date"].strftime("%Y-%m-%d"),  # convert date object to string
+                "date": shift["date"].strftime("%Y-%m-%d"), 
                 "shift_type": shift["shift_type"],
-                "start_time": str(timedelta(seconds=shift["start_time"].total_seconds()))[:-3],  # HH:MM
-                "end_time": str(timedelta(seconds=shift["end_time"].total_seconds()))[:-3],      # HH:MM
+                "start_time": str(timedelta(seconds=shift["start_time"].total_seconds()))[:-3],  
+                "end_time": str(timedelta(seconds=shift["end_time"].total_seconds()))[:-3],  
             })
 
         return jsonify(shifts)
@@ -172,7 +172,6 @@ def setup_routes(app):
 
             if analysts:
                 result = [{"id": a[0], "username": a[1]} for a in analysts]
-                print(result)
 
             return jsonify(result)
 
@@ -189,7 +188,7 @@ def setup_routes(app):
         data = request.get_json()
         date = data.get("date")
         shift_type = data.get("shift_type")
-        employee_ids = data.get("employee_ids")  # Adjusted to handle multiple employees
+        employee_ids = data.get("employee_ids")
 
         shift_times = {
             "morning": ("08:00:00", "16:00:00"),
@@ -206,32 +205,46 @@ def setup_routes(app):
             conn = get_db_connection()
             cursor = conn.cursor()
 
-            # Insert shift into the shift_assignments table
+            # Check if a shift already exists for that date and shift_type
             cursor.execute("""
-                INSERT INTO shift_assignments (date, shift_type, start_time, end_time)
-                VALUES (%s, %s, %s, %s)
-            """, (date, shift_type, start_time, end_time))
-            conn.commit()
+                SELECT id FROM shift_assignments
+                WHERE date = %s AND shift_type = %s
+            """, (date, shift_type))
+            existing_shift = cursor.fetchone()
 
-            shift_id = cursor.lastrowid
+            if existing_shift:
+                shift_id = existing_shift[0]
+            else:
+                # Create a new shift only if it doesn't exist
+                cursor.execute("""
+                    INSERT INTO shift_assignments (date, shift_type, start_time, end_time)
+                    VALUES (%s, %s, %s, %s)
+                """, (date, shift_type, start_time, end_time))
+                conn.commit()
+                shift_id = cursor.lastrowid
 
-            # Check if employee_ids is a list and contains valid employee IDs
-            if isinstance(employee_ids, list) and all(isinstance(employee_id, int) for employee_id in employee_ids):
-                # Link employees to the shift
-                for employee_id in employee_ids:
+            # Now link each employee to the shift (if not already linked)
+            for emp_id in employee_ids:
+                cursor.execute("""
+                    SELECT 1 FROM shift_employee_map
+                    WHERE shift_id = %s AND employee_id = %s
+                """, (shift_id, emp_id))
+                already_assigned = cursor.fetchone()
+
+                if not already_assigned:
                     cursor.execute("""
                         INSERT INTO shift_employee_map (shift_id, employee_id)
                         VALUES (%s, %s)
-                    """, (shift_id, employee_id))
-                conn.commit()
+                    """, (shift_id, emp_id))
 
-                return jsonify({"message": "Shift created successfully", "shift_id": shift_id}), 201
-            else:
-                return jsonify({"error": "Invalid employee IDs"}), 400
+            conn.commit()
+
+            return jsonify({"message": "Shift updated successfully", "shift_id": shift_id}), 200
 
         except mysql.connector.Error as err:
             conn.rollback()
             return jsonify({"error": str(err)}), 500
+
 
 
     # Edit Route

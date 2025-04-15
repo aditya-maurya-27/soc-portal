@@ -11,7 +11,7 @@ Modal.setAppElement("#root");
 
 const shiftTimeMapping = {
   Morning: { start: "08:00", end: "16:00" },
-  Evening: { start: "16:00", end: "23:00" },
+  Evening: { start: "16:00", end: "24:00" },
   Night: { start: "00:00", end: "08:00" },
 };
 

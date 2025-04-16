@@ -325,3 +325,26 @@ def setup_routes(app):
 
         except Exception as e:
             return jsonify({'error': str(e)}), 500
+        
+    @app.route("/api/clients", methods=["GET"])
+    def get_clients():
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM clients")
+        return jsonify(cursor.fetchall())
+
+    @app.route("/api/client-assets", methods=["GET"])
+    def get_assets():
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        client_id = request.args.get("client")
+        cursor.execute("SELECT * FROM client_assets WHERE client_id = %s", (client_id,))
+        return jsonify(cursor.fetchall())
+
+    @app.route("/api/escalation-matrix", methods=["GET"])
+    def get_escalation():
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        client_id = request.args.get("client")
+        cursor.execute("SELECT * FROM escalation_matrix WHERE client_id = %s", (client_id,))
+        return jsonify(cursor.fetchall())

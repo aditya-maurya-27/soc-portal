@@ -43,3 +43,17 @@ CREATE TABLE handover_notes (
     FOREIGN KEY (shift_id) REFERENCES shift_assignments(id),
     FOREIGN KEY (employee_id) REFERENCES users(id)
 );
+
+-- Table: knowledge_base
+CREATE TABLE knowledge_base (
+  id INT NOT NULL AUTO_INCREMENT,
+  entity_name VARCHAR(255),
+  asset VARCHAR(255),
+  itsm_ref VARCHAR(100),
+  asset_details TEXT,
+  status ENUM('Blocked', 'Allowed'),
+  reason TEXT,
+  context TEXT,
+  remarks TEXT,
+  PRIMARY KEY (id)
+);

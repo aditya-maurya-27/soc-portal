@@ -253,6 +253,25 @@ const Shifts = () => {
     }
   };
 
+  // Custom slot rendering
+  const slotLabelContent = (arg) => {
+    // Only show custom labels for the three main slots
+    if (arg.date.getHours() === 8) return "Morning";
+    if (arg.date.getHours() === 16) return "Evening";
+    if (arg.date.getHours() === 0) return "Night";
+    return "";
+  };
+
+  // Filter out slots we don't want to display
+  const slotLaneContent = (arg) => {
+    const hour = arg.date.getHours();
+    // Only show our three main slots (Morning, Evening, Night)
+    if (hour !== 0 && hour !== 8 && hour !== 16) {
+      return { display: "none" };
+    }
+    return null;
+  };
+
   return (
     <div className="shifts-wrapper">
       {isAdmin && (
@@ -268,6 +287,9 @@ const Shifts = () => {
           initialView="timeGridWeek"
           slotMinTime="00:00:00"
           slotMaxTime="24:00:00"
+          slotDuration="08:00:00" // Each slot is 8 hours
+          slotLabelContent={slotLabelContent}
+          slotLaneContent={slotLaneContent}
           headerToolbar={{
             left: "prev,next today",
             center: "title",
@@ -279,6 +301,22 @@ const Shifts = () => {
           eventClick={handleEventClick}
           eventDidMount={(info) => {
             info.el.setAttribute("title", info.event.title);
+          }}
+          slotLabelFormat={{
+            hour: 'numeric',
+            hour12: false,
+            omitZeroMinute: true,
+            meridiem: false
+          }}
+          views={{
+            timeGridDay: {
+              slotDuration: '08:00:00',
+              slotLabelInterval: '08:00:00'
+            },
+            timeGridWeek: {
+              slotDuration: '08:00:00',
+              slotLabelInterval: '08:00:00'
+            }
           }}
         />
       </div>

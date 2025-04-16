@@ -4,6 +4,7 @@ from app.db import get_db_connection
 from datetime import datetime, timedelta
 import bcrypt
 import mysql.connector
+import pandas as pd
 from app.token_utils import generate_token
 from app.token_utils import validate_token as verify_token
 from datetime import datetime
@@ -348,3 +349,171 @@ def setup_routes(app):
         client_id = request.args.get("client")
         cursor.execute("SELECT * FROM escalation_matrix WHERE client_id = %s", (client_id,))
         return jsonify(cursor.fetchall())
+    
+    @app.route('/api/kb-search', methods=['GET'])
+    def search():
+        query = request.args.get('query', '').strip()
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        try:
+            if not query:
+                cursor.execute("SELECT id, entity_name, asset, itsm_ref, asset_details, status, reason, context, remarks FROM knowledge_base")
+                results = cursor.fetchall()
+                return jsonify(results)
+
+            words = query.split()
+            conditions = []
+            params = []
+
+            for word in words:
+                conditions.append(
+                    "("
+                    "CAST(id AS CHAR) LIKE %s OR "
+                    "entity_name LIKE %s OR "
+                    "asset LIKE %s OR "
+                    "itsm_ref LIKE %s OR "
+                    "asset_details LIKE %s OR "
+                    "status LIKE %s OR "
+                    "reason LIKE %s OR "
+                    "context LIKE %s OR "
+                    "remarks LIKE %s"
+                    ")"
+                )
+                for _ in range(9):
+                    params.append(f"%{word}%")
+
+            where_clause = " AND ".join(conditions)
+            sql = f"""
+                SELECT id, entity_name, asset, itsm_ref, asset_details,
+                    status, reason, context, remarks
+                FROM knowledge_base
+                WHERE {where_clause}
+            """
+            cursor.execute(sql, params)
+            results = cursor.fetchall()
+            return jsonify(results)
+
+        finally:
+            cursor.close()
+            conn.close()
+
+    
+    @app.route('/api/kb_table-add', methods=['POST'])
+    def add_kb_entry():
+        try:
+            data = request.get_json()
+
+            required_fields = [
+                'entity_name', 'asset', 'itsm_ref', 'asset_details',
+                'status', 'reason', 'context', 'remarks'
+            ]
+
+        # Check for missing fields
+            if not all(field in data and data[field] for field in required_fields):
+                return jsonify({"message": "All fields are required."}), 400
+
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            insert_query = """
+                INSERT INTO knowledge_base (
+                    entity_name, asset, itsm_ref, asset_details,
+                    status, reason, context, remarks
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """
+
+            values = (
+                data['entity_name'],
+                data['asset'],
+                data['itsm_ref'],
+                data['asset_details'],
+                data['status'],
+                data['reason'],
+                data['context'],
+                data['remarks']
+            )
+
+            cursor.execute(insert_query, values)
+            conn.commit()
+
+            return jsonify({"message": "Entry added successfully!"}), 201
+
+        except Exception as e:
+            print("Error adding entry:", str(e))
+            return jsonify({"message": str(e)}), 500
+
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
+        
+    @app.route('/api/kb_table-import', methods=['POST'])
+    def import_data():
+        if 'file' not in request.files:
+            return jsonify({"message": "No file part in the request"}), 400
+
+        file = request.files['file']
+        if file.filename == "":
+            return jsonify({"message": "No file selected"}), 400
+
+        try:
+            filename = file.filename.lower()
+            if filename.endswith('.csv'):
+                df = pd.read_csv(file)
+            elif filename.endswith(('.xls', '.xlsx')):
+                df = pd.read_excel(file)
+            else:
+                return jsonify({"message": "Unsupported file type"}), 400
+
+            required_columns = [
+                'entity_name', 'asset', 'itsm_ref', 'asset_details',
+                'status', 'reason', 'context', 'remarks'
+            ]
+            if not all(col in df.columns for col in required_columns):
+                return jsonify({
+                    "message": f"Missing required columns. Expected: {', '.join(required_columns)}"
+                }), 400
+
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            insert_query = """
+                INSERT INTO knowledge_base (
+                entity_name, asset, itsm_ref, asset_details,
+                status, reason, context, remarks
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """
+
+            for index, row in df.iterrows():
+                try:
+                    values = (
+                        row['entity_name'],
+                        row['asset'],
+                        row['itsm_ref'],
+                        row['asset_details'],
+                        row['status'],
+                        row['reason'],
+                        row['context'],
+                        row['remarks']
+                    )
+                    cursor.execute(insert_query, values)
+                    print(f"Inserted row {index}: {values}")
+                except Exception as insert_error:
+                    print(f"Error inserting row {index}: {insert_error}")
+                    conn.rollback()
+                    return jsonify({"message": f"Error inserting row {index}: {str(insert_error)}"}), 500
+
+            conn.commit()
+            return jsonify({"message": "Import successful!"}), 200
+
+        except Exception as e:
+            conn.rollback()
+            print(f"Error: {str(e)}")
+            return jsonify({"message": str(e)}), 500
+
+        finally:
+            cursor.close()
+            conn.close()

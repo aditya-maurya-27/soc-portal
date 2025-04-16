@@ -1,10 +1,11 @@
 .shifts-wrapper {
   display: flex;
+  flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
   padding: 0;
   margin: 0;
-  min-height: 90%;
+  min-height: 90vh; /* Changed from 90% to viewport height */
   width: 100%;
 }
 
@@ -13,41 +14,80 @@
   height: 100%;
   padding: 15px;
   margin: 0;
+  flex-grow: 1; /* Allows calendar to expand */
 }
 
 .fc {
   min-height: 100%;
   min-width: 100%;
+  height: 100% !important; /* Force full height */
 }
 
+/* Increased slot height styles */
+.fc-timegrid-slots {
+  min-height: 90vh; /* Minimum height for slots area */
+}
+
+.fc-timegrid-slot {
+  height: 225px !important; /* Set fixed height for all slots */
+  min-height: 225px !important; /* Ensure minimum height */
+  max-height: 225px !important;
+}
+
+.fc-timegrid-event {
+  margin: 5px 2px;
+  font-size: 16px;
+  height: 20% !important; /* Fits better in taller slots */
+}
+
+/* Header and toolbar styles */
 .fc-header-toolbar {
   font-family: Calibri, sans-serif;
   padding: 0 !important;
-  margin: 0 0 10px 0 !important;
+  margin: 0 0 15px 0 !important; /* Slightly increased margin */
+}
+
+.fc-toolbar-title {
+  font-size: 28px;
+  color: #2b144d;
 }
 
 .fc-button {
   background-color: #2b144d !important;
   color: white !important;
-  border: none;
+  border: none !important;
   font-family: Calibri, sans-serif;
   font-weight: bold;
-  padding: 6px 12px;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
+  padding: 8px 14px !important; /* Slightly larger buttons */
+  border-radius: 4px !important;
+  transition: all 0.3s ease !important;
+  font-size: 0.9em !important;
+  height: auto !important;
 }
 
 .fc-button:hover {
   background-color: #ce95ff !important;
   cursor: pointer;
+  transform: translateY(-1px);
 }
 
 .fc-button-active {
   background-color: #deacff !important;
   color: white !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* ====== Modal Styles ====== */
+/* Day cell styles */
+.fc-col-header-cell {
+  background-color: #f5f0ff;
+  padding: 10px 0;
+}
+
+.fc-day-today {
+  background-color: #f0e6ff !important;
+}
+
+/* Modal styles (unchanged but better organized) */
 .modal {
   background: #ffffff;
   padding: 25px 30px;
@@ -87,6 +127,7 @@
   border: 1px solid #ccc;
   border-radius: 6px;
   resize: none;
+  min-height: 120px;
 }
 
 .modal button {
@@ -99,11 +140,12 @@
   border-radius: 4px;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .modal button:hover {
   background-color: #471a6f;
+  transform: translateY(-1px);
 }
 
 .modal p {
@@ -112,7 +154,7 @@
   margin-top: 10px;
 }
 
-/* Fade-in animation */
+/* Animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -121,5 +163,27 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .fc-toolbar {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .fc-toolbar-title {
+    font-size: 1.2em !important;
+  }
+  
+  .fc-button {
+    padding: 6px 10px !important;
+    font-size: 0.8em !important;
+  }
+  
+  .fc-timegrid-slot {
+    height: 80px !important;
+    min-height: 80px !important;
   }
 }

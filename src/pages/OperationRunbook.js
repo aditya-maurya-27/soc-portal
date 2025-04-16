@@ -121,7 +121,7 @@ function OperationRunbook() {
       <div className="client-details">
         {selectedClient && (
           <>
-            <h2>{selectedClientName} - ORB</h2>
+            <h2>Client: {selectedClientName}</h2>
 
             <div className="tab-buttons">
               <button 

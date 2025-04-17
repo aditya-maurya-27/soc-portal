@@ -12,7 +12,7 @@
   width: 100%;
   max-width: 100%;
   background-color: #fff;
-  padding: 10px 5px 5px 5px;
+  padding: 7px 15px 15px 15px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow-x: auto;
@@ -22,7 +22,7 @@
   display: flex;
   gap: 10px;
   width:100%;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   align-items: center;
   flex-wrap: wrap;
   
@@ -71,7 +71,7 @@
   background-color: #f0f0f0;
 }
 .dropdown-button:hover{
-  background-color: #e7bbff;
+  background-color: #e2acff;
   color:white;
   border:none;
 }
@@ -82,7 +82,7 @@
   min-width: 180px;
   padding: 10px 12px;
   font-size: 16px;
-  border: 1px solid hsl(288, 100%, 56%);
+  border: 1px solid hsl(288, 100%, 27%);
   border-radius: 6px;
 }
 
@@ -106,27 +106,27 @@
   justify-content: center;
   margin-top:0px;
   background-color: #fff;
-  color: #d92fff;
-  border: 1px solid hsl(288, 100%, 56%);
+  color: #9400b6;
+  border: 1px solid hsl(288, 100%, 21%);
 }
 .kb-imp{
   display:flex;
   justify-content: center;
   align-items: center;
-  margin-top: 5px;
+  margin-top: 0px;
   font-size: 14px;
   border-radius: 6px;
   white-space: nowrap;
   padding: 10px 14px;
   font-weight: 100;
   background-color: #fff;
-  color: #d92fff;
-  border: 1px solid hsl(288, 100%, 56%);
+  color: #6b0083;
+  border: 1px solid hsl(288, 100%, 20%);
 }
 .kb-imp:hover{
   background-color: #e7bbff;
   color: #fff;
-  border: none;
+  border: #e7bbff;
 }
 
 .kb-button:hover {
@@ -273,62 +273,4 @@
 
 
 
-/* Media Query: Tablet */
-@media screen and (max-width: 1024px) {
-  .kb-input {
-    font-size: 15px;
-  }
 
-  .kb-button,
-  .kb-button-outline {
-    font-size: 13px;
-  }
-
-  .kb-table th,
-  .kb-table td {
-    font-size: 13px;
-    padding: 10px;
-  }
-}
-
-/* Media Query: Mobile */
-@media screen and (max-width: 768px) {
-  .kb-search-bar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .kb-input,
-  .kb-button,
-  .kb-button-outline {
-    width: 100%;
-  }
-
-  .kb-table {
-    display: block;
-    overflow-x: auto;
-    font-size: 13px;
-  }
-
-  .kb-table th,
-  .kb-table td {
-    padding: 8px;
-  }
-}
-
-/* Extra small devices */
-@media screen and (max-width: 480px) {
-  .kb-table {
-    font-size: 12px;
-  }
-
-  .kb-input {
-    font-size: 14px;
-  }
-
-  .kb-button {
-    font-size: 12px;
-    padding: 8px 10px;
-    
-  }
-}

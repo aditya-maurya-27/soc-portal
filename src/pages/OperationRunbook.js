@@ -112,19 +112,20 @@ function OperationRunbook() {
                 setSelectedClientName(client.name);
               }}
             >
-              {client.name}
+              🟣 {client.name}
             </li>
           ))}
         </ul>
+
       </div>
 
       <div className="client-details">
         {selectedClient && (
           <>
-            <h2>Client: {selectedClientName}</h2>
+            <p className="client-text">{selectedClientName}</p>
 
             <div className="tab-buttons">
-              <button 
+              <button
                 onClick={() => setActiveTab("Assets")}
                 className={activeTab === "Assets" ? "active" : ""}
               >
@@ -182,7 +183,9 @@ function OperationRunbook() {
                 {escalationData.length > 0 ? (
                   escalationData.map((escalation, idx) => (
                     <div key={idx} className="escalation-card">
-                      <h3>Level: {escalation.level}</h3>
+                      <p><strong>Level:</strong> {escalation.level}
+
+                      </p>
                       <p>
                         <strong>Contact Name:</strong> {escalation.contact_name}
                       </p>

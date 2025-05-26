@@ -1,6 +1,6 @@
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
-SECRET_KEY = "your-secret-key"  # 🔐 Keep this secret
+SECRET_KEY = "adityamaurya"  # Keep this secret
 TOKEN_EXPIRY_SECONDS = 10000
 
 serializer = URLSafeTimedSerializer(SECRET_KEY)

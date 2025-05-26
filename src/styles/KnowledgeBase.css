@@ -1,6 +1,8 @@
 .kb-container {
   padding: 10px;
   display: flex;
+  width: 100%;
+  height: auto;
   justify-content: center;
 }
 .buttoncon{
@@ -11,21 +13,21 @@
 .kb-card {
   width: 100%;
   max-width: 100%;
-  background-color: #fff;
+  background-color: #424242;
   padding: 7px 15px 15px 15px;
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow-x: auto;
+  border: 1px solid #ccc;
 }
 
-.kb-search-bar {
+.tool-bar {
   display: flex;
   gap: 10px;
   width:100%;
   margin-bottom: 5px;
   align-items: center;
   flex-wrap: wrap;
-  
 }
 
 
@@ -77,13 +79,15 @@
 }
 
 
-.kb-input {
+.search-bar {
   flex: 1 1 250px;
   min-width: 180px;
   padding: 10px 12px;
   font-size: 16px;
-  border: 1px solid hsl(288, 100%, 27%);
+  border: 1px solid #ccc;
   border-radius: 6px;
+  color: white;
+  background-color: #666;
 }
 
 .kb-button,
@@ -185,8 +189,11 @@
 
 .kb-table {
   width: 100%;
+  height: auto;
   border-collapse: collapse;
   font-size: 14px;
+  color: white;
+  background-color: #666;
 }
 
 .kb-table th,

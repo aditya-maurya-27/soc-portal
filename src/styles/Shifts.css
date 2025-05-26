@@ -12,9 +12,10 @@
 .shifts-calendar {
   width: 100%;
   max-width: 100%;
-  background-color: #fff;
+  background-color: #424242;
   padding: 15px 15px 15px 15px;
   border-radius: 12px;
+  border: 1px solid #9e9e9e;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow-x: auto;
 }
@@ -25,24 +26,89 @@
   height: 100% !important; 
 }
 
-/* Increased slot height styles */
 .fc-timegrid-slots {
   min-height: 80vh; /* Minimum height for slots area */
 }
 
 .fc-timegrid-slot {
-  height: 275px !important; /* Set fixed height for all slots */
+  position: relative !important;  
+  height: 300px !important; /* Set fixed height for all slots */
   min-height: 275px !important; /* Ensure minimum height */
-  max-height: 275px !important;
+  max-height: 400px !important;
+  overflow: visible !important;
+}
+
+.fc-timegrid-slot-label {
+  display: flex;
+  width: 85px;
+  align-items: center;         /* Vertically center the text */
+  justify-content: center;     /* Horizontally center the text */
+  font-family: Calibri, sans-serif;
+  font-size: 18px;
+  background-color: #666;
+  color: white;
+  padding: 0 10px;              /* Reduced padding to prevent overflow */
+  text-align: center;
+}
+
+.fc-scrollgrid-section-header th:first-child {
+  background-color: #666 !important;
 }
 
 .fc-timegrid-event {
-  margin: 5px 2px;
-  font-size: 16px;
-  height: 20% !important; /* Fits better in taller slots */
+  position: relative !important;
+  height: 290px !important;
+  width: 99.5% !important;
+  left: 0 !important;
+  display: block !important;
+  margin: 4px 0px 0px 2px !important;
+  min-height: 25px !important;
+  z-index: auto !important;
+  align-items: center !important;
+  padding: 3px 5px 2px 5px !important;
+  box-sizing: border-box !important;
+  font-size: 15px !important;
+  border-radius: 5px !important;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Header and toolbar styles */
+.fc-daygrid-event {
+  position: relative !important;
+  height: auto !important;
+  width: auto !important;
+  left: 0 !important;
+  display: block !important;
+  margin: 0px 5px 3px 5px !important;
+  z-index: auto !important;
+  align-items: center !important;
+  border: 1px solid #9e9e9e !important;
+  padding: 2px 5px 2px 5px !important;
+  box-sizing: border-box !important;
+  font-size: 15px !important;
+  border-radius: 5px !important;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.fc-daygrid-day-top {
+  color: white;
+}
+
+.fc-daygrid-event:hover {
+  background-color: #2b144d  !important;
+  box-shadow: #f3ff86 0px 0px 20px !important;
+}
+
+.fc-timegrid-event:hover {
+  background-color: #2b144d  !important;
+  box-shadow: #f3ff86 0px 0px 20px !important;
+}
+
+.fc-timegrid-event-harness{
+  width: 100% !important;
+  left: 0 !important;
+  display: block !important;
+}
+
 .fc-header-toolbar {
   font-family: Calibri, sans-serif;
   padding: 0 !important;
@@ -51,47 +117,48 @@
 
 .fc-toolbar-title {
   font-size: 28px;
-  color: #2b144d;
+  color: white;
 }
 
+
 .fc-button {
-  background-color: #2b144d !important;
+  background-color: #6832ba !important;
   color: white !important;
-  border: none !important;
+  border: 1px solid white !important;
   font-family: Calibri, sans-serif;
-  font-weight: bold;
-  padding: 8px 14px !important; /* Slightly larger buttons */
-  border-radius: 4px !important;
+  font-size: 18px !important;
+  padding: 5px 16px !important; /* Slightly larger buttons */
+  border-radius: 10px !important;
+  margin: 0px 3px 0px 3px !important;
   transition: all 0.3s ease !important;
-  font-size: 0.9em !important;
   height: auto !important;
 }
 
 .fc-button:hover {
-  background-color: #ce95ff !important;
+  background-color: #278184 !important;
   cursor: pointer;
   transform: translateY(-1px);
 }
 
 .fc-button-active {
-  background-color: #deacff !important;
+  background-color: #278184 !important;
   color: white !important;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 /* Day cell styles */
 .fc-col-header-cell {
-  background-color: #f5f0ff;
+  background-color: #666;
   padding: 10px 0;
+  color: white;
 }
 
 .fc-day-today {
-  background-color: #f0e6ff !important;
+  background-color: #278184 !important;
 }
 
-/* Modal styles (unchanged but better organized) */
 .modal {
-  background: #ffffff;
+  background: #424242;
   padding: 25px 30px;
   max-width: 500px;
   width: 90%;
@@ -110,7 +177,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   z-index: 999;
 }
 
@@ -168,24 +235,21 @@
   }
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .fc-toolbar {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .fc-toolbar-title {
-    font-size: 1.2em !important;
-  }
-  
-  .fc-button {
-    padding: 6px 10px !important;
-    font-size: 0.8em !important;
-  }
-  
-  .fc-timegrid-slot {
-    height: 80px !important;
-    min-height: 80px !important;
-  }
+.add-shift-btn {
+  background-color: #6832ba;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0px 0px 15px 2px;
+  transition: all 0.3s ease;
 }
+
+.add-shift-btn:hover {
+  background-color: #278184;
+  transform: translateY(-1px);
+}
+

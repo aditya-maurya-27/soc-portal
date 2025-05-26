@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../styles/OperationRunbook.css";
 
-function OperationRunbook() {
+export default function OperationRunbook() {
   const [clients, setClients] = useState([]);
   const [originalClients, setOriginalClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState(null);
@@ -12,86 +12,129 @@ function OperationRunbook() {
   const [escalationData, setEscalationData] = useState([]);
   const [activeTab, setActiveTab] = useState("Assets");
 
+  const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
+  const [newClientName, setNewClientName] = useState("");
+
+  const [isAddEntryModalOpen, setIsAddEntryModalOpen] = useState(false);
+  const [newAsset, setNewAsset] = useState({
+    asset_name: "", location: "", ip_address: "",
+    mode: "", asset_type: "", asset_owner: "", remarks: ""
+  });
+  const [newEscalation, setNewEscalation] = useState({
+    level: "", contact_name: "", contact_email: "",
+    contact_number: "", sla_response_hours: "", sla_resolution_hours: ""
+  });
+
+  const isAdmin = localStorage.getItem("isAdmin") === "true";
+
   useEffect(() => {
-    fetch("http://192.168.1.49:5000/api/clients")
-      .then((res) => res.json())
-      .then((data) => {
-        const transformedClients = data.map(([id, name]) => ({ id, name }));
-        setClients(transformedClients);
-        setOriginalClients(transformedClients);
+    fetch("http://192.168.29.194:5000/api/clients")
+      .then(res => res.json())
+      .then(data => {
+        const formatted = data.map(([id, name]) => ({ id, name }));
+        setClients(formatted);
+        setOriginalClients(formatted);
       })
-      .catch((error) => console.error("Error fetching clients:", error));
+      .catch(console.error);
   }, []);
 
   useEffect(() => {
     if (selectedClient) {
-      fetch(`http://192.168.1.49:5000/api/client-assets?client=${selectedClient}`)
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("API Response Assets:", data);
-
-          const transformedData = data.map((assetArray) => ({
-            id: assetArray[0],
-            client_id: assetArray[1],
-            asset_name: assetArray[2],
-            location: assetArray[3],
-            ip_address: assetArray[4],
-            mode: assetArray[5],
-            asset_type: assetArray[6],
-            asset_owner: assetArray[7],
-            remarks: assetArray[8],
-          }));
-
-          setAssetData(transformedData);
-          setFilteredAssets(transformedData);
-          setFilters({ assetType: "", mode: "" });
-        })
-        .catch((error) => console.error("Error fetching assets:", error));
-
-      fetch(`http://192.168.1.49:5000/api/escalation-matrix?client=${selectedClient}`)
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("API Response Escalation:", data);
-
-          const transformedData = data.map((item) => ({
-            id: item[0],
-            client_id: item[1],
-            level: item[2],
-            contact_name: item[3],
-            contact_email: item[4],
-            contact_number: item[5],
-            sla_response_hours: item[6],
-            sla_resolution_hours: item[7],
-          }));
-
-          setEscalationData(transformedData);
-        })
-        .catch((error) => console.error("Error fetching escalation data:", error));
+      fetchAssetsAndEscalation(selectedClient);
     }
   }, [selectedClient]);
+
+  const fetchAssetsAndEscalation = (clientId) => {
+    fetch(`http://192.168.29.194:5000/api/assets?client=${clientId}`)
+      .then(res => res.json())
+      .then(data => {
+        setAssetData(data);
+        setFilteredAssets(data);
+      })
+      .catch(error => {
+        console.error("Error fetching assets:", error);
+        setAssetData([]);
+        setFilteredAssets([]);
+      });
+
+    fetch(`http://192.168.29.194:5000/api/escalation-matrix?client=${clientId}`)
+      .then(res => res.json())
+      .then(data => {
+        const formattedEscalations = data.map(e => ({
+          id: e[0], client_id: e[1], level: e[2],
+          contact_name: e[3], contact_email: e[4],
+          contact_number: e[5], sla_response_hours: e[6],
+          sla_resolution_hours: e[7],
+        }));
+        setEscalationData(formattedEscalations);
+      });
+  };
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     const updatedFilters = { ...filters, [name]: value };
     setFilters(updatedFilters);
 
-    const filtered = assetData.filter((asset) => {
-      return (
-        (updatedFilters.assetType === "" || asset.asset_type === updatedFilters.assetType) &&
-        (updatedFilters.mode === "" || asset.mode === updatedFilters.mode)
-      );
-    });
-
+    const filtered = assetData.filter(asset =>
+      (!updatedFilters.assetType || asset.asset_type === updatedFilters.assetType) &&
+      (!updatedFilters.mode || asset.mode === updatedFilters.mode)
+    );
     setFilteredAssets(filtered);
   };
 
   const handleSearchChange = (e) => {
-    const searchValue = e.target.value.toLowerCase();
-    setClients(
-      originalClients.filter((client) =>
-        client.name.toLowerCase().includes(searchValue)
-      )
-    );
+    const search = e.target.value.toLowerCase();
+    const filtered = originalClients.filter(c => c.name.toLowerCase().includes(search));
+    setClients(filtered);
+  };
+
+  const handleAddClient = async () => {
+    if (!newClientName.trim()) return;
+    const res = await fetch("http://192.168.29.194:5000/api/clients", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newClientName }),
+    });
+    if (res.ok) {
+      const added = await res.json();
+      const newEntry = { id: added.id, name: added.name };
+      setClients(prev => [...prev, newEntry]);
+      setOriginalClients(prev => [...prev, newEntry]);
+      setNewClientName("");
+      setIsAddClientModalOpen(false);
+    }
+  };
+
+  const handleAddAsset = async () => {
+    const res = await fetch("http://192.168.29.194:5000/api/assets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ client_id: selectedClient, ...newAsset }),
+    });
+    if (res.ok) {
+      const tempId = Date.now();
+      const added = { id: tempId, client_id: selectedClient, ...newAsset };
+      setAssetData(prev => [...prev, added]);
+      setFilteredAssets(prev => [...prev, added]);
+      setNewAsset({ asset_name: "", location: "", ip_address: "", mode: "", asset_type: "", asset_owner: "", remarks: "" });
+      setIsAddEntryModalOpen(false);
+      fetchAssetsAndEscalation(selectedClient);
+    } else {
+      console.error("Error adding asset");
+    }
+  };
+
+  const handleAddEscalation = async () => {
+    const res = await fetch("http://192.168.29.194:5000/api/escalation-matrix", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ client_id: selectedClient, ...newEscalation }),
+    });
+    if (res.ok) {
+      fetchAssetsAndEscalation(selectedClient);
+      setNewEscalation({ level: "", contact_name: "", contact_email: "", contact_number: "", sla_response_hours: "", sla_resolution_hours: "" });
+      setIsAddEntryModalOpen(false);
+    }
   };
 
   return (
@@ -103,118 +146,159 @@ function OperationRunbook() {
           placeholder="Search clients..."
           onChange={handleSearchChange}
         />
+        {isAdmin && (
+          <button onClick={() => setIsAddClientModalOpen(true)} className="add-client-btn">
+            Add Client
+          </button>
+        )}
         <ul className="client-list">
-          {clients.map((client) => (
-            <li
-              key={client.id}
-              onClick={() => {
-                setSelectedClient(client.id);
-                setSelectedClientName(client.name);
-              }}
-            >
+          {clients.map(client => (
+            <li key={client.id} onClick={() => { setSelectedClient(client.id); setSelectedClientName(client.name); }}>
               🟣 {client.name}
             </li>
           ))}
         </ul>
-
       </div>
-
       <div className="client-details">
         {selectedClient && (
           <>
             <p className="client-text">{selectedClientName}</p>
-
             <div className="tab-buttons">
-              <button
-                onClick={() => setActiveTab("Assets")}
-                className={activeTab === "Assets" ? "active" : ""}
-              >
-                Assets
-              </button>
-              <button
-                onClick={() => setActiveTab("Escalation Matrix")}
-                className={activeTab === "Escalation Matrix" ? "active" : ""}
-              >
-                Escalation Matrix
-              </button>
+              <button onClick={() => setActiveTab("Assets")} className={activeTab === "Assets" ? "active" : ""}>Assets</button>
+              <button onClick={() => setActiveTab("Escalation Matrix")} className={activeTab === "Escalation Matrix" ? "active" : ""}>Escalation Matrix</button>
+              {isAdmin && (
+                <button onClick={() => setIsAddEntryModalOpen(true)} className="add-entry-btn">
+                  Add Entry
+                </button>
+              )}
             </div>
-
             {activeTab === "Assets" && (
               <>
                 <div className="filters">
-                  <select
-                    name="assetType"
-                    value={filters.assetType}
-                    onChange={handleFilterChange}
-                  >
+                  <select name="assetType" value={filters.assetType} onChange={handleFilterChange}>
                     <option value="">All Asset Types</option>
-                    <option value="Server">Server</option>
-                    <option value="Workstation">Workstation</option>
-                    <option value="Router">Router</option>
+                    <option value="Linux">Linux</option>
+                    <option value="Window">Window</option>
+                    <option value="Network Appliance">Network Appliance</option>
                   </select>
-
                   <select name="mode" value={filters.mode} onChange={handleFilterChange}>
                     <option value="">All Modes</option>
                     <option value="RDP">RDP</option>
                     <option value="SSH">SSH</option>
                   </select>
                 </div>
-
-                {filteredAssets.length > 0 ? (
-                  filteredAssets.map((asset, idx) => (
-                    <div key={idx} className="asset-card">
-                      <p><strong>Asset Name:</strong> {asset.asset_name}</p>
-                      <p><strong>Location:</strong> {asset.location}</p>
-                      <p><strong>IP Address:</strong> {asset.ip_address}</p>
-                      <p><strong>Mode:</strong> {asset.mode}</p>
-                      <p><strong>Asset Type:</strong> {asset.asset_type}</p>
-                      <p><strong>Asset Owner:</strong> {asset.asset_owner}</p>
-                      <p><strong>Remarks:</strong> {asset.remarks}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p>No matching assets found.</p>
-                )}
+                <table className="asset-table">
+                  <thead>
+                    <tr>
+                      <th>Asset Name</th>
+                      <th>Location</th>
+                      <th>IP Address</th>
+                      <th>Mode</th>
+                      <th>Type</th>
+                      <th>Owner</th>
+                      <th>Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredAssets.map((asset, idx) => (
+                      <tr key={idx}>
+                        <td>{asset.asset_name}</td>
+                        <td>{asset.location}</td>
+                        <td>{asset.ip_address}</td>
+                        <td>{asset.mode}</td>
+                        <td>{asset.asset_type}</td>
+                        <td>{asset.asset_owner}</td>
+                        <td>{asset.remarks}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </>
             )}
-
             {activeTab === "Escalation Matrix" && (
-              <div className="escalation-matrix">
-                {escalationData.length > 0 ? (
-                  escalationData.map((escalation, idx) => (
-                    <div key={idx} className="escalation-card">
-                      <p><strong>Level:</strong> {escalation.level}
-
-                      </p>
-                      <p>
-                        <strong>Contact Name:</strong> {escalation.contact_name}
-                      </p>
-                      <p>
-                        <strong>Contact Email:</strong> {escalation.contact_email}
-                      </p>
-                      <p>
-                        <strong>Contact Number:</strong> {escalation.contact_number}
-                      </p>
-                      <p>
-                        <strong>Response SLA (Hours):</strong>{" "}
-                        {escalation.sla_response_hours}
-                      </p>
-                      <p>
-                        <strong>Resolution SLA (Hours):</strong>{" "}
-                        {escalation.sla_resolution_hours}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <p>No escalation data found.</p>
-                )}
-              </div>
+              <table className="asset-table">
+                <thead>
+                  <tr>
+                    <th>Level</th>
+                    <th>Contact Name</th>
+                    <th>Email Address</th>
+                    <th>Phone No.</th>
+                    <th>SLA Response Time</th>
+                    <th>SLA Resolution Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {escalationData.map((row, i) => (
+                    <tr key={i}>
+                      <td>{row.level}</td>
+                      <td>{row.contact_name}</td>
+                      <td>{row.contact_email}</td>
+                      <td>{row.contact_number}</td>
+                      <td>{row.sla_response_hours}</td>
+                      <td>{row.sla_resolution_hours}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </>
         )}
       </div>
+
+      {isAddClientModalOpen && (
+        <div className="modal-backdrop">
+          <div className="modal">
+            <h3>Add New Client</h3>
+            <input
+              type="text"
+              value={newClientName}
+              onChange={e => setNewClientName(e.target.value)}
+              placeholder="Client Name"
+            />
+            <div className="modal-buttons">
+              <button onClick={handleAddClient}>Save</button>
+              <button onClick={() => setIsAddClientModalOpen(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isAddEntryModalOpen && (
+        <div className="modal-backdrop">
+          <div className="modal">
+            {activeTab === "Assets" ? (
+              <>
+                <h3>Add New Asset</h3>
+                <input value={newAsset.asset_name} onChange={e => setNewAsset(prev => ({ ...prev, asset_name: e.target.value }))} placeholder="Asset Name" />
+                <input value={newAsset.location} onChange={e => setNewAsset(prev => ({ ...prev, location: e.target.value }))} placeholder="Location" />
+                <input value={newAsset.ip_address} onChange={e => setNewAsset(prev => ({ ...prev, ip_address: e.target.value }))} placeholder="IP Address" />
+                <input value={newAsset.mode} onChange={e => setNewAsset(prev => ({ ...prev, mode: e.target.value }))} placeholder="Mode" />
+                <input value={newAsset.asset_type} onChange={e => setNewAsset(prev => ({ ...prev, asset_type: e.target.value }))} placeholder="Asset Type" />
+                <input value={newAsset.asset_owner} onChange={e => setNewAsset(prev => ({ ...prev, asset_owner: e.target.value }))} placeholder="Asset Owner" />
+                <input value={newAsset.remarks} onChange={e => setNewAsset(prev => ({ ...prev, remarks: e.target.value }))} placeholder="Remarks" />
+                <div className="modal-buttons">
+                  <button onClick={handleAddAsset}>Save</button>
+                  <button onClick={() => setIsAddEntryModalOpen(false)}>Cancel</button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3>Add Escalation Contact</h3>
+                <input value={newEscalation.level} onChange={e => setNewEscalation(prev => ({ ...prev, level: e.target.value }))} placeholder="Level" />
+                <input value={newEscalation.contact_name} onChange={e => setNewEscalation(prev => ({ ...prev, contact_name: e.target.value }))} placeholder="Contact Name" />
+                <input value={newEscalation.contact_email} onChange={e => setNewEscalation(prev => ({ ...prev, contact_email: e.target.value }))} placeholder="Contact Email" />
+                <input value={newEscalation.contact_number} onChange={e => setNewEscalation(prev => ({ ...prev, contact_number: e.target.value }))} placeholder="Contact Number" />
+                <input value={newEscalation.sla_response_hours} onChange={e => setNewEscalation(prev => ({ ...prev, sla_response_hours: e.target.value }))} placeholder="SLA Response Hours" />
+                <input value={newEscalation.sla_resolution_hours} onChange={e => setNewEscalation(prev => ({ ...prev, sla_resolution_hours: e.target.value }))} placeholder="SLA Resolution Hours" />
+                <div className="modal-buttons">
+                  <button onClick={handleAddEscalation}>Save</button>
+                  <button onClick={() => setIsAddEntryModalOpen(false)}>Cancel</button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-export default OperationRunbook;

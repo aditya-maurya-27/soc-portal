@@ -84,6 +84,7 @@ def setup_routes(app):
         else:
             return jsonify({"error": "Invalid or expired token"}), 401
 
+
     @app.route('/api/shifts', methods=['GET'])
     def get_shifts():
         conn = get_db_connection()
@@ -100,25 +101,14 @@ def setup_routes(app):
         cursor.execute(query)
         results = cursor.fetchall()
 
-        shift_colors = {
-            "morning": "#28a745",   # green
-            "evening": "#ffc107",   # yellow
-            "night": "#007bff"      # blue
-        }
-
         shifts = []
         for row in results:
-            # Ensure both times are strings before parsing
             start_time_obj = datetime.strptime(str(row['start_time']), "%H:%M:%S").time()
             end_time_obj = datetime.strptime(str(row['end_time']), "%H:%M:%S").time()
-
-            # row['date'] is already a datetime.date object from MySQL
             shift_date = row['date']
-
             start_datetime = datetime.combine(shift_date, start_time_obj)
 
             if row['shift_type'] == "night" and end_time_obj < start_time_obj:
-                # Ends next day
                 end_datetime = datetime.combine(shift_date + timedelta(days=1), end_time_obj)
             else:
                 end_datetime = datetime.combine(shift_date, end_time_obj)
@@ -128,12 +118,13 @@ def setup_routes(app):
                 "title": f"{row['shift_type'].capitalize()} Shift - {row['employees'] or 'No One'}",
                 "start": start_datetime.strftime("%Y-%m-%dT%H:%M:%S"),
                 "end": end_datetime.strftime("%Y-%m-%dT%H:%M:%S"),
-                "backgroundColor": shift_colors.get(row['shift_type'], "#6c757d"),
-                "borderColor": shift_colors.get(row['shift_type'], "#6c757d"),
-                "textColor": "#fff"
+                "shift_type": row['shift_type'],  # Keep this so frontend can color based on it
+                "employees": row['employees'].split(', ') if row['employees'] else []
             })
+
         return jsonify(shifts)
-    
+
+
     @app.route('/api/user_shifts/<int:user_id>', methods=['GET'])
     def get_user_shifts(user_id):
         conn = get_db_connection()
@@ -162,6 +153,7 @@ def setup_routes(app):
 
         return jsonify(shifts)
 
+
     @app.route("/api/analysts")
     def get_analysts():
         try:
@@ -183,6 +175,7 @@ def setup_routes(app):
         finally:
             if conn:
                 conn.close()
+
 
     @app.route('/api/create_shift', methods=['POST'])
     def create_shift():
@@ -247,8 +240,6 @@ def setup_routes(app):
             return jsonify({"error": str(err)}), 500
 
 
-
-    # Edit Route
     @app.route('/api/edit_shift', methods=['PUT'])
     def edit_shift():
         data = request.get_json()
@@ -326,29 +317,7 @@ def setup_routes(app):
 
         except Exception as e:
             return jsonify({'error': str(e)}), 500
-        
-    @app.route("/api/clients", methods=["GET"])
-    def get_clients():
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM clients")
-        return jsonify(cursor.fetchall())
 
-    @app.route("/api/client-assets", methods=["GET"])
-    def get_assets():
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        client_id = request.args.get("client")
-        cursor.execute("SELECT * FROM client_assets WHERE client_id = %s", (client_id,))
-        return jsonify(cursor.fetchall())
-
-    @app.route("/api/escalation-matrix", methods=["GET"])
-    def get_escalation():
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        client_id = request.args.get("client")
-        cursor.execute("SELECT * FROM escalation_matrix WHERE client_id = %s", (client_id,))
-        return jsonify(cursor.fetchall())
     
     @app.route('/api/kb-search', methods=['GET'])
     def search():
@@ -517,3 +486,118 @@ def setup_routes(app):
         finally:
             cursor.close()
             conn.close()
+
+    @app.route("/api/clients", methods=["GET", "POST"])
+    def clients():
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        if request.method == "GET":
+            cursor.execute("SELECT * FROM clients")
+            return jsonify(cursor.fetchall())
+
+        if request.method == "POST":
+            data = request.get_json()
+            name = data.get("name")
+
+        if not name:
+            return jsonify({"error": "Client name is required"}), 400
+
+        cursor.execute("INSERT INTO clients (name) VALUES (%s)", (name,))
+        conn.commit()
+
+        client_id = cursor.lastrowid
+        return jsonify({"id": client_id, "name": name}), 201
+    
+    @app.route("/api/assets", methods=["GET", "POST"])
+    def assets():
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)  
+
+        try:
+            if request.method == "GET":
+                client_id = request.args.get("client")
+                if not client_id:
+                    return jsonify({"error": "client_id is required in query parameters"}), 400
+
+                cursor.execute("SELECT * FROM client_assets WHERE client_id = %s", (client_id,))
+                assets = cursor.fetchall()
+                conn.close()
+                if not assets:
+                    return jsonify({"message": "No assets found for this client"}), 404
+                return jsonify(assets), 200
+
+            elif request.method == "POST":
+                data = request.get_json()
+
+                required_fields = ["asset_name", "location", "ip_address", "mode", "asset_type", "asset_owner", "client_id"]
+                missing_fields = [field for field in required_fields if not data.get(field)]
+                if missing_fields:
+                    return jsonify({"error": f"Missing fields: {', '.join(missing_fields)}"}), 400
+
+                asset_name = data.get("asset_name")
+                location = data.get("location")
+                ip_address = data.get("ip_address")
+                mode = data.get("mode")
+                asset_type = data.get("asset_type")
+                asset_owner = data.get("asset_owner")
+                remarks = data.get("remarks", "")  # remarks is optional
+                client_id = data.get("client_id")
+
+                cursor.execute(
+                    """
+                    INSERT INTO client_assets 
+                    (asset_name, location, ip_address, mode, asset_type, asset_owner, remarks, client_id)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    """,
+                    (asset_name, location, ip_address, mode, asset_type, asset_owner, remarks, client_id)
+                )
+
+                conn.commit()
+                return jsonify({"message": "Asset added successfully"}), 201
+
+        except mysql.connector.Error as err:
+            conn.rollback()
+            return jsonify({"error": f"MySQL Error: {str(err)}"}), 500
+
+        except Exception as e:
+            conn.rollback()
+            return jsonify({"error": f"Unexpected Error: {str(e)}"}), 500
+
+        finally:
+            cursor.close()
+            conn.close()
+
+    @app.route("/api/escalation-matrix", methods=["GET", "POST"])
+    def escalation_matrix():
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        if request.method == "GET":
+            client_id = request.args.get("client")
+            cursor.execute("SELECT * FROM escalation_matrix WHERE client_id = %s", (client_id,))
+            escalation = cursor.fetchall()
+            conn.close()
+            return jsonify(escalation)
+
+        if request.method == "POST":
+            data = request.get_json()
+            client_id = data.get("client_id")
+            level = data.get("level")
+            engineer_name = data.get("contact_name")
+            email = data.get("contact_email")
+            phone = data.get("contact_number")
+            sla_response = data.get("sla_response_hours")
+            sla_resolution = data.get("sla_resolution_hours")
+
+            cursor.execute(
+                """
+                INSERT INTO escalation_matrix 
+                (client_id, level, contact_name, contact_email, contact_number, sla_response_hours, sla_resolution_hours)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """,
+                (client_id, level, engineer_name, email, phone, sla_response, sla_resolution)
+            )
+            conn.commit()
+            conn.close()
+            return jsonify({"message": "Escalation matrix entry added successfully"}), 201

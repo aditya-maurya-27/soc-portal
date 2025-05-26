@@ -1,6 +1,6 @@
 db_config = {
     "host": "localhost",
     "user": "root", 
-    "passwd": "12345", 
+    "passwd": "2707", 
     "database": "soc"
 }

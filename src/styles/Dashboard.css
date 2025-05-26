@@ -6,14 +6,40 @@
     align-items: center;
     font-size: 22px;
     height: 30px;
-    background-color: rgb(239, 209, 255);
-    padding-left: 10px;
+    background-color: #278184;
+    padding-left: 15px;
 }
 
 .dashboard-container{
     display: flex;
     font-family: Calibri, sans-serif;
     flex-direction: column;
+    color: white;
     height: 100%;
+}
+
+.upcoming-shifts{
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+    height: 46%;
+    margin: 15px 15px 15px 15px;
+    border-radius: 5px;
+    background-color: #424242;
+    padding: 10px;
+    overflow-y: auto; /* enables scroll if content overflows vertically */
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    transition: box-shadow 0.3s ease;
+}
+
+.upcoming-shifts:hover{
+    box-shadow: #f3ff86 0px 0px 20px;
+}
+
+.upcoming-shifts ul {
+    margin: 0;
+    padding-left: 15px; /* keep bullets aligned */
+    list-style-type: disc;
 }
 

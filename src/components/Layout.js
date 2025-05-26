@@ -54,10 +54,10 @@ function Layout() {
             {!isAuthenticated ? (
               <>
                 <li>
-                  <button onClick={handleRegister} className="register-btn">Register</button>
+                  <button onClick={handleRegister} className="button"><span>Register</span></button>
                 </li>
                 <li>
-                  <button onClick={handleLogin} className="login-btn">Login</button>
+                  <button onClick={handleLogin} className="button"><span>Login</span></button>
                 </li>
               </>
             ) : (

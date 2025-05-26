@@ -16,7 +16,7 @@ const KnowledgeBase = () => {
     asset: "",
     itsm_ref: "",
     asset_details: "",
-    status: "Allowed",
+    status: "",
     reason: "",
     context: "",
     remarks: "",
@@ -30,7 +30,7 @@ const KnowledgeBase = () => {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("http://192.168.1.49:5000/api/kb-search");
+      const res = await fetch("http://192.168.29.194:5000/api/kb-search");
       const jsonData = await res.json();
       setData(jsonData);
       setCurrentPage(1); // reset to first page
@@ -46,7 +46,7 @@ const KnowledgeBase = () => {
     } else {
       try {
         const res = await fetch(
-          `http://192.168.1.49:5000/api/kb-search?query=${encodeURIComponent(query)}`
+          `http://192.168.29.194:5000/api/kb-search?query=${encodeURIComponent(query)}`
         );
         const jsonData = await res.json();
         cache.current.set(cacheKey, jsonData);
@@ -56,7 +56,7 @@ const KnowledgeBase = () => {
       }
     }
     setShowingSearch(true);
-    setCurrentPage(1); // reset to first page on search
+    setCurrentPage(1); 
   };
 
   const handleGoBack = () => {
@@ -72,7 +72,7 @@ const KnowledgeBase = () => {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://192.168.1.49:5000/api/kb_table-import", {
+      const res = await fetch("http://192.168.29.194:5000/api/kb_table-import", {
         method: "POST",
         body: formData,
       });
@@ -92,7 +92,7 @@ const KnowledgeBase = () => {
 
   const handleManualSubmit = async () => {
     try {
-      const res = await fetch("http://192.168.1.49:5000/api/kb_table-add", {
+      const res = await fetch("http://192.168.29.194:5000/api/kb_table-add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -127,7 +127,7 @@ const KnowledgeBase = () => {
     }
   };
 
-  // Pagination calculations
+  // Pagination logic 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
@@ -136,14 +136,14 @@ const KnowledgeBase = () => {
   return (
     <div className="kb-container">
       <div className="kb-card">
-        <div className="kb-search-bar">
+        <div className="tool-bar">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Search..."
-            className="kb-input"
+            placeholder="Search here..."
+            className="search-bar"
           />
           <button className="kb-button" onClick={handleSearch}>
             <Search size={16} /> Search
@@ -151,7 +151,7 @@ const KnowledgeBase = () => {
           
           <div className="dropdown">
             <button className="kb-button dropdown-toggle">
-              {sourceType} ▼
+              {sourceType}
             </button>
             <div className="dropdown-menu">
               <div onClick={() => setSourceType("Local")}>Local</div>

@@ -14,6 +14,57 @@ def setup_routes(app):
     def home():
         return jsonify({"message": "API is running!"})
     
+
+
+
+    @app.route('/api/update_cab_status', methods=['PATCH'])
+    def update_cab_status():
+        data = request.get_json()
+        shift_id = data.get("shift_id")
+        employee_id = data.get("employee_id")
+        cab_facility = data.get("cab_facility")  # "Yes" or "No"
+
+        if not all([shift_id, employee_id, cab_facility]):
+            return jsonify({"error": "Missing required fields"}), 400
+
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            query = """
+                UPDATE shift_employee_map
+                SET cab_facility = %s
+                WHERE shift_id = %s AND employee_id = %s
+            """
+            cursor.execute(query, (cab_facility, shift_id, employee_id))
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            return jsonify({"message": "Cab status updated successfully"}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    
+    @app.route('/api/shifts/<int:shift_id>/cab-status', methods=['GET'])
+    def get_cab_status(shift_id):
+        try:
+            conn=get_db_connection()
+            cursor=conn.cursor(dictionary=True)
+            query = """
+                SELECT u.id, u.username, sem.cab_facility
+                FROM shift_employee_map sem
+                JOIN users u ON sem.employee_id = u.id
+                WHERE sem.shift_id = %s
+            """
+            cursor.execute(query, (shift_id,))
+            employees = cursor.fetchall()
+            conn.close()
+            return jsonify(employees), 200
+        except Exception as e:
+            print("Error fetching employees for shift:", e)
+            return jsonify({'error': 'Internal Server Error'}), 500
+    
     @app.route("/api/login", methods=["POST", "OPTIONS"])
     def login():
         if request.method == "OPTIONS":
@@ -118,7 +169,7 @@ def setup_routes(app):
                 "title": f"{row['shift_type'].capitalize()} Shift - {row['employees'] or 'No One'}",
                 "start": start_datetime.strftime("%Y-%m-%dT%H:%M:%S"),
                 "end": end_datetime.strftime("%Y-%m-%dT%H:%M:%S"),
-                "shift_type": row['shift_type'],  # Keep this so frontend can color based on it
+                "shift_type": row['shift_type'],  # frontend can color based on it
                 "employees": row['employees'].split(', ') if row['employees'] else []
             })
 
@@ -227,8 +278,8 @@ def setup_routes(app):
 
                 if not already_assigned:
                     cursor.execute("""
-                        INSERT INTO shift_employee_map (shift_id, employee_id)
-                        VALUES (%s, %s)
+                        INSERT INTO shift_employee_map (shift_id, employee_id, cab_facility)
+                        VALUES (%s, %s, 'No')
                     """, (shift_id, emp_id))
 
             conn.commit()

@@ -48,10 +48,10 @@ function HomePage() {
         this.yC = this.height / 2;
 
         // Parameters for worm-like effect
-        this.lifespan = 1100;
+        this.lifespan = 1000;
         this.popPerBirth = 1;
         this.maxPop = 300;
-        this.birthFreq = 6;
+        this.birthFreq = 5;
         this.gridSize = 8;
         this.gridSteps = Math.floor(1000 / this.gridSize);
         this.grid = [];
@@ -127,7 +127,7 @@ function HomePage() {
         });
 
         const particle = {
-          hue: 270 + Math.sin(Date.now()) * 5000,
+          hue: 260 + Math.sin(Date.now()) * 5000,
           sat: 100,
           lum: 60,
           x: closestSpot.x,
@@ -157,7 +157,7 @@ function HomePage() {
           let gridSpot = this.grid[index];
 
           // Original worm movement logic
-          if (Math.random() < 0.25) {
+          if (Math.random() < 0.35) { //speeeeeeeeeeeeeeeeeeeeeeeeed
             if (!gridSpot.isEdge) {
               const topIndex = index - 1;
               const bottomIndex = index + 1;
@@ -280,7 +280,12 @@ function HomePage() {
       <div className="effect-area">
         <canvas ref={canvasRef} className="particle-canvas" />
         <div className="package">
-          <div className="package2"><p className="banner">CYBER VIGILANCE CENTRE</p></div>
+          <div className="package2">
+            <p className="banner">CYBER VIGILANCE CENTRE</p>
+            <div className="package-image-wrapper">
+              <img src="homepage-logo.png" alt="Company Logo" className="package-image" />
+            </div>
+          </div>
         </div>
       </div>
     </div>

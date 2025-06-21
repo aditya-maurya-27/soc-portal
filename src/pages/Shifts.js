@@ -18,7 +18,7 @@ const shiftTimeMapping = {
 const Shifts = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
-
+  const [cabStatusList, setCabStatusList] = useState([]);
   const [shifts, setShifts] = useState([]);
   const [selectedShift, setSelectedShift] = useState(null);
   const [comment, setComment] = useState("");
@@ -29,7 +29,7 @@ const Shifts = () => {
   const [newShiftType, setNewShiftType] = useState("Night");
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [analysts, setAnalysts] = useState([]);
-
+  const [cabOpted, setCabOpted] = useState(false);
   const [editShiftType, setEditShiftType] = useState("Night");
   const [editShiftDate, setEditShiftDate] = useState("");
   const [editEmployeeId, setEditEmployeeId] = useState("");
@@ -57,7 +57,30 @@ const Shifts = () => {
     );
   };
 
-  const handleEventClick = (info) => {
+  const isUserInShift = () => {
+    return cabStatusList.some(emp => emp.username === user.username);
+  };
+
+  const handleCabToggle = async () => {
+    const newCabOpted = !cabOpted;
+    setCabOpted(newCabOpted);
+    try {
+      await fetch(`http://192.168.29.194:5000/api/update_cab_status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          shift_id: selectedShift.id,
+          employee_id: user.id, 
+          cab_facility: newCabOpted ? "Yes" : "No"
+        }),
+      });
+    } catch (err) {
+      console.error("Failed to update cab status:", err);
+    }
+  };
+
+
+  const handleEventClick = async (info) => {
     const shift = info.event;
     setSelectedShift(shift);
     setComment(commentsMap[shift.id] || "");
@@ -75,6 +98,23 @@ const Shifts = () => {
       setEditShiftType(shiftType);
       setEditShiftDate(date);
       setEditEmployeeId(matchedEmp?.id || "");
+    }
+
+    // Fetch cab status for employees in this shift
+    try {
+      const response = await fetch(`http://192.168.29.194:5000/api/shifts/${shift.id}/cab-status`);
+      if (!response.ok) throw new Error("Failed to fetch cab status");
+      const data = await response.json();
+      setCabStatusList(data);
+      if (!isAdmin && data.length > 0) {
+        const currentUser = data.find(emp => emp.username === user.username);
+        setCabOpted(currentUser?.cab_facility === "Yes");
+      }
+
+    } catch (error) {
+      console.error("Error fetching cab status:", error);
+      setCabStatusList([]);
+
     }
 
     setIsModalOpen(true);
@@ -337,6 +377,23 @@ const Shifts = () => {
               }
             />
 
+            <div className="cab-status-list">
+              <h3>Cab Facility Status</h3>
+              <ul>
+                {cabStatusList.length === 0 ? (
+                  <li>No cab data available</li>
+                ) : (
+                  cabStatusList.map(emp => (
+                    <li key={emp.id}>
+                      {emp.username} – {emp.cab_facility === 'Yes' ? 'Yes' : 'No'}
+                    </li>
+                  ))
+                )}
+              </ul>
+            </div>
+
+
+
             {isAdmin && (
               <>
                 <h3>Edit Shift</h3>
@@ -380,6 +437,22 @@ const Shifts = () => {
               >
                 Save Comments
               </button>
+
+
+              {!isAdmin && (
+                <div className="cab-toggle-wrapper">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={cabOpted}
+                      onChange={handleCabToggle}
+                      disabled={!isUserInShift()}
+                    />
+                    Use Cab Facility
+                  </label>
+                </div>
+              )}
+
               {isAdmin && (
                 <>
                   <button
@@ -445,6 +518,8 @@ const Shifts = () => {
             </div>
           ))}
         </div>
+
+
 
         <div className="modal-buttons">
           <button

@@ -5,19 +5,17 @@ function HomePage() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    const el = document.querySelector('.package');
+    const el = document.querySelector(".package");
 
     const updateScale = () => {
       const ratio = window.devicePixelRatio;
       el.style.transform = `translate(-50%, -50%) scale(${1 / ratio})`;
     };
 
-    updateScale(); // Initial call
-    window.addEventListener('resize', updateScale);
-    return () => window.removeEventListener('resize', updateScale);
+    updateScale();
+    window.addEventListener("resize", updateScale);
+    return () => window.removeEventListener("resize", updateScale);
   }, []);
-
-
 
   useEffect(() => {
     const App = {
@@ -47,7 +45,6 @@ function HomePage() {
         this.xC = this.width / 2;
         this.yC = this.height / 2;
 
-        // Parameters for worm-like effect
         this.lifespan = 1000;
         this.popPerBirth = 1;
         this.maxPop = 300;
@@ -56,7 +53,6 @@ function HomePage() {
         this.gridSteps = Math.floor(1000 / this.gridSize);
         this.grid = [];
 
-        // Build grid with proper worm behavior
         let i = 0;
         const gridArea = 1000;
         const gridRadius = gridArea / 2;
@@ -65,18 +61,19 @@ function HomePage() {
             const r = Math.sqrt(xx * xx + yy * yy);
             const r0 = 110;
             let field;
-            if (r < r0) field = 255 / r0 * r;
+            if (r < r0) field = (255 / r0) * r;
             else field = 255 - Math.min(255, (r - r0) / 5);
             this.grid.push({
               x: xx,
               y: yy,
               busyAge: 0,
               spotIndex: i,
-              isEdge: (xx === -gridRadius ||
-                xx >= (gridRadius - this.gridSize) ||
+              isEdge:
+                xx === -gridRadius ||
+                xx >= gridRadius - this.gridSize ||
                 yy === -gridRadius ||
-                yy >= (gridRadius - this.gridSize)),
-              field: field
+                yy >= gridRadius - this.gridSize,
+              field: field,
             });
             i++;
           }
@@ -90,35 +87,29 @@ function HomePage() {
           this.animationFrame = requestAnimationFrame(animate);
         };
         animate();
-      },
 
-      evolve: function () {
-        this.stepCount++;
+        // Interactivity: click to spawn
+        canvas.addEventListener("click", (e) => {
+          const rect = canvas.getBoundingClientRect();
+          const baseX = e.clientX - rect.left;
+          const baseY = e.clientY - rect.top;
 
-        this.grid.forEach(function (e) {
-          if (e.busyAge > 0) e.busyAge++;
+          // Spawn 5 worms with slight random offsets
+          for (let i = 0; i < 5; i++) {
+            const offsetX = baseX + (Math.random() - 0.5) * 40; // random offset within ±20px
+            const offsetY = baseY + (Math.random() - 0.5) * 40;
+            this.spawnAt(offsetX, offsetY);
+          }
         });
-
-        if (this.stepCount % this.birthFreq === 0 &&
-          (this.particles.length + this.popPerBirth) < this.maxPop) {
-          this.birth();
-        }
-        this.move();
-        this.draw();
       },
 
-      birth: function () {
-        // Spawn worms in a circular pattern
-        const angle = Math.random() * Math.PI * 6;
-        const radius = Math.sqrt(Math.random()) * 600;
+      spawnAt: function (canvasX, canvasY) {
+        const x = (canvasX - this.xC) / (1.6 * this.dataToImageRatio);
+        const y = (canvasY - this.yC) / (1.6 * this.dataToImageRatio);
 
-        const x = radius * Math.cos(angle);
-        const y = radius * Math.sin(angle);
-
-        // Find closest grid spot
         let closestSpot = this.grid[0];
         let minDist = Infinity;
-        this.grid.forEach(spot => {
+        this.grid.forEach((spot) => {
           const dist = Math.hypot(spot.x - x, spot.y - y);
           if (dist < minDist) {
             minDist = dist;
@@ -142,7 +133,61 @@ function HomePage() {
             oldIndex: closestSpot.spotIndex,
             gridSpotIndex: closestSpot.spotIndex,
           },
-          name: 'worm-' + Math.ceil(10000000 * Math.random())
+          name: "worm-" + Math.ceil(10000000 * Math.random()),
+        };
+        this.particles.push(particle);
+      },
+
+      evolve: function () {
+        this.stepCount++;
+        this.grid.forEach((e) => {
+          if (e.busyAge > 0) e.busyAge++;
+        });
+
+        if (
+          this.stepCount % this.birthFreq === 0 &&
+          this.particles.length + this.popPerBirth < this.maxPop
+        ) {
+          this.birth();
+        }
+
+        this.move();
+        this.draw();
+      },
+
+      birth: function () {
+        const angle = Math.random() * Math.PI * 6;
+        const radius = Math.sqrt(Math.random()) * 600;
+        const x = radius * Math.cos(angle);
+        const y = radius * Math.sin(angle);
+
+        let closestSpot = this.grid[0];
+        let minDist = Infinity;
+        this.grid.forEach((spot) => {
+          const dist = Math.hypot(spot.x - x, spot.y - y);
+          if (dist < minDist) {
+            minDist = dist;
+            closestSpot = spot;
+          }
+        });
+
+        const particle = {
+          hue: 260 + Math.sin(Date.now()) * 5000,
+          sat: 100,
+          lum: 60,
+          x: closestSpot.x,
+          y: closestSpot.y,
+          xLast: closestSpot.x,
+          yLast: closestSpot.y,
+          xSpeed: 0,
+          ySpeed: 0,
+          age: 0,
+          ageSinceStuck: 0,
+          attractor: {
+            oldIndex: closestSpot.spotIndex,
+            gridSpotIndex: closestSpot.spotIndex,
+          },
+          name: "worm-" + Math.ceil(10000000 * Math.random()),
         };
         this.particles.push(particle);
       },
@@ -156,25 +201,22 @@ function HomePage() {
           let index = p.attractor.gridSpotIndex;
           let gridSpot = this.grid[index];
 
-          // Original worm movement logic
-          if (Math.random() < 0.35) { //speeeeeeeeeeeeeeeeeeeeeeeeed
+          if (Math.random() < 0.35) {
             if (!gridSpot.isEdge) {
-              const topIndex = index - 1;
-              const bottomIndex = index + 1;
-              const leftIndex = index - this.gridSteps;
-              const rightIndex = index + this.gridSteps;
-
-              const neighbors = [];
-              if (topIndex >= 0) neighbors.push(this.grid[topIndex]);
-              if (bottomIndex < this.grid.length) neighbors.push(this.grid[bottomIndex]);
-              if (leftIndex >= 0) neighbors.push(this.grid[leftIndex]);
-              if (rightIndex < this.grid.length) neighbors.push(this.grid[rightIndex]);
+              const neighbors = [
+                this.grid[index - 1],
+                this.grid[index + 1],
+                this.grid[index - this.gridSteps],
+                this.grid[index + this.gridSteps],
+              ].filter(Boolean);
 
               if (neighbors.length > 1) {
                 const chaos = 3.5;
                 const maxFieldSpot = neighbors.reduce((max, spot) =>
-                  (spot.field + chaos * Math.random()) >
-                    (max.field + chaos * Math.random()) ? spot : max
+                  spot.field + chaos * Math.random() >
+                    max.field + chaos * Math.random()
+                    ? spot
+                    : max
                 );
 
                 if (maxFieldSpot.busyAge === 0 || maxFieldSpot.busyAge > 15) {
@@ -196,8 +238,8 @@ function HomePage() {
             }
           }
 
-          // Spring physics for organic movement
-          const k = 8, visc = 0.4;
+          const k = 8,
+            visc = 0.4;
           const dx = p.x - gridSpot.x;
           const dy = p.y - gridSpot.y;
 
@@ -218,13 +260,11 @@ function HomePage() {
       },
 
       draw: function () {
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.02)';
+        this.ctx.fillStyle = "rgba(0, 0, 0, 0.02)";
         this.ctx.fillRect(0, 0, this.width, this.height);
 
         for (const p of this.particles) {
           const h = p.hue + this.stepCount / 200;
-
-          // Draw worm trail
           const last = this.dataXYtoCanvasXY(p.xLast, p.yLast);
           const now = this.dataXYtoCanvasXY(p.x, p.y);
 
@@ -235,7 +275,6 @@ function HomePage() {
           this.ctx.lineWidth = 1.5;
           this.ctx.stroke();
 
-          // Draw worm head
           const attracSpot = this.grid[p.attractor.gridSpotIndex];
           const attracXY = this.dataXYtoCanvasXY(attracSpot.x, attracSpot.y);
           const oldAttracXY = this.dataXYtoCanvasXY(
@@ -256,14 +295,14 @@ function HomePage() {
         const zoom = 1.6;
         return {
           x: this.xC + x * zoom * this.dataToImageRatio,
-          y: this.yC + y * zoom * this.dataToImageRatio
+          y: this.yC + y * zoom * this.dataToImageRatio,
         };
       },
 
       initDraw: function () {
-        this.ctx.fillStyle = '';
+        this.ctx.fillStyle = "";
         this.ctx.fillRect(0, 0, this.width, this.height);
-      }
+      },
     };
 
     App.setup();

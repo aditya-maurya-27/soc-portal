@@ -93,7 +93,7 @@
   top: 50%;
   background: radial-gradient(
     rgb(0, 0, 0) 0%,  /* Slightly lighter at center */
-    rgb(5, 5, 5) 61%,     /* Darkens toward edges */
+    rgb(5, 5, 5) 60%,     /* Darkens toward edges */
     rgba(255, 255, 255, 0.1) 100%
   );
   border-radius: 50%;

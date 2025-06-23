@@ -1,178 +1,178 @@
 /* Global Styling */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Calibri, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Calibri, sans-serif;
 }
 
 
 
 .button {
-    position: relative;
-    text-decoration: none;
-    color: #fff;
-    background: linear-gradient(45deg, #6832ba, #813ee6, #6832ba);
-    padding: 7px 18px;
-    margin-top: 0;
-    border-radius: 10px;
-    font-size: 1.20em;
-    cursor: pointer;
-  }
-  
-  .button span {
-    position: relative;
-    z-index: 1;
-  }
-  
-  .button::before {
-    content: "";
-    position: absolute;
-    inset: 2px 2px 2px 2px;
-    background: #272727;
-    border-radius: 10px;
-    transition: 0.5s;
-  }
-  
-  .button:hover::before {
-    opacity: 0.7;
-  }
-  
-  .button::after {
-    content: "";
-    position: absolute;
-    inset: 0px;
-    background: linear-gradient(45deg, #6832ba, #813ee6, #6832ba);
-    border-radius: 9px;
-    transition: 0.5s;
-    opacity: 0;
-    filter: blur(20px);
-  }
-  
-  .button:hover:after {
-    opacity: 1;
-  }
-  
+  background: rgb(95, 0, 139);
+  color: white;
+  font-size: 18px;
+  margin-top: 0;
+  padding: 5px 12px;
+  cursor: pointer;
+  border-radius: 7px;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.8),
+    inset 0 3px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -3px 2px rgba(255, 255, 255, 0.1),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5) !important;
+  transition: all 0.3s ease-in-out;
+}
+
+.button:hover {
+  background: rgb(172, 55, 255) !important;
+  box-shadow: 0 0 20px rgb(172, 55, 255) !important;
+}
+
+.button span {
+  position: relative;
+  z-index: 1;
+}
+
+.button:hover::before {
+  opacity: 0.7;
+}
+
+.button:hover:after {
+  opacity: 1;
+}
+
 
 
 .container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 .logo-container {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .logo-image {
-    width: 40px;
-    height: auto;
-    margin-right: 10px;
+  width: 40px;
+  height: auto;
+  margin-right: 10px;
 }
 
-.logo-text{
-    font-family: Calibri, sans-serif;
-    font-weight: lighter;
-    font-size: 28px;
-    padding: 0;
-    margin: 0;
+.logo-text {
+  font-family: Calibri, sans-serif;
+  font-weight: lighter;
+  font-size: 28px;
+  padding: 0;
+  margin: 0;
 }
 
 .navbar {
-    background: #212121;
-    color: white;
-    display: flex;
-    align-items: center;
-    border-bottom: 3px solid #6832ba;
-    justify-content: space-between;
-    padding: 10px 20px;
+  background: #212121;
+  color: white;
+  display: flex;
+  align-items: center;
+  border-bottom: 3px solid #6832ba;
+  justify-content: space-between;
+  padding: 10px 20px;
 }
 
 .login-btn {
-    background: rgb(255, 255, 255);
-    color: #333;
-    font-size: 18px;
-    margin-top: 0;
-    border: 2px solid rgb(193, 93, 255);
-    border-radius: 8px;
-    padding: 4px 18px;
-    cursor: pointer;
+  background: rgb(255, 255, 255);
+  color: #333;
+  font-size: 18px;
+  margin-top: 0;
+  border: 2px solid rgb(193, 93, 255);
+  border-radius: 8px;
+  padding: 4px 18px;
+  cursor: pointer;
 }
 
 .login-btn:hover {
-    background: rgb(252, 204, 255);
+  background: rgb(252, 204, 255);
 }
 
 .register-btn {
-    background: rgb(255, 255, 255);
-    color: #333;
-    font-size: 18px;
-    margin-top: 0;
-    border: 2px solid rgb(193, 93, 255);
-    border-radius: 8px;
-    padding: 4px 14px;
-    cursor: pointer;
+  background: rgb(255, 255, 255);
+  color: #333;
+  font-size: 18px;
+  margin-top: 0;
+  border: 2px solid rgb(193, 93, 255);
+  border-radius: 8px;
+  padding: 4px 14px;
+  cursor: pointer;
 }
 
 .register-btn:hover {
-    background: rgb(252, 204, 255);
+  background: rgb(252, 204, 255);
 }
 
 .logout-btn {
-    background: red;
-    color: white;
-    font-size: 18px;
-    margin-top: 0;
-    border: none;
-    padding: 5px 12px;
-    cursor: pointer;
+  background: darkred;
+  color: white;
+  font-size: 18px;
+  margin-top: 0;
+  padding: 5px 12px;
+  cursor: pointer;
+  border-radius: 7px;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.8),
+    inset 0 3px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -3px 2px rgba(255, 255, 255, 0.1),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5) !important;
+  transition: all 0.3s ease-in-out;
 }
 
 .logout-btn:hover {
-    background: darkred;
+  background: red;
+  box-shadow: 0 0 20px red !important;
 }
 
 .content {
-    flex-grow: 1;
-    padding: 0px;
-    background: #2f2f2f;
+  flex-grow: 1;
+  padding: 0px;
+  background: #2f2f2f;
 }
 
 .footer {
-    background: #212121;
-    color: white;
-    text-align: center;
-    padding: 8px;
-    font-size: 16px;
-    border-top: 3px solid #6832ba;
+  background: #212121;
+  color: white;
+  text-align: center;
+  padding: 8px;
+  font-size: 16px;
+  border-top: 3px solid #6832ba;
 }
 
 .nav-links {
-    list-style: none;
-    display: flex;
-    gap: 22px;
-    padding: 0;
-    align-items: center;
-  }
-  
-  .nav-links li {
-    margin: 0;
-  }
-  
-  .nav-links a {
-    text-decoration: none;
-    color: white;
-    font-family: Calibri, sans-serif;
-    font-size: 18px;
-    background: none;
-    border: None;
-    padding: 0;
-  }
+  list-style: none;
+  display: flex;
+  gap: 22px;
+  padding: 0;
+  align-items: center;
+}
+
+.nav-links li {
+  margin: 0;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: white;
+  font-family: Calibri, sans-serif;
+  font-size: 18px;
+  background: none;
+  border: None;
+  padding: 0;
+}
 
 .nav-links a.active {
-    color: rgb(227, 223, 20);
-    text-shadow: 0px 0px 20px rgba(230, 255, 41, 0.900);
-    transition: all 1s ease-in-out;
+  color: rgb(227, 223, 20);
+  text-shadow: 0px 0px 20px rgba(230, 255, 41, 0.900);
+  transition: all 1s ease-in-out;
 }

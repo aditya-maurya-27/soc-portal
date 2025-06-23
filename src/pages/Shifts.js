@@ -91,11 +91,18 @@ const Shifts = () => {
     "#1b262c", // blue-black
     "#001f3f", // abyss blue
     "#2d132c", // noir rose
+    "#8B008B", // Dark Magenta
+    "#800040", // Deep Rose
+    "#993366", // Dusky Pink
+    "#702963", // Byzantium
+    "#A52A6A", // Rose Red
+    "#78002E", // Dark Raspberry
+    "#AA336A", // Vintage Pink
     "#260701", // ember coal
     "#191825", // nightfall
     "#1f1d36", // dark orchid
     "#3b2f2f", // cocoa ash
-    "#2e2e38", // grayish indigo
+    "#2e2e40", // grayish indigo
     "#1e1e2f", // subdued navy
     "#222831", // graphite
     "#35013f", // strong plum
@@ -389,18 +396,25 @@ const Shifts = () => {
           eventDidMount={(info) => {
             const shiftId = info.event.id;
 
-            // If color not already assigned, pick a random one
+            // Assign color to shift
             if (!shiftColorMap.current[shiftId]) {
               const randomColor = shiftColorPool[Math.floor(Math.random() * shiftColorPool.length)];
               shiftColorMap.current[shiftId] = randomColor;
             }
-
             const color = shiftColorMap.current[shiftId];
-
-            // Apply colors
             info.el.style.backgroundColor = color;
-            info.el.style.borderColor = color;
+            
             info.el.style.color = "#fff";
+
+            //glare effect
+            if (window.VanillaTilt && info.el) {
+              window.VanillaTilt.init(info.el, {
+                
+                glare: true,
+                "max-glare": 0.3,
+                
+              });
+            }
           }}
 
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}

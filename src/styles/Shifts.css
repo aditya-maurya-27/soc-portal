@@ -81,7 +81,7 @@
   box-sizing: border-box !important;
   font-size: 15px !important;
   border-radius: 7px !important;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease !important;
   box-shadow:
     0 8px 30px rgba(0, 0, 0, 0.8),
     inset 0 3px 2px rgba(255, 255, 255, 0.2),
@@ -90,6 +90,8 @@
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5) !important;
 }
+
+
 
 .fc-daygrid-event {
   position: relative !important;
@@ -147,14 +149,12 @@
 }
 
 .fc-daygrid-event:hover {
-  background-color: black !important;
-  box-shadow: #f3ff86 0px 0px 7px !important;
+  box-shadow: #ffffff 0px 0px 3px !important;
   transform: scale(1.015) !important;
 }
 
 .fc-timegrid-event:hover {
-  background-color: black !important;
-  box-shadow: #f3ff86 0px 0px 7px !important;
+  box-shadow: #ffffff 0px 0px 3px !important;
   transform: scale(1.015) !important;
 }
 
@@ -178,7 +178,7 @@
 
 
 .fc-button {
-  background-color: #6832ba !important;
+  background-color: #512890 !important;
   color: white !important;
   border: 1px solid white !important;
   font-family: Calibri, sans-serif;
@@ -189,7 +189,15 @@
   margin: 0px 3px 0px 3px !important;
   transition: all 0.3s ease !important;
   height: auto !important;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.8),
+    inset 0 3px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -3px 2px rgba(255, 255, 255, 0.1),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5) !important;
 }
+
 
 .fc-button:hover {
   background-color: #278184 !important;
@@ -225,20 +233,25 @@
 
 .modal {
   position: absolute;
-  background: #424242 !important;
+  background: #363636ac !important;
+  backdrop-filter: blur(5px);
   min-height: 85%;
   padding: 25px 30px;
   max-width: 80%;
   width: 90%;
   margin: auto;
   border-radius: 10px;
-  border: 1px solid #9e9e9e;
   position: relative;
   top: 8%;
   left: 10%;
   font-family: Calibri, sans-serif;
-  box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.9) !important;
   animation: fadeIn 0.3s ease-in-out;
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.8),
+    inset 0 3px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -3px 2px rgba(255, 255, 255, 0.1),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
 .overlay {
@@ -269,7 +282,7 @@
 .modal p {
   font-size: 16px;
   text-align: left;
-  color: rgb(255, 251, 0);
+  color: rgb(255, 255, 255);
   margin-top: 10px;
 }
 
@@ -387,19 +400,51 @@
 }
 
 .modal-btn.save-btn {
-  background-color: #9046ff;
+  background-color: #6432b0;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.8),
+    inset 0 3px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -3px 2px rgba(255, 255, 255, 0.1),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5) !important;
+  transition: all 0.3s ease-in-out;
 }
 
 .modal-btn.edit-btn {
   background-color: #2980b9;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.8),
+    inset 0 3px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -3px 2px rgba(255, 255, 255, 0.1),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5) !important;
+  transition: all 0.3s ease-in-out;
 }
 
 .modal-btn.delete-btn {
   background-color: #c0392b;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.8),
+    inset 0 3px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -3px 2px rgba(255, 255, 255, 0.1),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5) !important;
+  transition: all 0.3s ease-in-out;
 }
 
 .modal-btn.cancel-btn {
-  background-color: #8e44ad;
+  background-color: #898339;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.8),
+    inset 0 3px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -3px 2px rgba(255, 255, 255, 0.1),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5) !important;
+  transition: all 0.3s ease-in-out;
 }
 
 .modal-btn {

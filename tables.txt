@@ -1,92 +1,114 @@
 -- Table: users
-CREATE TABLE users (
-    id INT NOT NULL AUTO_INCREMENT,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL DEFAULT 'analyst',
-    PRIMARY KEY (id)
+ CREATE TABLE `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` varchar(50) NOT NULL DEFAULT 'analyst',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
 );
+
+
 
 -- Table: shift_assignments
-CREATE TABLE shift_assignments (
-    id INT NOT NULL AUTO_INCREMENT,
-    date DATE NOT NULL,
-    shift_type ENUM('morning', 'evening', 'night') NOT NULL,
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
+CREATE TABLE `shift_assignments` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `date` date NOT NULL,
+  `shift_type` enum('morning','evening','night') NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 );
+
+
 
 -- Table: shift_employee_map
-CREATE TABLE shift_employee_map (
-    id INT NOT NULL AUTO_INCREMENT,
-    shift_id INT NOT NULL,
-    employee_id INT NOT NULL,
-    PRIMARY KEY (id),
-    INDEX (shift_id),
-    INDEX (employee_id),
-    FOREIGN KEY (shift_id) REFERENCES shift_assignments(id),
-    FOREIGN KEY (employee_id) REFERENCES users(id)
+CREATE TABLE `shift_employee_map` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `shift_id` int NOT NULL,
+  `employee_id` int NOT NULL,
+  `cab_facility` enum('Yes','No') DEFAULT 'No',
+  PRIMARY KEY (`id`),
+  KEY `shift_id` (`shift_id`),
+  KEY `employee_id` (`employee_id`),
+  FOREIGN KEY (`shift_id`) REFERENCES `shift_assignments` (`id`),
+  FOREIGN KEY (`employee_id`) REFERENCES `users` (`id`)
 );
+
+
 
 -- Table: handover_notes
-CREATE TABLE handover_notes (
-    id INT NOT NULL AUTO_INCREMENT,
-    shift_id INT NOT NULL,
-    employee_id INT NOT NULL,
-    note TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    INDEX (shift_id),
-    INDEX (employee_id),
-    FOREIGN KEY (shift_id) REFERENCES shift_assignments(id),
-    FOREIGN KEY (employee_id) REFERENCES users(id)
+CREATE TABLE `handover_notes` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `shift_id` int NOT NULL,
+  `employee_id` int NOT NULL,
+  `note` text NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `shift_id` (`shift_id`),
+  KEY `employee_id` (`employee_id`),
+  FOREIGN KEY (`shift_id`) REFERENCES `shift_assignments` (`id`),
+  FOREIGN KEY (`employee_id`) REFERENCES `users` (`id`)
 );
+
+
 
 -- Table: knowledge_base
-CREATE TABLE knowledge_base (
-  id INT NOT NULL AUTO_INCREMENT,
-  entity_name VARCHAR(255),
-  asset VARCHAR(255),
-  itsm_ref VARCHAR(100),
-  asset_details TEXT,
-  status ENUM('Blocked', 'Allowed'),
-  reason TEXT,
-  context TEXT,
-  remarks TEXT,
-  PRIMARY KEY (id)
+CREATE TABLE `knowledge_base` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `entity_name` varchar(255) DEFAULT NULL,
+  `asset` varchar(255) DEFAULT NULL,
+  `itsm_ref` varchar(100) DEFAULT NULL,
+  `asset_details` text,
+  `status` enum('Blocked','Allowed') DEFAULT NULL,
+  `reason` text,
+  `context` text,
+  `remarks` text,
+  PRIMARY KEY (`id`)
 );
+
+
+
 
 --Table: clients
-CREATE TABLE clients (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL UNIQUE
+ CREATE TABLE `clients` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
 );
+
+
 
 --Table client_assets
-CREATE TABLE assets (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    client_id INT NOT NULL,
-    asset_name VARCHAR(100) DEFAULT NULL,
-    location VARCHAR(100) DEFAULT NULL,
-    ip_address VARCHAR(45) DEFAULT NULL,
-    mode ENUM('RDP', 'SSH') DEFAULT NULL,
-    asset_type VARCHAR(100) DEFAULT NULL,
-    asset_owner VARCHAR(100) DEFAULT NULL,
-    remarks TEXT DEFAULT NULL,
-    FOREIGN KEY (client_id) REFERENCES clients(id)
+CREATE TABLE `client_assets` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `client_id` int NOT NULL,
+  `asset_name` varchar(100) DEFAULT NULL,
+  `location` varchar(100) DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `mode` enum('RDP','SSH') DEFAULT NULL,
+  `asset_type` varchar(100) DEFAULT NULL,
+  `asset_owner` varchar(100) DEFAULT NULL,
+  `remarks` text,
+  PRIMARY KEY (`id`),
+  KEY `client_id` (`client_id`),
+  FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`)
 );
 
+
 --Table escalation_matrix
-CREATE TABLE escalation_matrix (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    client_id INT NOT NULL,
-    level VARCHAR(50) NOT NULL,
-    contact_name VARCHAR(100) NOT NULL,
-    contact_email VARCHAR(100) DEFAULT NULL,
-    contact_number VARCHAR(20) DEFAULT NULL,
-    sla_response_hours DECIMAL(5, 2) NOT NULL,
-    sla_resolution_hours DECIMAL(5, 2) NOT NULL,
-    FOREIGN KEY (client_id) REFERENCES clients(id)
+CREATE TABLE `escalation_matrix` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `client_id` int NOT NULL,
+  `level` varchar(50) NOT NULL,
+  `contact_name` varchar(100) NOT NULL,
+  `contact_email` varchar(100) DEFAULT NULL,
+  `contact_number` varchar(20) DEFAULT NULL,
+  `sla_response_hours` decimal(5,2) NOT NULL,
+  `sla_resolution_hours` decimal(5,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `client_id` (`client_id`),
+  FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`)
 );

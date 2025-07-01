@@ -14,6 +14,83 @@ def setup_routes(app):
     def home():
         return jsonify({"message": "API is running!"})
     
+    
+    @app.route('/api/shifts/<int:shift_id>/notes', methods=['GET'])
+    def get_shift_notes(shift_id):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+            
+            # Simplified query - just get notes with employee_id
+            query = """
+                SELECT employee_id, note, created_at
+                FROM handover_notes
+                WHERE shift_id = %s
+            """
+            cursor.execute(query, (shift_id,))
+            notes = cursor.fetchall()
+            
+            cursor.close()
+            conn.close()
+            
+            return jsonify(notes)
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    @app.route('/api/save_notes', methods=['POST'])
+    def save_notes():
+        data = request.get_json()
+        shift_id = data.get("shift_id")
+        employee_id = data.get("employee_id")
+        note = data.get("notes")
+
+        if not all([shift_id, employee_id, note is not None]):
+            return jsonify({"error": "Missing required fields"}), 400
+
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            # Verify employee is actually in this shift
+            cursor.execute(
+                "SELECT id FROM shift_employee_map WHERE shift_id = %s AND employee_id = %s",
+                (shift_id, employee_id)
+            )
+            if not cursor.fetchone():
+                return jsonify({"error": "Employee not in this shift"}), 403
+            
+            # Check if note already exists
+            cursor.execute(
+                "SELECT id FROM handover_notes WHERE shift_id = %s AND employee_id = %s",
+                (shift_id, employee_id)
+            )
+            existing_note = cursor.fetchone()
+            
+            if existing_note:
+                # Update existing note
+                query = """
+                    UPDATE handover_notes
+                    SET note = %s, created_at = NOW()
+                    WHERE shift_id = %s AND employee_id = %s
+                """
+                cursor.execute(query, (note, shift_id, employee_id))
+            else:
+                # Create new note
+                query = """
+                    INSERT INTO handover_notes (shift_id, employee_id, note, created_at)
+                    VALUES (%s, %s, %s, NOW())
+                """
+                cursor.execute(query, (shift_id, employee_id, note))
+            
+            conn.commit()
+            cursor.close()
+            conn.close()
+            
+            return jsonify({"message": "Notes saved successfully"}), 200
+            
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+    
 
 
 
@@ -359,6 +436,10 @@ def setup_routes(app):
 
             # First delete from dependent table
             cursor.execute("DELETE FROM shift_employee_map WHERE shift_id = %s", (shift_id,))
+
+            # then notes
+            # 1. First delete all notes associated with this shift
+            cursor.execute("DELETE FROM handover_notes WHERE shift_id = %s", (shift_id,))
 
             # Then delete the shift itself
             cursor.execute("DELETE FROM shift_assignments WHERE id = %s", (shift_id,))

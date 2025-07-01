@@ -12,7 +12,7 @@ Modal.setAppElement("#root");
 const shiftTimeMapping = {
   Night: { start: "00:00", end: "08:00" },
   Morning: { start: "08:00", end: "16:00" },
-  Evening: { start: "16:00", end: "24:00" },
+  Evening: { start: "16:00", end: "00:00" },
 };
 
 const Shifts = () => {
@@ -20,9 +20,13 @@ const Shifts = () => {
   const isAdmin = user?.role === "admin";
   const [cabStatusList, setCabStatusList] = useState([]);
   const [shifts, setShifts] = useState([]);
+  const [selectedEmployeeForNotes, setSelectedEmployeeForNotes] = useState("");
+  const [employeeNotes, setEmployeeNotes] = useState({});
   const shiftColorMap = useRef({});
   const [selectedShift, setSelectedShift] = useState(null);
   const [comment, setComment] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState({ success: null, message: '' });
   const [commentsMap, setCommentsMap] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -191,6 +195,7 @@ const Shifts = () => {
     setSelectedShift(shift);
     setComment(commentsMap[shift.id] || "");
 
+    // Admin logic remains the same
     if (isAdmin) {
       const date = shift.start.toISOString().slice(0, 10);
       let shiftType = "Morning";
@@ -207,20 +212,51 @@ const Shifts = () => {
     }
 
     try {
-      const response = await fetch(`http://192.168.29.194:5000/api/shifts/${shift.id}/cab-status`);
-      if (!response.ok) throw new Error("Failed to fetch cab status");
-      const data = await response.json();
-      if (isMountedRef.current) {
-        setCabStatusList(data);
-        if (!isAdmin && data.length > 0) {
-          const currentUser = data.find((emp) => emp.username === user.username);
-          setCabOpted(currentUser?.cab_facility === "Yes");
-        }
+      // 1. First fetch cab status (contains employee info)
+      const cabResponse = await fetch(`http://192.168.29.194:5000/api/shifts/${shift.id}/cab-status`);
+      if (!cabResponse.ok) throw new Error("Failed to fetch cab status");
+      const cabData = await cabResponse.json();
+
+      if (!isMountedRef.current) return;
+
+      setCabStatusList(cabData);
+      if (!isAdmin && cabData.length > 0) {
+        const currentUser = cabData.find((emp) => emp.username === user.username);
+        setCabOpted(currentUser?.cab_facility === "Yes");
       }
+
+      // 2. Then fetch notes for this shift
+      const notesResponse = await fetch(`http://192.168.29.194:5000/api/shifts/${shift.id}/notes`);
+      if (!notesResponse.ok) throw new Error("Failed to fetch notes");
+      const notesData = await notesResponse.json();
+
+      // Debug logs to verify data
+      console.log("Cab Data:", cabData);
+      console.log("Notes Data:", notesData);
+
+      // Create mapping of username to note
+      const notesMap = {};
+      notesData.forEach(note => {
+        // Find the employee in cabData - using id from cab status that matches employee_id in notes
+        const employee = cabData.find(emp => emp.id === note.employee_id);
+        if (employee) {
+          notesMap[employee.username] = note.note;
+        }
+      });
+
+      console.log("Notes Map:", notesMap); // Debug log
+      setEmployeeNotes(notesMap);
+
+      // Set default selected employee (current user if in shift, otherwise first employee)
+      const defaultEmployee = cabData.find(emp => emp.username === user?.username)?.username ||
+        (cabData[0]?.username || '');
+      setSelectedEmployeeForNotes(defaultEmployee);
+
     } catch (error) {
+      console.error("Error fetching shift data:", error);
       if (isMountedRef.current) {
-        console.error("Error fetching cab status:", error);
         setCabStatusList([]);
+        setEmployeeNotes({});
       }
     }
 
@@ -235,15 +271,80 @@ const Shifts = () => {
     return now >= start && now <= end;
   };
 
-  const handleSave = () => {
-    if (selectedShift) {
-      setCommentsMap((prev) => ({
-        ...prev,
-        [selectedShift.id]: comment,
-      }));
+  const handleSave = async () => {
+    if (!selectedShift || !selectedEmployeeForNotes) {
+      setSaveStatus({ success: false, message: "No shift or employee selected" });
+      return;
     }
-    setIsModalOpen(false);
+
+    try {
+      setIsSaving(true);
+      setSaveStatus({ success: null, message: '' });
+
+      // Find the employee in the shift
+      const employee = cabStatusList.find(emp => emp.username === selectedEmployeeForNotes);
+      if (!employee && !isAdmin) {
+        throw new Error("You are not assigned to this shift");
+      }
+
+      // Prepare the note content (handle empty strings)
+      const noteToSave = employeeNotes[selectedEmployeeForNotes] || "";
+
+      const response = await fetch("http://192.168.29.194:5000/api/save_notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          shift_id: selectedShift.id,
+          employee_id: employee?.id, // Safe access with optional chaining
+          notes: noteToSave,
+          is_admin: isAdmin // Send admin status to backend
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.message || "Failed to save notes");
+      }
+
+      // Update local state with the saved note
+      setEmployeeNotes(prev => ({
+        ...prev,
+        [selectedEmployeeForNotes]: noteToSave
+      }));
+
+      setSaveStatus({
+        success: true,
+        message: "Notes saved successfully!",
+        timestamp: new Date().toISOString()
+      });
+
+      // Refresh notes from server to ensure consistency
+      try {
+        const notesResponse = await fetch(`http://192.168.29.194:5000/api/shifts/${selectedShift.id}/notes`);
+        if (notesResponse.ok) {
+          const notesData = await notesResponse.json();
+          const updatedNotes = {};
+          notesData.forEach(note => {
+            const emp = cabStatusList.find(e => e.id === note.employee_id);
+            if (emp) updatedNotes[emp.username] = note.note;
+          });
+          setEmployeeNotes(updatedNotes);
+        }
+      } catch (refreshError) {
+        console.warn("Couldn't refresh notes:", refreshError);
+      }
+
+    } catch (err) {
+      console.error("Error saving notes:", err);
+      setSaveStatus({
+        success: false,
+        message: err.message || "An unexpected error occurred"
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
+
 
   const handleAddShift = async () => {
     if (selectedEmployees.length === 0 || !newShiftDate || !newShiftType) {
@@ -252,10 +353,17 @@ const Shifts = () => {
     }
 
     const { start, end } = shiftTimeMapping[newShiftType];
-    const startDateTime = new Date(`${newShiftDate}T${start}`);
-    let endDateTime = new Date(`${newShiftDate}T${end}`);
-    if (end === "00:00") {
-      endDateTime.setDate(endDateTime.getDate() + 1);
+
+    // Special handling for Evening shift (16:00-24:00)
+    let endTime = end;
+    let endDate = newShiftDate;
+
+    if (newShiftType === "Evening") {
+      // Convert 24:00 to 00:00 of next day
+      endTime = "00:00";
+      const nextDay = new Date(newShiftDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      endDate = nextDay.toISOString().split('T')[0];
     }
 
     const selectedEmployeeObjects = analysts.filter((emp) =>
@@ -273,6 +381,8 @@ const Shifts = () => {
               date: newShiftDate,
               shift_type: newShiftType.toLowerCase(),
               employee_ids: [emp.id],
+              // For Evening shift, explicitly set the end date
+              ...(newShiftType === "Evening" && { end_date: endDate })
             }),
           }
         );
@@ -287,13 +397,14 @@ const Shifts = () => {
       fetchShifts();
       alert("Shift(s) created successfully!");
     } catch (err) {
-      console.error(err);
-      alert("Failed to create shift.");
+      console.error("Failed to create shift:", err);
+      alert("Failed to create shift. Check console for details.");
     }
 
     setIsAddModalOpen(false);
     setSelectedEmployees([]);
   };
+
 
   const handleEditShift = async () => {
     try {
@@ -396,6 +507,8 @@ const Shifts = () => {
           eventDidMount={(info) => {
             const shiftId = info.event.id;
 
+
+            /*
             // Assign color to shift
             if (!shiftColorMap.current[shiftId]) {
               const randomColor = shiftColorPool[Math.floor(Math.random() * shiftColorPool.length)];
@@ -403,16 +516,17 @@ const Shifts = () => {
             }
             const color = shiftColorMap.current[shiftId];
             info.el.style.backgroundColor = color;
-            
             info.el.style.color = "#fff";
+            info.el.style.borderColor = color;
+            */
 
             //glare effect
             if (window.VanillaTilt && info.el) {
               window.VanillaTilt.init(info.el, {
-                
+
                 glare: true,
                 "max-glare": 0.3,
-                
+
               });
             }
           }}
@@ -534,28 +648,91 @@ const Shifts = () => {
               </div>
 
               <div className="right-section">
-                <label>Comments / Notes:</label>
+                <label className="label1">Comments / Notes:</label>
+                {cabStatusList.length > 0 ? (
+                  <div className="notes-selector-container">
+                    <select
+                      value={selectedEmployeeForNotes}
+                      onChange={(e) => {
+                        setSelectedEmployeeForNotes(e.target.value);
+                      }}
+                      className="notes-employee-select"
+                      disabled={cabStatusList.length === 0}
+                    >
+                      {cabStatusList.map((emp) => (
+                        <option key={emp.id} value={emp.username}>
+                          {emp.username}'s Notes
+                          {user?.username === emp.username ? " (You)" : ""}
+                        </option>
+                      ))}
+                    </select>
+                    {employeeNotes[selectedEmployeeForNotes] && (
+                      <div className="last-updated">
+                        Last updated: {new Date().toLocaleString()} {/* Replace with actual timestamp if available */}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="no-notes-message">No employees assigned to this shift</div>
+                )}
+
                 <textarea
                   rows="10"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  disabled={!isWithinShift()}
+                  value={employeeNotes[selectedEmployeeForNotes] || ""}
+                  onChange={(e) => {
+                    const newNotes = { ...employeeNotes };
+                    newNotes[selectedEmployeeForNotes] = e.target.value;
+                    setEmployeeNotes(newNotes);
+                  }}
+                  disabled={
+                    !isAdmin &&
+                    (!isWithinShift() || user?.username !== selectedEmployeeForNotes)
+                  }
+                  className={
+                    !isAdmin && user?.username !== selectedEmployeeForNotes
+                      ? "notes-textarea view-only"
+                      : "notes-textarea"
+                  }
+                  spellCheck="false"
                   placeholder={
-                    isWithinShift()
-                      ? "Add or edit your notes here..."
-                      : "Editing is disabled outside shift time."
+                    isAdmin
+                      ? "Add or edit notes here..."
+                      : isWithinShift()
+                        ? user?.username === selectedEmployeeForNotes
+                          ? "Add or edit your notes here..."
+                          : "Viewing another employee's notes (read-only)"
+                        : "Notes can only be edited during shift time"
                   }
                 />
+
+                {!isWithinShift() && !isAdmin && (
+                  <div className="edit-disabled-message">
+                    ⚠️ Note: Editing is only allowed during shift hours
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="modal-buttons">
+              {isSaving && <div className="save-status saving">Saving...</div>}
+              {saveStatus.message && (
+                <div className={`save-status ${saveStatus.success ? 'success' : 'error'}`}>
+                  {saveStatus.message}
+                </div>
+              )}
+
               <button
                 onClick={handleSave}
-                disabled={!isWithinShift()}
+                disabled={(!isWithinShift() && !isAdmin) || isSaving}
                 className="modal-btn save-btn"
               >
-                Save Comments
+                {isSaving ? (
+                  <>
+                    <span className="spinner"></span> Saving...
+                  </>
+                ) : (
+                  'Save Comments'
+                )}
               </button>
 
               {!isAdmin && (

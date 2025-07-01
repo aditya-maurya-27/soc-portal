@@ -69,11 +69,11 @@
 
 .fc-timegrid-event {
   position: relative !important;
-  height: 290px !important;
-  width: 99.5% !important;
+  height: 292px !important;
+  width: 99.3% !important;
   left: 0 !important;
   display: block !important;
-  margin: 4px 0px 0px 2px !important;
+  margin: 3px 0px 0px 2px !important;
   min-height: 25px !important;
   z-index: auto !important;
   align-items: center !important;
@@ -107,6 +107,7 @@
   font-size: 15px !important;
   border-radius: 5px !important;
   transition: all 0.3s ease;
+  color: white !important;
   box-shadow:
     0 8px 20px rgba(0, 0, 0, 0.8),
     inset 0 3px 2px rgba(255, 255, 255, 0.2),
@@ -149,13 +150,13 @@
 }
 
 .fc-daygrid-event:hover {
-  box-shadow: #ffffff 0px 0px 3px !important;
-  transform: scale(1.015) !important;
+  box-shadow: #ffffff 0px 0px 2px !important;
+  transform: scale(1.016) !important;
 }
 
 .fc-timegrid-event:hover {
-  box-shadow: #ffffff 0px 0px 3px !important;
-  transform: scale(1.015) !important;
+  box-shadow: #ffffff 0px 0px 2px !important;
+  transform: scale(1.016) !important;
 }
 
 .fc-timegrid-event-harness {
@@ -360,7 +361,7 @@
 }
 
 .left-section {
-  flex: 1 1 30%;
+  flex: 1 1 25%;
   /* Make left smaller */
   display: flex;
   flex-direction: column;
@@ -368,19 +369,24 @@
 }
 
 .right-section {
-  flex: 1 1 70%;
+  flex: 1 1 75%;
   /* Make right larger */
   display: flex;
   flex-direction: column;
   border-top: 1px solid #ccc;
 }
 
+.label1{
+  color: white;
+  font-size: 16px;
+}
+
 
 .right-section textarea {
   flex: 1;
   resize: vertical;
-  background-color: #5a5a5a;
-  color: white;
+  background-color: #f0f0f0;
+  color: black;
   border: 1px solid #aaa;
   border-radius: 6px;
   padding: 10px;
@@ -446,6 +452,16 @@
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5) !important;
   transition: all 0.3s ease-in-out;
 }
+
+.notes-employee-select {
+  width: 35%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+}
+
 
 .modal-btn {
   color: white;

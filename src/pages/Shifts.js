@@ -39,79 +39,17 @@ const Shifts = () => {
   const [editShiftDate, setEditShiftDate] = useState("");
   const [editEmployeeId, setEditEmployeeId] = useState("");
   const shiftColorPool = [
-    "#0b3d91", // dark azure blue
-    "#4b1d3f", // deep plum
-    "#0f3b57", // midnight teal
-    "#440047", // deep grape
-    "#004d40", // deep teal
-    "#3d0000", // deep maroon
-    "#00203f", // dark navy
-    "#2c003e", // dark purple
-    "#4a148c", // indigo
-    "#1a1a40", // navy black
-    "#3a0ca3", // royal violet
-    "#311432", // raisin black
-    "#8B0000", // dark red
-    "#7B241C", // deep crimson
-    "#641E16", // dark cherry
-    "#78281F", // wine red
-    "#6E1414", // roasted red
-    "#8B2500", // burnt orange
-    "#B7410E", // rust
-    "#A0522D", // sienna brown
-    "#D2691E", // chocolate orange
-    "#9C640C", // golden bronze
-    "#8B4513", // saddle brown
-    "#7C4700", // caramel burnt
-    "#705700", // muddy gold
-    "#665D1E",  // dark mustard
-    "#003f5c", // deep ocean blue
-    "#390099", // vibrant purple
-    "#1c0032", // dark violet
-    "#3e065f", // cosmic purple
-    "#123524", // pine green
-    "#1e2a38", // shadow slate
-    "#0c1f3f", // indigo night
-    "#420516", // merlot
-    "#1a1a2e", // deep blue-gray
-    "#092635", // arctic navy
-    "#402218", // dark brown
-    "#0d1b2a", // dark sea navy
-    "#1b1b2f", // gothic gray
-    "#27374d", // dusty night blue
-    "#132743", // midnight steel
-    "#3e1f47", // mulberry
-    "#183D3D", // sea moss
-    "#1c1c1c", // nearly black
-    "#003366", // classic navy
-    "#212121", // pitch black
-    "#2b1d0e", // earthy brown
-    "#321325", // shadow magenta
-    "#102c57", // blue slate
-    "#2c2c54", // dusk purple
-    "#2a0944", // grape skin
-    "#2e003e", // plum pit
-    "#000f1a", // true deep blue
-    "#1b262c", // blue-black
-    "#001f3f", // abyss blue
-    "#2d132c", // noir rose
-    "#8B008B", // Dark Magenta
-    "#800040", // Deep Rose
-    "#993366", // Dusky Pink
-    "#702963", // Byzantium
-    "#A52A6A", // Rose Red
-    "#78002E", // Dark Raspberry
-    "#AA336A", // Vintage Pink
-    "#260701", // ember coal
-    "#191825", // nightfall
-    "#1f1d36", // dark orchid
-    "#3b2f2f", // cocoa ash
-    "#2e2e40", // grayish indigo
-    "#1e1e2f", // subdued navy
-    "#222831", // graphite
-    "#35013f", // strong plum
-    "#1A4D2E"  // deep forest green
-  ];
+  "#061e48", "#260e20", "#081e2c", "#220024", "#002620", "#3d0000", "#001020", "#2c003e",
+  "#250a46", "#0d0d20", "#1d0652", "#180a19", "#460000", "#3e120e", "#320f0b", "#3c1410",
+  "#370a0a", "#461200", "#5c2007", "#502916", "#69340f", "#4e3206", "#46220a", "#3e2400",
+  "#382c00", "#332e0f", "#00202e", "#1c004c", "#1c0032", "#1f0330", "#091a12", "#0f151c",
+  "#061020", "#420516", "#0d0d17", "#04131a", "#20110c", "#0d1b2a", "#0e0e18", "#141c26",
+  "#0a1422", "#1f1024", "#0c1e1e", "#0e0e0e", "#001a33", "#101010", "#160e07", "#190a12",
+  "#08162c", "#16162a", "#150422", "#2e003e", "#000f1a", "#0e1316", "#001f3f", "#160a16",
+  "#460046", "#400020", "#4c1a33", "#381432", "#521535", "#3c0017", "#551a35", "#260701",
+  "#0c0c12", "#100e1b", "#1e1818", "#171720", "#0f0f18", "#111418", "#35013f", "#0d2617"
+];
+
 
 
 
@@ -519,10 +457,8 @@ const Shifts = () => {
             //glare effect
             if (window.VanillaTilt && info.el) {
               window.VanillaTilt.init(info.el, {
-
                 glare: true,
                 "max-glare": 0.3,
-
               });
             }
           }}

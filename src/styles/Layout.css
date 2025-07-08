@@ -29,8 +29,8 @@
 }
 
 .button:hover {
-  background: rgb(172, 55, 255) !important;
-  box-shadow: 0 0 20px rgb(172, 55, 255) !important;
+  background: rgb(184, 85, 255) !important;
+  box-shadow: 0 0 20px rgb(184, 85, 255) !important;
 }
 
 .button span {
@@ -74,13 +74,13 @@
 }
 
 .navbar {
-  background: #212121;
+  background: #121212;
   color: white;
   display: flex;
   align-items: center;
-  border-bottom: 2px solid #6832ba;
+  border-bottom: 2px solid #8832ba;
   justify-content: space-between;
-  padding: 10px 20px;
+  padding: 9px 20px;
 }
 
 
@@ -117,12 +117,12 @@
 }
 
 .footer {
-  background: #212121;
+  background: #121212;
   color: white;
   text-align: center;
-  padding: 8px;
+  padding: 5px;
   font-size: 16px;
-  border-top: 3px solid #6832ba;
+  border-top: 2px solid #8832ba;
 }
 
 .nav-links {

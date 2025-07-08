@@ -131,7 +131,7 @@ const Shifts = () => {
   }, [user]);
 
   const fetchShifts = () => {
-    fetch("http://192.168.29.194:5000/api/shifts")
+    fetch("http://localhost:5000/api/shifts")
       .then((res) => res.json())
       .then((data) => {
         if (isMountedRef.current) setShifts(data);
@@ -143,7 +143,7 @@ const Shifts = () => {
 
   useEffect(() => {
     fetchShifts();
-    fetch("http://192.168.29.194:5000/api/analysts")
+    fetch("http://localhost:5000/api/analysts")
       .then((res) => res.json())
       .then((data) => {
         if (isMountedRef.current) setAnalysts(data);
@@ -167,7 +167,7 @@ const Shifts = () => {
     const newCabOpted = !cabOpted;
     setCabOpted(newCabOpted);
     try {
-      await fetch(`http://192.168.29.194:5000/api/update_cab_status`, {
+      await fetch(`http://localhost:5000/api/update_cab_status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -213,7 +213,7 @@ const Shifts = () => {
 
     try {
       // 1. First fetch cab status (contains employee info)
-      const cabResponse = await fetch(`http://192.168.29.194:5000/api/shifts/${shift.id}/cab-status`);
+      const cabResponse = await fetch(`http://localhost:5000/api/shifts/${shift.id}/cab-status`);
       if (!cabResponse.ok) throw new Error("Failed to fetch cab status");
       const cabData = await cabResponse.json();
 
@@ -226,7 +226,7 @@ const Shifts = () => {
       }
 
       // 2. Then fetch notes for this shift
-      const notesResponse = await fetch(`http://192.168.29.194:5000/api/shifts/${shift.id}/notes`);
+      const notesResponse = await fetch(`http://localhost:5000/api/shifts/${shift.id}/notes`);
       if (!notesResponse.ok) throw new Error("Failed to fetch notes");
       const notesData = await notesResponse.json();
 
@@ -290,7 +290,7 @@ const Shifts = () => {
       // Prepare the note content (handle empty strings)
       const noteToSave = employeeNotes[selectedEmployeeForNotes] || "";
 
-      const response = await fetch("http://192.168.29.194:5000/api/save_notes", {
+      const response = await fetch("http://localhost:5000/api/save_notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -320,7 +320,7 @@ const Shifts = () => {
 
       // Refresh notes from server to ensure consistency
       try {
-        const notesResponse = await fetch(`http://192.168.29.194:5000/api/shifts/${selectedShift.id}/notes`);
+        const notesResponse = await fetch(`http://localhost:5000/api/shifts/${selectedShift.id}/notes`);
         if (notesResponse.ok) {
           const notesData = await notesResponse.json();
           const updatedNotes = {};
@@ -354,17 +354,14 @@ const Shifts = () => {
 
     const { start, end } = shiftTimeMapping[newShiftType];
 
-    // Special handling for Evening shift (16:00-24:00)
-    let endTime = end;
-    let endDate = newShiftDate;
+    const startDateTime = `${newShiftDate}T${start}:00`;
 
-    if (newShiftType === "Evening") {
-      // Convert 24:00 to 00:00 of next day
-      endTime = "00:00";
-      const nextDay = new Date(newShiftDate);
-      nextDay.setDate(nextDay.getDate() + 1);
-      endDate = nextDay.toISOString().split('T')[0];
+    let endDate = new Date(newShiftDate);
+    if (end === "00:00") {
+      endDate.setDate(endDate.getDate() + 1);
     }
+    const endDateStr = endDate.toISOString().split('T')[0];
+    const endDateTime = `${endDateStr}T${end}:00`;
 
     const selectedEmployeeObjects = analysts.filter((emp) =>
       selectedEmployees.includes(emp.username)
@@ -373,16 +370,15 @@ const Shifts = () => {
     try {
       for (let emp of selectedEmployeeObjects) {
         const response = await fetch(
-          "http://192.168.29.194:5000/api/create_shift",
+          "http://localhost:5000/api/create_shift",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              date: newShiftDate,
-              shift_type: newShiftType.toLowerCase(),
+              start_datetime: startDateTime,
+              end_datetime: endDateTime,
               employee_ids: [emp.id],
-              // For Evening shift, explicitly set the end date
-              ...(newShiftType === "Evening" && { end_date: endDate })
+              shift_type: newShiftType.toLowerCase(),
             }),
           }
         );
@@ -433,7 +429,7 @@ const Shifts = () => {
         return;
       }
 
-      const response = await fetch("http://192.168.29.194:5000/api/edit_shift", {
+      const response = await fetch("http://localhost:5000/api/edit_shift", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -458,7 +454,7 @@ const Shifts = () => {
   };
   const handleDeleteShift = async () => {
     try {
-      const response = await fetch("http://192.168.29.194:5000/api/delete_shift", {
+      const response = await fetch("http://localhost:5000/api/delete_shift", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ shift_id: selectedShift.id }),

@@ -69,11 +69,11 @@
 
 .fc-timegrid-event {
   position: relative !important;
-  height: 292px !important;
+  height: 290px !important;
   width: 99.3% !important;
   left: 0 !important;
   display: block !important;
-  margin: 3px 0px 0px 2px !important;
+  margin: 4px 0px 0px 2px !important;
   min-height: 25px !important;
   z-index: auto !important;
   align-items: center !important;
@@ -151,12 +151,12 @@
 
 .fc-daygrid-event:hover {
   box-shadow: #ffffff 0px 0px 2px !important;
-  transform: scale(1.016) !important;
+  transform: scale(1.008) !important;
 }
 
 .fc-timegrid-event:hover {
   box-shadow: #ffffff 0px 0px 2px !important;
-  transform: scale(1.016) !important;
+  transform: scale(1.008) !important;
 }
 
 .fc-timegrid-event-harness {
@@ -228,10 +228,6 @@
 
 
 
-
-
-
-
 .modal {
   position: absolute;
   background: #363636ac !important;
@@ -243,7 +239,7 @@
   margin: auto;
   border-radius: 10px;
   position: relative;
-  top: 8%;
+  top: 2%;
   left: 10%;
   font-family: Calibri, sans-serif;
   animation: fadeIn 0.3s ease-in-out;

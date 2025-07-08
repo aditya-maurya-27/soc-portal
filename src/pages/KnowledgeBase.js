@@ -30,7 +30,7 @@ const KnowledgeBase = () => {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("http://192.168.29.194:5000/api/kb-search");
+      const res = await fetch("http://localhost:5000/api/kb-search");
       const jsonData = await res.json();
       setData(jsonData);
       setCurrentPage(1); // reset to first page
@@ -46,7 +46,7 @@ const KnowledgeBase = () => {
     } else {
       try {
         const res = await fetch(
-          `http://192.168.29.194:5000/api/kb-search?query=${encodeURIComponent(query)}`
+          `http://localhost:5000/api/kb-search?query=${encodeURIComponent(query)}`
         );
         const jsonData = await res.json();
         cache.current.set(cacheKey, jsonData);
@@ -72,7 +72,7 @@ const KnowledgeBase = () => {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://192.168.29.194:5000/api/kb_table-import", {
+      const res = await fetch("http://localhost:5000/api/kb_table-import", {
         method: "POST",
         body: formData,
       });
@@ -92,7 +92,7 @@ const KnowledgeBase = () => {
 
   const handleManualSubmit = async () => {
     try {
-      const res = await fetch("http://192.168.29.194:5000/api/kb_table-add", {
+      const res = await fetch("http://localhost:5000/api/kb_table-add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

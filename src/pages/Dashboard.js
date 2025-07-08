@@ -13,7 +13,7 @@ function Dashboard() {
 
     const fetchShifts = async () => {
       try {
-        const response = await fetch(`http://192.168.29.194:5000/api/user_shifts/${user.id}`);
+        const response = await fetch(`http://localhost:5000/api/user_shifts/${user.id}`);
         const data = await response.json();
         setShifts(data);
       } catch (error) {

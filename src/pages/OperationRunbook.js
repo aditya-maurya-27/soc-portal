@@ -28,7 +28,7 @@ export default function OperationRunbook() {
   const isAdmin = localStorage.getItem("isAdmin") === "true";
 
   useEffect(() => {
-    fetch("http://192.168.29.194:5000/api/clients")
+    fetch("http://localhost:5000/api/clients")
       .then(res => res.json())
       .then(data => {
         const formatted = data.map(([id, name]) => ({ id, name }));
@@ -45,7 +45,7 @@ export default function OperationRunbook() {
   }, [selectedClient]);
 
   const fetchAssetsAndEscalation = (clientId) => {
-    fetch(`http://192.168.29.194:5000/api/assets?client=${clientId}`)
+    fetch(`http://localhost:5000/api/assets?client=${clientId}`)
       .then(res => res.json())
       .then(data => {
         setAssetData(data);
@@ -57,7 +57,7 @@ export default function OperationRunbook() {
         setFilteredAssets([]);
       });
 
-    fetch(`http://192.168.29.194:5000/api/escalation-matrix?client=${clientId}`)
+    fetch(`http://localhost:5000/api/escalation-matrix?client=${clientId}`)
       .then(res => res.json())
       .then(data => {
         const formattedEscalations = data.map(e => ({
@@ -90,7 +90,7 @@ export default function OperationRunbook() {
 
   const handleAddClient = async () => {
     if (!newClientName.trim()) return;
-    const res = await fetch("http://192.168.29.194:5000/api/clients", {
+    const res = await fetch("http://localhost:5000/api/clients", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: newClientName }),
@@ -106,7 +106,7 @@ export default function OperationRunbook() {
   };
 
   const handleAddAsset = async () => {
-    const res = await fetch("http://192.168.29.194:5000/api/assets", {
+    const res = await fetch("http://localhost:5000/api/assets", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ client_id: selectedClient, ...newAsset }),
@@ -125,7 +125,7 @@ export default function OperationRunbook() {
   };
 
   const handleAddEscalation = async () => {
-    const res = await fetch("http://192.168.29.194:5000/api/escalation-matrix", {
+    const res = await fetch("http://localhost:5000/api/escalation-matrix", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ client_id: selectedClient, ...newEscalation }),

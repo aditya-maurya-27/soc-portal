@@ -59,7 +59,7 @@ function HomePage() {
         for (let xx = -gridRadius; xx < gridRadius; xx += this.gridSize) {
           for (let yy = -gridRadius; yy < gridRadius; yy += this.gridSize) {
             const r = Math.sqrt(xx * xx + yy * yy);
-            const r0 = 110;
+            const r0 = 102;
             let field;
             if (r < r0) field = (255 / r0) * r;
             else field = 255 - Math.min(255, (r - r0) / 5);
@@ -119,8 +119,8 @@ function HomePage() {
 
         const particle = {
           hue: 260 + Math.sin(Date.now()) * 5000,
-          sat: 100,
-          lum: 60,
+          sat: 60,
+          lum: 55,
           x: closestSpot.x,
           y: closestSpot.y,
           xLast: closestSpot.x,
@@ -173,8 +173,8 @@ function HomePage() {
 
         const particle = {
           hue: 260 + Math.sin(Date.now()) * 5000,
-          sat: 100,
-          lum: 60,
+          sat: 60,
+          lum: 55,
           x: closestSpot.x,
           y: closestSpot.y,
           xLast: closestSpot.x,

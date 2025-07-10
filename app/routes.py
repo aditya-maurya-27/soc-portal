@@ -451,17 +451,17 @@ def setup_routes(app):
         query = request.args.get('query', '').strip()
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-
+ 
         try:
             if not query:
                 cursor.execute("SELECT id, entity_name, asset, itsm_ref, asset_details, status, reason, context, remarks FROM knowledge_base")
                 results = cursor.fetchall()
                 return jsonify(results)
-
+ 
             words = query.split()
             conditions = []
             params = []
-
+ 
             for word in words:
                 conditions.append(
                     "("
@@ -478,7 +478,7 @@ def setup_routes(app):
                 )
                 for _ in range(9):
                     params.append(f"%{word}%")
-
+ 
             where_clause = " AND ".join(conditions)
             sql = f"""
                 SELECT id, entity_name, asset, itsm_ref, asset_details,
@@ -489,7 +489,7 @@ def setup_routes(app):
             cursor.execute(sql, params)
             results = cursor.fetchall()
             return jsonify(results)
-
+ 
         finally:
             cursor.close()
             conn.close()
@@ -544,6 +544,31 @@ def setup_routes(app):
                 cursor.close()
             if conn:
                 conn.close()
+
+
+    @app.route('/api/kb_table-delete', methods=['POST'])
+    def delete_entries():
+        try:
+            data = request.get_json()
+            ids = data.get('ids', [])
+            if not ids:
+                return jsonify({"message": "No IDs provided"}), 400
+ 
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            format_strings = ','.join(['%s'] * len(ids))
+            cursor.execute(f"DELETE FROM knowledge_base WHERE id IN ({format_strings})", tuple(ids))
+            conn.commit()
+ 
+            return jsonify({"message": "Entries deleted successfully!"}), 200
+ 
+        except Exception as e:
+            print("Error deleting entries:", str(e))
+            return jsonify({"message": str(e)}), 500
+ 
+        finally:
+            cursor.close()
+            conn.close()
 
         
     @app.route('/api/kb_table-import', methods=['POST'])

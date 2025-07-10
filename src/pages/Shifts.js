@@ -39,16 +39,16 @@ const Shifts = () => {
   const [editShiftDate, setEditShiftDate] = useState("");
   const [editEmployeeId, setEditEmployeeId] = useState("");
   const shiftColorPool = [
-  "#061e48", "#260e20", "#081e2c", "#220024", "#002620", "#3d0000", "#001020", "#2c003e",
-  "#250a46", "#0d0d20", "#1d0652", "#180a19", "#460000", "#3e120e", "#320f0b", "#3c1410",
-  "#370a0a", "#461200", "#5c2007", "#502916", "#69340f", "#4e3206", "#46220a", "#3e2400",
-  "#382c00", "#332e0f", "#00202e", "#1c004c", "#1c0032", "#1f0330", "#091a12", "#0f151c",
-  "#061020", "#420516", "#0d0d17", "#04131a", "#20110c", "#0d1b2a", "#0e0e18", "#141c26",
-  "#0a1422", "#1f1024", "#0c1e1e", "#0e0e0e", "#001a33", "#101010", "#160e07", "#190a12",
-  "#08162c", "#16162a", "#150422", "#2e003e", "#000f1a", "#0e1316", "#001f3f", "#160a16",
-  "#460046", "#400020", "#4c1a33", "#381432", "#521535", "#3c0017", "#551a35", "#260701",
-  "#0c0c12", "#100e1b", "#1e1818", "#171720", "#0f0f18", "#111418", "#35013f", "#0d2617"
-];
+    "#061e48", "#260e20", "#081e2c", "#220024", "#002620", "#3d0000", "#001020", "#2c003e",
+    "#250a46", "#0d0d20", "#1d0652", "#180a19", "#460000", "#3e120e", "#320f0b", "#3c1410",
+    "#370a0a", "#461200", "#5c2007", "#502916", "#69340f", "#4e3206", "#46220a", "#3e2400",
+    "#382c00", "#332e0f", "#00202e", "#1c004c", "#1c0032", "#1f0330", "#091a12", "#0f151c",
+    "#061020", "#420516", "#0d0d17", "#04131a", "#20110c", "#0d1b2a", "#0e0e18", "#141c26",
+    "#0a1422", "#1f1024", "#0c1e1e", "#0e0e0e", "#001a33", "#101010", "#160e07", "#190a12",
+    "#08162c", "#16162a", "#150422", "#2e003e", "#000f1a", "#0e1316", "#001f3f", "#160a16",
+    "#460046", "#400020", "#4c1a33", "#381432", "#521535", "#3c0017", "#551a35", "#260701",
+    "#0c0c12", "#100e1b", "#1e1818", "#171720", "#0f0f18", "#111418", "#35013f", "#0d2617"
+  ];
 
 
 
@@ -434,7 +434,7 @@ const Shifts = () => {
             onClick={() => setIsAddModalOpen(true)}
             className="add-shift-btn"
           >
-            Create Shift
+            Add Shift
           </button>
         )}
         <FullCalendar
@@ -443,7 +443,7 @@ const Shifts = () => {
 
 
             /*
-            // Assign color to shift
+            //event colorization
             if (!shiftColorMap.current[shiftId]) {
               const randomColor = shiftColorPool[Math.floor(Math.random() * shiftColorPool.length)];
               shiftColorMap.current[shiftId] = randomColor;
@@ -454,7 +454,8 @@ const Shifts = () => {
             info.el.style.borderColor = color;
             */
 
-            //glare effect
+
+            //glare
             if (window.VanillaTilt && info.el) {
               window.VanillaTilt.init(info.el, {
                 glare: true,
@@ -721,51 +722,53 @@ const Shifts = () => {
         overlayClassName="overlay"
       >
         <h2>Create New Shift</h2>
-        <label>Date:</label>
-        <input
-          type="date"
-          value={newShiftDate}
-          onChange={(e) => setNewShiftDate(e.target.value)}
-        />
+        <div className="modal-content-wrapper">
+          <div className="left-div">
+            <label htmlFor="shift-date">Date:</label>
+            <input
+              type="date"
+              id="shift-date"
+              value={newShiftDate}
+              onChange={(e) => setNewShiftDate(e.target.value)}
+            />
 
-        <label>Shift Type:</label>
-        <select
-          value={newShiftType}
-          onChange={(e) => setNewShiftType(e.target.value)}
-        >
-          <option>Morning</option>
-          <option>Evening</option>
-          <option>Night</option>
-        </select>
+            <label htmlFor="shift-type">Shift Type:</label>
+            <select
+              id="shift-type"
+              value={newShiftType}
+              onChange={(e) => setNewShiftType(e.target.value)}
+              className="dropdown"
+            >
+              <option>Morning</option>
+              <option>Evening</option>
+              <option>Night</option>
+            </select>
+          </div>
 
-        <label>Select Employees:</label>
-        <div className="employees-checkboxes">
-          {analysts.map((emp) => (
-            <div key={emp.id} className="employee-checkbox">
-              <input
-                type="checkbox"
-                id={`emp-${emp.id}`}
-                checked={selectedEmployees.includes(emp.username)}
-                onChange={() => handleEmployeeToggle(emp.username)}
-              />
-              <label htmlFor={`emp-${emp.id}`}>{emp.username}</label>
+          <div className="right-div">
+            <label>Select Employees:</label>
+            <div className="employees-checkboxes">
+              {analysts.map((emp) => (
+                <label key={emp.id} className="custom-checkbox">
+                  <input
+                    type="checkbox"
+                    className="dummy"
+                    id={`emp-${emp.id}`}
+                    checked={selectedEmployees.includes(emp.username)}
+                    onChange={() => handleEmployeeToggle(emp.username)}
+                  />
+                  <span className="checkmark"></span>
+                  {emp.username}
+                </label>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
-
-
-
         <div className="modal-buttons">
-          <button
-            onClick={handleAddShift}
-            className="modal-btn save-btn"
-          >
+          <button onClick={handleAddShift} className="modal-btn save-btn">
             Create
           </button>
-          <button
-            onClick={() => setIsAddModalOpen(false)}
-            className="modal-btn cancel-btn"
-          >
+          <button onClick={() => setIsAddModalOpen(false)} className="modal-btn cancel-btn">
             Cancel
           </button>
         </div>

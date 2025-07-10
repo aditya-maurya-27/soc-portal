@@ -1,0 +1,58 @@
+.handover_wrapper {
+    padding: 10px 15px;
+    font-family: Arial, sans-serif;
+    height: 100%;
+    margin: auto;
+    background-color: #222222;
+}
+
+.handover_display {
+    color: white;
+
+}
+
+.table_title {
+  color: white;
+  font-size: 20px !important;
+  font-weight: bold;
+  text-align: center;
+  padding: 12px;
+  border: 1px solid #ccc;
+}
+
+
+
+.shift_info p {
+    margin: 4px 0;
+}
+
+.handover_table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    color: white;
+}
+
+.handover_table th {
+    color: black;
+    background-color: #a65bc9 !important;
+    border: 1px solid #ccc;
+    padding: 5px;
+    font-size: 18px;
+}
+
+.handover_table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    vertical-align: top;
+    text-align: left;
+}
+
+.handover_table th {
+    background-color: #f2f2f2;
+}
+
+.handover_table td {
+    white-space: pre-wrap;
+    cursor: text;
+}

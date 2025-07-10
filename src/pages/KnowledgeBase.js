@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, Trash2 } from "lucide-react";
 import "../styles/KnowledgeBase.css";
-
+ 
 const KnowledgeBase = () => {
   const [query, setQuery] = useState("");
   const [data, setData] = useState([]);
@@ -10,7 +10,9 @@ const KnowledgeBase = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
   const [sourceType, setSourceType] = useState("Local");
-
+  const [showCheckboxes, setShowCheckboxes] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
+ 
   const [newEntry, setNewEntry] = useState({
     entity_name: "",
     asset: "",
@@ -21,24 +23,33 @@ const KnowledgeBase = () => {
     context: "",
     remarks: "",
   });
-
+ 
   const cache = useRef(new Map());
-
+ 
   useEffect(() => {
     fetchData();
   }, []);
-
+ 
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (query.trim() !== "") {
+        handleSearch();
+      }
+    }, 500);
+    return () => clearTimeout(delayDebounce);
+  }, [query]);
+ 
   const fetchData = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/kb-search");
+      const res = await fetch("http://localhost:3000/api/kb-search");
       const jsonData = await res.json();
       setData(jsonData);
-      setCurrentPage(1); // reset to first page
+      setCurrentPage(1);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-
+ 
   const handleSearch = async () => {
     const cacheKey = query.trim().toLowerCase();
     if (cache.current.has(cacheKey)) {
@@ -46,7 +57,7 @@ const KnowledgeBase = () => {
     } else {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/kb-search?query=${encodeURIComponent(query)}`
+          `http://localhost:3000/api/kb-search?query=${encodeURIComponent(query)}`
         );
         const jsonData = await res.json();
         cache.current.set(cacheKey, jsonData);
@@ -56,23 +67,23 @@ const KnowledgeBase = () => {
       }
     }
     setShowingSearch(true);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
-
+ 
   const handleGoBack = () => {
     setQuery("");
     fetchData();
     setShowingSearch(false);
   };
-
+ 
   const handleImport = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const formData = new FormData();
     formData.append("file", file);
-
+ 
     try {
-      const res = await fetch("http://localhost:5000/api/kb_table-import", {
+      const res = await fetch("http://localhost:3000/api/kb_table-import", {
         method: "POST",
         body: formData,
       });
@@ -89,10 +100,10 @@ const KnowledgeBase = () => {
     }
     e.target.value = "";
   };
-
+ 
   const handleManualSubmit = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/kb_table-add", {
+      const res = await fetch("http://localhost:3000/api/kb_table-add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -120,19 +131,66 @@ const KnowledgeBase = () => {
       console.error("Add error:", error);
     }
   };
-
+ 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
     }
   };
-
-  // Pagination logic 
+ 
+  const toggleCheckbox = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+ 
+  const handleDelete = async () => {
+    if (selectedIds.length === 0) {
+      alert("No entries selected.");
+      return;
+    }
+ 
+    const confirmDelete = window.confirm("Are you sure you want to delete the selected entries?");
+    if (!confirmDelete) return;
+ 
+    try {
+      const res = await fetch("http://localhost:3000/api/kb_table-delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids: selectedIds }),
+      });
+ 
+      const result = await res.json();
+      if (res.ok) {
+        alert("Entries deleted successfully!");
+ 
+        const updatedRes = await fetch("http://localhost:3000/api/kb-search");
+        const updatedData = await updatedRes.json();
+ 
+        setData(updatedData);
+ 
+        const minDeletedId = Math.min(...selectedIds);
+        const newPage = Math.ceil(minDeletedId / itemsPerPage);
+        setCurrentPage(newPage);
+ 
+        setSelectedIds([]);
+        setShowCheckboxes(false);
+      } else {
+        alert("Delete failed: " + result.message);
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Delete failed due to a network error.");
+    }
+  };
+ 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(data.length / itemsPerPage);
-
+ 
   return (
     <div className="kb-container">
       <div className="kb-card">
@@ -148,7 +206,7 @@ const KnowledgeBase = () => {
           <button className="kb-button" onClick={handleSearch}>
             <Search size={16} /> Search
           </button>
-          
+ 
           <div className="dropdown">
             <button className="kb-button dropdown-toggle">
               {sourceType}
@@ -158,7 +216,7 @@ const KnowledgeBase = () => {
               <div onClick={() => setSourceType("ITSM API")}>ITSM API</div>
             </div>
           </div>
-
+ 
           <label htmlFor="import-file" className="kb-imp">
             Import Excel
           </label>
@@ -172,8 +230,16 @@ const KnowledgeBase = () => {
           <button className="kb-button" onClick={() => setShowForm(!showForm)}>
             <Plus size={16} /> Add Entry
           </button>
+          <button className="kb-button" onClick={() => setShowCheckboxes(!showCheckboxes)}>
+            <Trash2 size={16} /> {showCheckboxes ? "Cancel Delete" : "Delete Entries"}
+          </button>
+          {showCheckboxes && (
+            <button className="kb-button" onClick={handleDelete}>
+              Confirm Delete
+            </button>
+          )}
         </div>
-
+ 
         {showForm && (
           <div className="modal-overlay">
             <div className="modal-form">
@@ -204,10 +270,11 @@ const KnowledgeBase = () => {
             </div>
           </div>
         )}
-
+ 
         <table className="kb-table">
           <thead>
             <tr>
+              {showCheckboxes && <th>Select</th>}
               <th>ID</th>
               <th>Entity Name</th>
               <th>Asset</th>
@@ -221,9 +288,18 @@ const KnowledgeBase = () => {
           </thead>
           <tbody>
             {currentItems.length > 0 ? (
-              currentItems.map((item) => (
+              currentItems.map((item,index) => (
                 <tr key={item.id}>
-                  <td>{item.id}</td>
+                  {showCheckboxes && (
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(item.id)}
+                        onChange={() => toggleCheckbox(item.id)}
+                      />
+                    </td>
+                  )}
+                  <td>{indexOfFirstItem + index + 1}</td>
                   <td>{item.entity_name}</td>
                   <td>{item.asset}</td>
                   <td>{item.itsm_ref}</td>
@@ -236,13 +312,12 @@ const KnowledgeBase = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="9">No results found</td>
+                <td colSpan="10">No results found</td>
               </tr>
             )}
           </tbody>
         </table>
-
-        {/* Pagination Controls */}
+ 
         {data.length > itemsPerPage && (
           <div className="pagination">
             <button
@@ -266,7 +341,7 @@ const KnowledgeBase = () => {
             </button>
           </div>
         )}
-
+ 
         {showingSearch && (
           <button className="kb-button kb-back-button" onClick={handleGoBack}>
             ← Back to All Data
@@ -276,8 +351,5 @@ const KnowledgeBase = () => {
     </div>
   );
 };
-
+ 
 export default KnowledgeBase;
-
-
-

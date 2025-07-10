@@ -6,6 +6,7 @@ import "../styles/Layout.css";
 const protectedRoutes = [
   "/dashboard",
   "/shifts",
+  "/shift_handover",
   "/knowledge_base",
   "/operation_runbook",
   "/advisory_system"
@@ -70,6 +71,11 @@ function Layout() {
                 <li>
                   <Link to="/shifts" className={location.pathname === "/shifts" ? "active" : ""}>
                     Shifts
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/shift_handover" className={location.pathname === "/shift_handover" ? "active" : ""}>
+                    Shift Handover
                   </Link>
                 </li>
                 <li>

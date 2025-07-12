@@ -33,6 +33,24 @@ function ShiftHandover() {
                 status: "",
             },
         ],
+        currentShiftPoints: [
+            {
+                description: "Keep an eye on Peru log Sources - delayed, ERCSL Log Sources, EIU Log sources, RNB Log sources, Thailand still down, FRCHRG ForcePoint DLP, Liminal Cloudflare, Liminal GitLab",
+                status: "Informational",
+            },
+            {
+                description: "Ticket Delivery Email Address Update",
+                status: "",
+            },
+            {
+                description: `Going forward please ensure to send all the tickets of limnial to soc@limnl.app.\n- Cloudflare – Distributed Unauthorized Access Attempts\n- Cloudflare – Multiple Proxy Authentication Failures\n- Cloudflare – Bot Traffic from Suspicious User Agents detected\n\nThe above rules are newly made rules in GTIBharat if it triggers raise without fail.`,
+                status: "Important",
+            },
+            {
+                description: "In RNB, please don’t use any other mailing list or mail ids apart from SOP, all mails are clearly mentioned in SOP document for Incident & Reports as well.",
+                status: "Important",
+            },
+        ],
     });
 
     const handleCellEdit = (index, field, value) => {
@@ -41,19 +59,45 @@ function ShiftHandover() {
         setHandoverData({ ...handoverData, actionPoints: updatedActions });
     };
 
+    const handleCurrentCellEdit = (index, field, value) => {
+        const updated = [...handoverData.currentShiftPoints];
+        updated[index][field] = value;
+        setHandoverData({ ...handoverData, currentShiftPoints: updated });
+    };
+
     return (
         <div className="handover_wrapper">
-
             <div className="handover_display">
                 <div className="shift_info">
-                    <p><strong>Date:</strong> {handoverData.date}</p>
-                    <p><strong>Shift:</strong> {handoverData.shift}</p>
-                    <p><strong>Cluster:</strong> {handoverData.cluster}</p>
-                    <p><strong>Team Members:</strong> {handoverData.members}</p>
+                    <p><strong>Select Date:</strong>
+                        <input
+                            type="date"
+                            value={handoverData.date}
+                            onChange={(e) => setHandoverData({ ...handoverData, date: e.target.value })}
+                            className="date_picker"
+                        />
+                    </p>
+                    <p>
+                        <strong>Shift:</strong>{" "}
+                        <select value={handoverData.shift} onChange={(e) => setHandoverData({ ...handoverData, shift: e.target.value })} className="shift_picker">
+                            <option value="Morning">Morning Shift</option>
+                            <option value="Afternoon">Afternoon Shift</option>
+                            <option value="Night">Night Shift</option>
+                        </select>
+                    </p>
+                    <p><strong>Cluster:</strong>
+                        <select value={handoverData.cluster} onChange={(e) => setHandoverData({ ...handoverData, cluster: e.target.value })} className="cluster_picker">
+                            <option value="Cluster1">Cluster 1</option>
+                            <option value="Cluster2">Cluster 2</option>
+                            <option value="Cluster3">Cluster 3</option>
+                            <option value="Cluster4">Cluster 4</option>
+                        </select>
+                    </p>
                 </div>
+                <p><strong>Team Members:</strong> {handoverData.members}</p>
 
+                {/* Previous Shift Table */}
                 <table className="handover_table">
-
                     <thead>
                         <tr>
                             <th colSpan="3" className="table_title">Action Points from Previous Shift</th>
@@ -64,8 +108,6 @@ function ShiftHandover() {
                             <th>Status</th>
                         </tr>
                     </thead>
-
-
                     <tbody>
                         {handoverData.actionPoints.map((action, index) => (
                             <tr key={index}>
@@ -81,6 +123,41 @@ function ShiftHandover() {
                                     contentEditable
                                     suppressContentEditableWarning
                                     onBlur={(e) => handleCellEdit(index, "status", e.target.innerText)}
+                                >
+                                    {action.status}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+                {/* Current Shift Table */}
+                <table className="handover_table">
+                    <thead>
+                        <tr>
+                            <th colSpan="3" className="table_title">Action Points from Current Shift</th>
+                        </tr>
+                        <tr>
+                            <th>S.No.</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {handoverData.currentShiftPoints.map((action, index) => (
+                            <tr key={`current-${index}`}>
+                                <td>{index + 1}</td>
+                                <td
+                                    contentEditable
+                                    suppressContentEditableWarning
+                                    onBlur={(e) => handleCurrentCellEdit(index, "description", e.target.innerText)}
+                                >
+                                    {action.description}
+                                </td>
+                                <td
+                                    contentEditable
+                                    suppressContentEditableWarning
+                                    onBlur={(e) => handleCurrentCellEdit(index, "status", e.target.innerText)}
                                 >
                                     {action.status}
                                 </td>

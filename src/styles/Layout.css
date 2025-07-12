@@ -9,7 +9,7 @@
 
 
 .button {
-  background: rgb(93, 46, 135);
+  background: #333333;
   color: white;
   font-size: 18px;
   margin-top: 0;
@@ -29,8 +29,8 @@
 }
 
 .button:hover {
-  background: rgb(184, 85, 255) !important;
-  box-shadow: 0 0 20px rgb(184, 85, 255) !important;
+  background: rgb(168, 46, 255) !important;
+  box-shadow: 0 0 20px rgb(168, 46, 255) !important;
 }
 
 .button span {
@@ -74,13 +74,13 @@
 }
 
 .navbar {
-  background: #121212;
   color: white;
   display: flex;
   align-items: center;
-  border-bottom: 2px solid #8832ba;
+  border-bottom: 1px solid #a600e2;
   justify-content: space-between;
   padding: 9px 20px;
+  transition: background-color 2s ease;
 }
 
 
@@ -122,7 +122,8 @@
   text-align: center;
   padding: 5px;
   font-size: 16px;
-  border-top: 2px solid #8832ba;
+  border-top: 1px solid #a600e2;
+  transition: background-color 2s ease;
 }
 
 .nav-links {

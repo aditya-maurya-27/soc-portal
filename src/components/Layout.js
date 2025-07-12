@@ -1,6 +1,7 @@
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
 import "../styles/Layout.css";
 
 const protectedRoutes = [
@@ -12,10 +13,13 @@ const protectedRoutes = [
   "/advisory_system"
 ];
 
+
 function Layout() {
   const { isAuthenticated, logout, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [navbarColor, setNavbarColor] = useState("#121212");
+  
 
   const handleLogin = () => {
     login();
@@ -43,9 +47,21 @@ function Layout() {
     }
   }, [isAuthenticated, location.pathname, navigate]);
 
+  useEffect(() => {
+    // Set navbar color based on route
+    if (location.pathname === "/") {
+      setNavbarColor("#121212"); // dark for landing page
+    } else if (location.pathname === "/login" || location.pathname === "/register") {
+      setNavbarColor("#222222"); // white for login/register
+    } else {
+      setNavbarColor("#332042"); // light gray or any color for other pages
+    }
+  }, [location.pathname]);
+
+
   return (
     <div className="container">
-      <header className="navbar">
+      <header className="navbar" style={{ backgroundColor: navbarColor }}>
         <div className="logo-container">
           <img src="/logo.png" className="logo-image" alt="Logo" />
           <h1 className="logo-text">Grant Thornton</h1>
@@ -101,12 +117,12 @@ function Layout() {
           </ul>
         </nav>
       </header>
-      
+
       <main className="content">
         <Outlet />
       </main>
-      
-      <footer className="footer">
+
+      <footer className="footer" style={{ backgroundColor: navbarColor }}>
         <p>© 2025 Grant Thornton Bharat LLP - All Rights Reserved.</p>
       </footer>
     </div>

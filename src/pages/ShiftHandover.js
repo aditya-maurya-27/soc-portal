@@ -104,24 +104,26 @@ function ShiftHandover() {
                         />
                     </p>
                     <p><strong>Shift:</strong>
-                        <select value={handoverData.shift} onChange={(e) => setHandoverData({ ...handoverData, shift: e.target.value })}>
+                        <select className="shift_picker" value={handoverData.shift} onChange={(e) => setHandoverData({ ...handoverData, shift: e.target.value })}>
                             <option value="Morning">Morning Shift</option>
                             <option value="Afternoon">Afternoon Shift</option>
                             <option value="Night">Night Shift</option>
+                            <option value="General">General Shift</option>
                         </select>
                     </p>
                     <p><strong>Cluster:</strong>
-                        <select value={handoverData.cluster} onChange={(e) => setHandoverData({ ...handoverData, cluster: e.target.value })}>
+                        <select className="cluster_picker" value={handoverData.cluster} onChange={(e) => setHandoverData({ ...handoverData, cluster: e.target.value })}>
                             <option value="Cluster1">Cluster 1</option>
                             <option value="Cluster2">Cluster 2</option>
                             <option value="Cluster3">Cluster 3</option>
                             <option value="Cluster4">Cluster 4</option>
+                            <option value="Cluster5">Cluster 5</option>
                         </select>
                     </p>
                 </div>
 
                 <p><strong>Team Members:</strong> {handoverData.members}</p>
-
+                <br/>
                 {/* Previous Shift Table */}
                 <table className="handover_table">
                     <thead>
@@ -153,7 +155,8 @@ function ShiftHandover() {
                         ))}
                     </tbody>
                 </table>
-
+                <br/>
+                <br/>
                 {/* Current Shift Table */}
                 <table className="handover_table">
                     <thead>
@@ -186,7 +189,8 @@ function ShiftHandover() {
                         ))}
                     </tbody>
                 </table>
-
+                <br/>
+                <br/>
                 {/* Last Incident Raised Table */}
                 <table className="handover_table">
                     <thead>
@@ -259,6 +263,63 @@ function ShiftHandover() {
                                     {handoverData.lastIncidents[3].value.timestamp}
                                 </span>
                             </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br/>
+                <br/>
+                {/* Shift Activity Tracker Table */}
+                <table className="handover_table">
+                    <thead>
+                        <tr>
+                            <th colSpan="4">
+                                Shift Activity Tracker
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colSpan="4">
+                                Pending from previous Shifts
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>Total Pending</th>
+                            <th colspan="3">Some of the Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowSpan="4" style={{ textAlign: "center"}}>50</td>
+                            <td colspan="3">Zscaler ZIA Logs for previous 3 months</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">Require SOC Playbook</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">RE: ECLF Audit requirement</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">CVC Monthly review - May 2025</td>
+                        </tr>
+                    </tbody>
+                    <thead>
+                        <tr>
+                            <th colSpan="4">
+                                Current Shift
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>Total Requests Received</th>
+                            <th>Resolved</th>
+                            <th>Pending</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={{ textAlign: "center" }}>00</td>
+                            <td style={{ textAlign: "center" }}>00</td>
+                            <td style={{ textAlign: "center" }}>00</td>
+                            <td style={{ textAlign: "center" }}>--</td>
                         </tr>
                     </tbody>
                 </table>

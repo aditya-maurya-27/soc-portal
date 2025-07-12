@@ -8,55 +8,52 @@ function ShiftHandover() {
         cluster: "Cluster 02",
         members: "Anant, Jachandeep, Vikas",
         actionPoints: [
-            {
-                description: "Keep an eye on various log sources (Peru Log Sources - delayed, EFCLS Log Sources, EIU Log Sources, RNB Log sources) and FCHRBIG ForcePoint DLP with Thailand still down.",
-                status: "Informational",
-            },
-            {
-                description: "Ticket Delivery Email Address Update",
-                status: "Important",
-            },
-            {
-                description: `Going forward please ensure to send all the tickets of limnial to soc@limnl.app.\n- Cloudflare - Distributed Unauthorized Access Attempts\n- Cloudflare - Multiple Proxy Authentication Failures\n- Cloudflare - Bot Traffic from Suspicious User Agents detected\n\nThe above rules are newly made rules in GTIBharat if it triggers raise without fail.`,
-                status: "Important",
-            },
-            {
-                description: `SIK - Palo Alto Scan Activity – Daily Reporting Protocol Update\nStarting from the morning shift on 5th July, any offense related to “Potential Scan Activity on Palo Alto from External Source” should be treated as follows:\n* If the action is other than ‘accept’, the incident can be reported once per day as a P5 severity offense.\n* If the action is ‘accept’, incidents should be reported as per SLA.\n\nThe incident window is from 06:00 AM to 06:00 AM the following day, aligning with the morning shift schedule.\n\nTagging for awareness:\nDefenders Vamun Kumar, Faiz Ahmad, Nithish Reddy\nCluster Leads Ratan Jeswal, Swati Singh, Siddharth Baghel\nPlease ensure that all types of incidents are being reported in Sekura not just Operational Incidents.`,
-                status: "Important",
-            },
-            {
-                description: `RE Unmanned SOC- Daily Report – 04 July 2025.\nHi Team,\nThanks for sharing logs request you to closely watch accept traffic from suspicious countries or IOCs and share detailed daily report.`,
-                status: "",
-            },
-            {
-                description: "CRCSL SE",
-                status: "",
-            },
+            { description: "Keep an eye on various log sources...", status: "Informational" },
+            { description: "Ticket Delivery Email Address Update", status: "Important" },
+            { description: `Going forward please ensure to send all the tickets...`, status: "Important" },
+            { description: `SIK - Palo Alto Scan Activity – Daily Reporting Protocol Update...`, status: "Important" },
+            { description: `RE Unmanned SOC- Daily Report – 04 July 2025...`, status: "" },
+            { description: "CRCSL SE", status: "" },
         ],
         currentShiftPoints: [
-            {
-                description: "Keep an eye on Peru log Sources - delayed, ERCSL Log Sources, EIU Log sources, RNB Log sources, Thailand still down, FRCHRG ForcePoint DLP, Liminal Cloudflare, Liminal GitLab",
-                status: "Informational",
-            },
-            {
-                description: "Ticket Delivery Email Address Update",
-                status: "",
-            },
-            {
-                description: `Going forward please ensure to send all the tickets of limnial to soc@limnl.app.\n- Cloudflare – Distributed Unauthorized Access Attempts\n- Cloudflare – Multiple Proxy Authentication Failures\n- Cloudflare – Bot Traffic from Suspicious User Agents detected\n\nThe above rules are newly made rules in GTIBharat if it triggers raise without fail.`,
-                status: "Important",
-            },
-            {
-                description: "In RNB, please don’t use any other mailing list or mail ids apart from SOP, all mails are clearly mentioned in SOP document for Incident & Reports as well.",
-                status: "Important",
-            },
+            { description: "Keep an eye on Peru log Sources...", status: "Informational" },
+            { description: "Ticket Delivery Email Address Update", status: "" },
+            { description: `Going forward please ensure to send all the tickets...`, status: "Important" },
+            { description: "In RNB, please don’t use any other mailing list...", status: "Important" },
         ],
+        lastIncidents: [
+            {
+                client: "QRadar",
+                timings: ["1019372 (POC)", "283869 (Pred One)", "826552 (PROD)"]
+            },
+            {
+                client: "SentinelOne",
+                timings: ["", "", ""]
+            },
+            {
+                client: "Seceon",
+                subClients: ["Freecharge", "RMSI"],
+                severities: [
+                    { type: "Major", values: ["-", "07/06/2025, 01:59:06 PM"] },
+                    { type: "Minor", values: ["-", "7/6/2025, 07:08:03 PM"] },
+                    { type: "System", values: ["-", "-"] },
+                    { type: "Critical", values: ["-", "07/06/2025, 04:22:03 PM"] }
+                ]
+            },
+            {
+                client: "DLP (Force Point)",
+                value: {
+                    name: "Orient Electric",
+                    timestamp: "2025-07-06 19:45:28"
+                }
+            }
+        ]
     });
 
     const handleCellEdit = (index, field, value) => {
-        const updatedActions = [...handoverData.actionPoints];
-        updatedActions[index][field] = value;
-        setHandoverData({ ...handoverData, actionPoints: updatedActions });
+        const updated = [...handoverData.actionPoints];
+        updated[index][field] = value;
+        setHandoverData({ ...handoverData, actionPoints: updated });
     };
 
     const handleCurrentCellEdit = (index, field, value) => {
@@ -65,9 +62,38 @@ function ShiftHandover() {
         setHandoverData({ ...handoverData, currentShiftPoints: updated });
     };
 
+    const handleIncidentEdit = (index, field, value, subIndex = null) => {
+        const updatedIncidents = [...handoverData.lastIncidents];
+
+        if (subIndex !== null) {
+            if (field === "timing") {
+                updatedIncidents[index].timings[subIndex] = value;
+            } else if (field === "subClient") {
+                updatedIncidents[index].subClients[subIndex] = value;
+            } else if (field === "severityType") {
+                updatedIncidents[index].severities[subIndex].type = value;
+            } else if (field === "severityValue_0") {
+                updatedIncidents[index].severities[subIndex].values[0] = value;
+            } else if (field === "severityValue_1") {
+                updatedIncidents[index].severities[subIndex].values[1] = value;
+            }
+        } else {
+            if (field === "client") {
+                updatedIncidents[index].client = value;
+            } else if (field === "dlpName") {
+                updatedIncidents[index].value.name = value;
+            } else if (field === "dlpTimestamp") {
+                updatedIncidents[index].value.timestamp = value;
+            }
+        }
+
+        setHandoverData({ ...handoverData, lastIncidents: updatedIncidents });
+    };
+
     return (
         <div className="handover_wrapper">
             <div className="handover_display">
+                {/* Basic Info */}
                 <div className="shift_info">
                     <p><strong>Select Date:</strong>
                         <input
@@ -77,16 +103,15 @@ function ShiftHandover() {
                             className="date_picker"
                         />
                     </p>
-                    <p>
-                        <strong>Shift:</strong>{" "}
-                        <select value={handoverData.shift} onChange={(e) => setHandoverData({ ...handoverData, shift: e.target.value })} className="shift_picker">
+                    <p><strong>Shift:</strong>
+                        <select value={handoverData.shift} onChange={(e) => setHandoverData({ ...handoverData, shift: e.target.value })}>
                             <option value="Morning">Morning Shift</option>
                             <option value="Afternoon">Afternoon Shift</option>
                             <option value="Night">Night Shift</option>
                         </select>
                     </p>
                     <p><strong>Cluster:</strong>
-                        <select value={handoverData.cluster} onChange={(e) => setHandoverData({ ...handoverData, cluster: e.target.value })} className="cluster_picker">
+                        <select value={handoverData.cluster} onChange={(e) => setHandoverData({ ...handoverData, cluster: e.target.value })}>
                             <option value="Cluster1">Cluster 1</option>
                             <option value="Cluster2">Cluster 2</option>
                             <option value="Cluster3">Cluster 3</option>
@@ -94,37 +119,35 @@ function ShiftHandover() {
                         </select>
                     </p>
                 </div>
+
                 <p><strong>Team Members:</strong> {handoverData.members}</p>
 
                 {/* Previous Shift Table */}
                 <table className="handover_table">
                     <thead>
-                        <tr>
-                            <th colSpan="3" className="table_title">Action Points from Previous Shift</th>
-                        </tr>
-                        <tr>
-                            <th>S.No.</th>
-                            <th>Description</th>
-                            <th>Status</th>
-                        </tr>
+                        <tr><th colSpan="3">Action Points from Previous Shift</th></tr>
+                        <tr><th>S.No.</th><th>Description</th><th>Status</th></tr>
                     </thead>
                     <tbody>
-                        {handoverData.actionPoints.map((action, index) => (
+                        {handoverData.actionPoints.map((item, index) => (
                             <tr key={index}>
                                 <td>{index + 1}</td>
-                                <td
-                                    contentEditable
-                                    suppressContentEditableWarning
-                                    onBlur={(e) => handleCellEdit(index, "description", e.target.innerText)}
-                                >
-                                    {action.description}
+                                <td contentEditable suppressContentEditableWarning onBlur={(e) => handleCellEdit(index, "description", e.target.innerText)}>
+                                    {item.description}
                                 </td>
                                 <td
                                     contentEditable
                                     suppressContentEditableWarning
+                                    className={
+                                        item.status === "Important"
+                                            ? "status-important"
+                                            : item.status === "Informational"
+                                                ? "status-informational"
+                                                : ""
+                                    }
                                     onBlur={(e) => handleCellEdit(index, "status", e.target.innerText)}
                                 >
-                                    {action.status}
+                                    {item.status}
                                 </td>
                             </tr>
                         ))}
@@ -134,35 +157,109 @@ function ShiftHandover() {
                 {/* Current Shift Table */}
                 <table className="handover_table">
                     <thead>
-                        <tr>
-                            <th colSpan="3" className="table_title">Action Points from Current Shift</th>
-                        </tr>
-                        <tr>
-                            <th>S.No.</th>
-                            <th>Description</th>
-                            <th>Status</th>
-                        </tr>
+                        <tr><th colSpan="3">Action Points from Current Shift</th></tr>
+                        <tr><th>S.No.</th><th>Description</th><th>Status</th></tr>
                     </thead>
                     <tbody>
-                        {handoverData.currentShiftPoints.map((action, index) => (
-                            <tr key={`current-${index}`}>
+                        {handoverData.currentShiftPoints.map((item, index) => (
+                            <tr key={index}>
                                 <td>{index + 1}</td>
-                                <td
-                                    contentEditable
-                                    suppressContentEditableWarning
-                                    onBlur={(e) => handleCurrentCellEdit(index, "description", e.target.innerText)}
-                                >
-                                    {action.description}
+                                <td contentEditable suppressContentEditableWarning onBlur={(e) => handleCurrentCellEdit(index, "description", e.target.innerText)}>
+                                    {item.description}
                                 </td>
                                 <td
                                     contentEditable
                                     suppressContentEditableWarning
+                                    className={
+                                        item.status === "Important"
+                                            ? "status-important"
+                                            : item.status === "Informational"
+                                                ? "status-informational"
+                                                : ""
+                                    }
                                     onBlur={(e) => handleCurrentCellEdit(index, "status", e.target.innerText)}
                                 >
-                                    {action.status}
+                                    {item.status}
+                                </td>
+
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+                {/* Last Incident Raised Table */}
+                <table className="handover_table">
+                    <thead>
+                        <tr><th colSpan="4">Last Incident Raised</th></tr>
+                        <tr><th>Client</th><th colSpan="3">Timings / Subclients / Details</th></tr>
+                    </thead>
+                    <tbody>
+                        {/* QRadar */}
+                        <tr>
+                            <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(0, "client", e.target.innerText)}>
+                                {handoverData.lastIncidents[0].client}
+                            </td>
+                            {handoverData.lastIncidents[0].timings.map((timing, i) => (
+                                <td key={i} contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(0, "timing", e.target.innerText, i)}>
+                                    {timing}
+                                </td>
+                            ))}
+                        </tr>
+
+                        {/* SentinelOne */}
+                        <tr>
+                            <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(1, "client", e.target.innerText)}>
+                                {handoverData.lastIncidents[1].client}
+                            </td>
+                            {handoverData.lastIncidents[1].timings.map((timing, i) => (
+                                <td key={i} contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(1, "timing", e.target.innerText, i)}>
+                                    {timing}
+                                </td>
+                            ))}
+                        </tr>
+
+                        {/* Seceon Header Row */}
+                        <tr>
+                            <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "client", e.target.innerText)}>
+                                {handoverData.lastIncidents[2].client}
+                            </td>
+                            <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "subClient", e.target.innerText, 0)}>
+                                {handoverData.lastIncidents[2].subClients[0]}
+                            </td>
+                            <td colSpan="2" contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "subClient", e.target.innerText, 1)}>
+                                {handoverData.lastIncidents[2].subClients[1]}
+                            </td>
+                        </tr>
+
+                        {/* Seceon Severity Rows */}
+                        {handoverData.lastIncidents[2].severities.map((severity, i) => (
+                            <tr key={i}>
+                                <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "severityType", e.target.innerText, i)}>
+                                    {severity.type}
+                                </td>
+                                <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "severityValue_0", e.target.innerText, i)}>
+                                    {severity.values[0]}
+                                </td>
+                                <td colSpan="2" contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "severityValue_1", e.target.innerText, i)}>
+                                    {severity.values[1]}
                                 </td>
                             </tr>
                         ))}
+
+                        {/* DLP Row */}
+                        <tr>
+                            <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(3, "client", e.target.innerText)}>
+                                {handoverData.lastIncidents[3].client}
+                            </td>
+                            <td colSpan="3" style={{ textAlign: "center" }}>
+                                <strong contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(3, "dlpName", e.target.innerText)}>
+                                    {handoverData.lastIncidents[3].value.name}
+                                </strong><br />
+                                <span contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(3, "dlpTimestamp", e.target.innerText)}>
+                                    {handoverData.lastIncidents[3].value.timestamp}
+                                </span>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

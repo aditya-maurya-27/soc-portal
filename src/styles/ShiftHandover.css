@@ -92,3 +92,11 @@
     white-space: pre-wrap;
     cursor: text;
 }
+
+.status-important {
+  background-color: #800000; /* light red */
+}
+
+.status-informational {
+  background-color: #007a00; /* light green */
+}

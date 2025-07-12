@@ -128,7 +128,7 @@ function ShiftHandover() {
                 <table className="handover_table">
                     <thead>
                         <tr><th colSpan="3">Action Points from Previous Shift</th></tr>
-                        <tr><th>S.No.</th><th>Description</th><th>Status</th></tr>
+                        <tr><th style={{ width: "10%" }}>S.No.</th><th style={{ width: "75%" }}>Description</th><th style={{ width: "15%" }}>Status</th></tr>
                     </thead>
                     <tbody>
                         {handoverData.actionPoints.map((item, index) => (
@@ -161,7 +161,7 @@ function ShiftHandover() {
                 <table className="handover_table">
                     <thead>
                         <tr><th colSpan="3">Action Points from Current Shift</th></tr>
-                        <tr><th>S.No.</th><th>Description</th><th>Status</th></tr>
+                        <tr><th style={{ width: "10%" }}>S.No.</th><th style={{ width: "75%" }}>Description</th><th style={{ width: "15%" }}>Status</th></tr>
                     </thead>
                     <tbody>
                         {handoverData.currentShiftPoints.map((item, index) => (

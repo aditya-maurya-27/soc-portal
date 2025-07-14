@@ -8,7 +8,7 @@ function ShiftHandover() {
         cluster: "Cluster 02",
         members: "Anant, Jachandeep, Vikas",
         actionPoints: [
-            { description: "Keep an eye on various log sources...", status: "Informational" },
+            { description: "Keep an eye on various log sources...\n1. moniotor this\n2. monitor that", status: "Informational" },
             { description: "Ticket Delivery Email Address Update", status: "Important" },
             { description: `Going forward please ensure to send all the tickets...`, status: "Important" },
             { description: `SIK - Palo Alto Scan Activity – Daily Reporting Protocol Update...`, status: "Important" },
@@ -95,7 +95,7 @@ function ShiftHandover() {
             <div className="handover_display">
                 {/* Basic Info */}
                 <div className="shift_info">
-                    <p><strong>Select Date:</strong>
+                    <p><strong>Date:</strong>
                         <input
                             type="date"
                             value={handoverData.date}
@@ -123,7 +123,12 @@ function ShiftHandover() {
                 </div>
 
                 <p><strong>Team Members:</strong> {handoverData.members}</p>
-                <br/>
+                <div className="disclaimer">
+                    <p>
+                        ALL INCIDENTS AND REPORTS HAVE BEEN READ OUT AND VALIDATED
+                    </p>
+                </div>
+                <br />
                 {/* Previous Shift Table */}
                 <table className="handover_table">
                     <thead>
@@ -140,13 +145,15 @@ function ShiftHandover() {
                                 <td
                                     contentEditable
                                     suppressContentEditableWarning
+
                                     className={
-                                        item.status === "Important"
+                                        item.status.trim().toLowerCase() === "important"
                                             ? "status-important"
-                                            : item.status === "Informational"
+                                            : item.status.trim().toLowerCase() === "informational"
                                                 ? "status-informational"
                                                 : ""
                                     }
+
                                     onBlur={(e) => handleCellEdit(index, "status", e.target.innerText)}
                                 >
                                     {item.status}
@@ -155,8 +162,8 @@ function ShiftHandover() {
                         ))}
                     </tbody>
                 </table>
-                <br/>
-                <br/>
+                <br />
+                <br />
                 {/* Current Shift Table */}
                 <table className="handover_table">
                     <thead>
@@ -173,29 +180,31 @@ function ShiftHandover() {
                                 <td
                                     contentEditable
                                     suppressContentEditableWarning
+
                                     className={
-                                        item.status === "Important"
+                                        item.status.trim().toLowerCase() === "important"
                                             ? "status-important"
-                                            : item.status === "Informational"
+                                            : item.status.trim().toLowerCase() === "informational"
                                                 ? "status-informational"
                                                 : ""
                                     }
+
                                     onBlur={(e) => handleCurrentCellEdit(index, "status", e.target.innerText)}
+
                                 >
                                     {item.status}
                                 </td>
-
                             </tr>
                         ))}
                     </tbody>
                 </table>
-                <br/>
-                <br/>
+                <br />
+                <br />
                 {/* Last Incident Raised Table */}
                 <table className="handover_table">
                     <thead>
-                        <tr><th colSpan="4">Last Incident Raised</th></tr>
-                        <tr><th>Client</th><th colSpan="3">Timings / Subclients / Details</th></tr>
+                        <tr><th colSpan="7">Last Incident Raised</th></tr>
+                        <tr><th>Client</th><th colSpan="6">Timings / Subclients / Details</th></tr>
                     </thead>
                     <tbody>
                         {/* QRadar */}
@@ -203,12 +212,20 @@ function ShiftHandover() {
                             <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(0, "client", e.target.innerText)}>
                                 {handoverData.lastIncidents[0].client}
                             </td>
-                            {handoverData.lastIncidents[0].timings.map((timing, i) => (
-                                <td key={i} contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(0, "timing", e.target.innerText, i)}>
-                                    {timing}
-                                </td>
-                            ))}
+                            <th>POC</th>
+                            <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(0, "timing", e.target.innerText, 0)}>
+                                {handoverData.lastIncidents[0].timings[0]}
+                            </td>
+                            <th>Pred One</th>
+                            <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(0, "timing", e.target.innerText, 1)}>
+                                {handoverData.lastIncidents[0].timings[1]}
+                            </td>
+                            <th>PROD</th>
+                            <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(0, "timing", e.target.innerText, 2)}>
+                                {handoverData.lastIncidents[0].timings[2]}
+                            </td>
                         </tr>
+
 
                         {/* SentinelOne */}
                         <tr>
@@ -216,7 +233,7 @@ function ShiftHandover() {
                                 {handoverData.lastIncidents[1].client}
                             </td>
                             {handoverData.lastIncidents[1].timings.map((timing, i) => (
-                                <td key={i} contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(1, "timing", e.target.innerText, i)}>
+                                <td colSpan="2" key={i} contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(1, "timing", e.target.innerText, i)}>
                                     {timing}
                                 </td>
                             ))}
@@ -227,10 +244,10 @@ function ShiftHandover() {
                             <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "client", e.target.innerText)}>
                                 {handoverData.lastIncidents[2].client}
                             </td>
-                            <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "subClient", e.target.innerText, 0)}>
+                            <td colSpan="3" contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "subClient", e.target.innerText, 0)}>
                                 {handoverData.lastIncidents[2].subClients[0]}
                             </td>
-                            <td colSpan="2" contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "subClient", e.target.innerText, 1)}>
+                            <td colSpan="3" contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "subClient", e.target.innerText, 1)}>
                                 {handoverData.lastIncidents[2].subClients[1]}
                             </td>
                         </tr>
@@ -241,10 +258,10 @@ function ShiftHandover() {
                                 <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "severityType", e.target.innerText, i)}>
                                     {severity.type}
                                 </td>
-                                <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "severityValue_0", e.target.innerText, i)}>
+                                <td colspan="3" contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "severityValue_0", e.target.innerText, i)}>
                                     {severity.values[0]}
                                 </td>
-                                <td colSpan="2" contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "severityValue_1", e.target.innerText, i)}>
+                                <td colSpan="3" contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(2, "severityValue_1", e.target.innerText, i)}>
                                     {severity.values[1]}
                                 </td>
                             </tr>
@@ -255,7 +272,7 @@ function ShiftHandover() {
                             <td contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(3, "client", e.target.innerText)}>
                                 {handoverData.lastIncidents[3].client}
                             </td>
-                            <td colSpan="3" style={{ textAlign: "center" }}>
+                            <td colSpan="6" style={{ textAlign: "center" }}>
                                 <strong contentEditable suppressContentEditableWarning onBlur={(e) => handleIncidentEdit(3, "dlpName", e.target.innerText)}>
                                     {handoverData.lastIncidents[3].value.name}
                                 </strong><br />
@@ -266,8 +283,8 @@ function ShiftHandover() {
                         </tr>
                     </tbody>
                 </table>
-                <br/>
-                <br/>
+                <br />
+                <br />
                 {/* Shift Activity Tracker Table */}
                 <table className="handover_table">
                     <thead>
@@ -288,7 +305,7 @@ function ShiftHandover() {
                     </thead>
                     <tbody>
                         <tr>
-                            <td rowSpan="4" style={{ textAlign: "center"}}>50</td>
+                            <td rowSpan="4" style={{ textAlign: "center" }}>50</td>
                             <td colspan="3">Zscaler ZIA Logs for previous 3 months</td>
                         </tr>
                         <tr>

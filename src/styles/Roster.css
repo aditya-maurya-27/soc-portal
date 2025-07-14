@@ -1,14 +1,108 @@
-.shifts-wrapper {
+.wrapper {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
   padding: 8px;
   background-color: #222222;
   margin: 0;
-  min-height: 90vh;
+  min-height: 100vh;
   width: 100%;
 }
+
+.tab-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5px;
+  background-color: #444444;
+  border-radius: 9px;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.indicator {
+  content: "";
+  width: 135px;
+  height: 32px;
+  background: #8900bf;
+  position: absolute;
+  top: 3px;
+  left: 0px;
+  z-index: 9;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6);
+  border-radius: 7px;
+  transition: all 0.2s ease-out;
+}
+
+.tab {
+  width: 130px;
+  height: 28px;
+  position: absolute;
+  z-index: 99;
+  outline: none;
+  opacity: 0;
+}
+
+.tab_label {
+  width: 130px;
+  height: 28px;
+  position: relative;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.tab--1:checked ~ .indicator {
+  left: 2px;
+}
+
+.tab--2:checked ~ .indicator {
+  left: calc(140px + 2px);
+}
+
+.tab--3:checked ~ .indicator {
+  left: calc(140px * 2 + 2px);
+}
+
+.tab--4:checked ~ .indicator {
+  left: calc(140px * 3 + 2px);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .shifts-calendar {
   width: 100%;

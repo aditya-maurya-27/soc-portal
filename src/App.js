@@ -4,7 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
 import Dashboard from "./pages/Dashboard";
-import Shifts from "./pages/Shifts";
+import Shifts from "./pages/Roster";
 import ShiftHandover from "./pages/ShiftHandover";
 import KnowledgeBase from "./pages/KnowledgeBase";
 import OperationRunbook from "./pages/OperationRunbook";
@@ -25,7 +25,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
-        <Route path="/shifts" element={<ProtectedRoute element={<Shifts />} />} />
+        <Route path="/roster" element={<ProtectedRoute element={<Shifts />} />} />
         <Route path="/shift_handover" element={<ProtectedRoute element={<ShiftHandover />} />} />
         <Route path="/knowledge_base" element={<ProtectedRoute element={<KnowledgeBase />} />} />
         <Route path="/operation_runbook" element={<ProtectedRoute element={<OperationRunbook />} />} />

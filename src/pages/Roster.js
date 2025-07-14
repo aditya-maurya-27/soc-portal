@@ -5,7 +5,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import Modal from "react-modal";
 import { useAuth } from "../context/AuthContext";
-import "../styles/Shifts.css";
+import "../styles/Roster.css";
 
 Modal.setAppElement("#root");
 
@@ -15,10 +15,11 @@ const shiftTimeMapping = {
   Evening: { start: "16:00", end: "00:00" },
 };
 
-const Shifts = () => {
+const Roster = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const [cabStatusList, setCabStatusList] = useState([]);
+  const [activeTab, setActiveTab] = useState("tab1");
   const [shifts, setShifts] = useState([]);
   const [selectedEmployeeForNotes, setSelectedEmployeeForNotes] = useState("");
   const [employeeNotes, setEmployeeNotes] = useState({});
@@ -427,8 +428,27 @@ const Shifts = () => {
   };
 
   return (
-    <div className="shifts-wrapper">
-      <div className="shifts-calendar">
+    <div className="wrapper">
+
+      <div className="tab-container">
+        <input type="radio" name="tab" id="tab1" className="tab tab--1" defaultChecked onChange={() => setActiveTab("tab1")} />
+        <label className="tab_label" htmlFor="tab1">Shifts</label>
+
+        <input type="radio" name="tab" id="tab2" className="tab tab--2" onChange={() => setActiveTab("tab2")} />
+        <label className="tab_label" htmlFor="tab2">Shift Summary</label>
+
+        <input type="radio" name="tab" id="tab3" className="tab tab--3" onChange={() => setActiveTab("tab3")} />
+        <label className="tab_label" htmlFor="tab3">Cab Status</label>
+
+        <input type="radio" name="tab" id="tab4" className="tab tab--4" onChange={() => setActiveTab("tab4")} />
+        <label className="tab_label" htmlFor="tab4">Clusters</label>
+
+        <div className="indicator"></div>
+      </div>
+
+      <div className="tab-content">
+        {activeTab === "tab1" && 
+        <div className="shifts-calendar">
         {isAdmin && (
           <button
             onClick={() => setIsAddModalOpen(true)}
@@ -442,7 +462,6 @@ const Shifts = () => {
             const shiftId = info.event.id;
 
 
-            /*
             //event colorization
             if (!shiftColorMap.current[shiftId]) {
               const randomColor = shiftColorPool[Math.floor(Math.random() * shiftColorPool.length)];
@@ -452,7 +471,6 @@ const Shifts = () => {
             info.el.style.backgroundColor = color;
             info.el.style.color = "#fff";
             info.el.style.borderColor = color;
-            */
 
 
             //glare
@@ -505,6 +523,65 @@ const Shifts = () => {
           }}
         />
       </div>
+        }
+        {activeTab === "tab2" && <div>Shift summary</div>}
+        {activeTab === "tab3" && <div>Cab status</div>}
+        {activeTab === "tab4" && <div>Clusters</div>}
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       <Modal
         isOpen={isModalOpen}
@@ -777,4 +854,4 @@ const Shifts = () => {
   );
 };
 
-export default Shifts;
+export default Roster;

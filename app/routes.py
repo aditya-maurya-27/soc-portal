@@ -753,3 +753,65 @@ def setup_routes(app):
             conn.commit()
             conn.close()
             return jsonify({"message": "Escalation matrix entry added successfully"}), 201
+
+
+
+    @app.route('/api/clusters', methods=['GET'])
+    def get_clusters():
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT DISTINCT cluster FROM clusters ORDER BY cluster")
+            clusters = [row[0] for row in cursor.fetchall()]
+            conn.close()
+            return jsonify(clusters), 200
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+        
+
+    @app.route('/api/clusters/<int:cluster_id>', methods=['GET'])
+    def get_users_by_cluster(cluster_id):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT id, username FROM clusters WHERE cluster = %s", (cluster_id,))
+            users = cursor.fetchall()
+            conn.close()
+            return jsonify(users), 200
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+        
+
+    @app.route('/api/clusters', methods=['POST'])
+    def create_user_in_cluster():
+        data = request.get_json()
+        username = data.get('username')
+        cluster = data.get('cluster')
+
+        if not username or not cluster:
+            return jsonify({'error': 'Username and cluster are required'}), 400
+
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO clusters (username, cluster) VALUES (%s, %s)", (username, cluster))
+            conn.commit()
+            conn.close()
+            return jsonify({'message': 'User added to cluster successfully'}), 201
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+
+    @app.route('/api/clusters/<int:user_id>', methods=['DELETE'])
+    def delete_user_from_cluster(user_id):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM clusters WHERE id = %s", (user_id,))
+            conn.commit()
+            conn.close()
+            return jsonify({'message': 'User deleted from cluster successfully'}), 200
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+

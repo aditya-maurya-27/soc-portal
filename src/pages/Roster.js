@@ -39,6 +39,12 @@ const Roster = () => {
   const [editShiftType, setEditShiftType] = useState("Night");
   const [editShiftDate, setEditShiftDate] = useState("");
   const [editEmployeeId, setEditEmployeeId] = useState("");
+  const [clusters, setClusters] = useState([]);
+  const [selectedCluster, setSelectedCluster] = useState('');
+  const [users, setUsers] = useState([]);
+  const [newUsername, setNewUsername] = useState('');
+  const [newUserCluster, setNewUserCluster] = useState('');
+
   const shiftColorPool = [
     "#061e48", "#260e20", "#081e2c", "#220024", "#002620", "#3d0000", "#001020", "#2c003e",
     "#250a46", "#0d0d20", "#1d0652", "#180a19", "#460000", "#3e120e", "#320f0b", "#3c1410",
@@ -68,6 +74,29 @@ const Roster = () => {
       setIsAddModalOpen(false);
     }
   }, [user]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/clusters")
+      .then(res => res.json())
+      .then(data => {
+        setClusters(data);
+        if (data.length > 0) {
+          setSelectedCluster(data[0]);
+        }
+      })
+      .catch(err => console.error("Failed to fetch clusters:", err));
+  }, []);
+
+
+  useEffect(() => {
+    if (selectedCluster) {
+      fetch(`http://localhost:5000/api/clusters/${selectedCluster}`)
+        .then(res => res.json())
+        .then(data => setUsers(data))
+        .catch(err => console.error("Failed to fetch users:", err));
+    }
+  }, [selectedCluster]);
+
 
   const fetchShifts = () => {
     fetch("http://localhost:5000/api/shifts")
@@ -427,6 +456,54 @@ const Roster = () => {
     return null;
   };
 
+  const handleCreateUser = async () => {
+    if (!newUsername || !newUserCluster) {
+      alert("Please enter both username and cluster number.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/clusters", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: newUsername, cluster: newUserCluster }),
+      });
+
+      if (!response.ok) throw new Error("Failed to create user");
+
+      setNewUsername('');
+      setNewUserCluster('');
+      if (selectedCluster === newUserCluster) {
+        // Refresh users if the new user is in the selected cluster
+        const updated = await fetch(`http://localhost:5000/api/clusters/${newUserCluster}`);
+        const data = await updated.json();
+        setUsers(data);
+      }
+    } catch (err) {
+      console.error("Error creating user:", err);
+      alert("Failed to create user.");
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/clusters/${userId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Failed to delete user");
+
+      // Refresh users
+      const updated = await fetch(`http://localhost:5000/api/clusters/${selectedCluster}`);
+      const data = await updated.json();
+      setUsers(data);
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      alert("Failed to delete user.");
+    }
+  };
+
+
   return (
     <div className="wrapper">
 
@@ -447,86 +524,157 @@ const Roster = () => {
       </div>
 
       <div className="tab-content">
-        {activeTab === "tab1" && 
-        <div className="shifts-calendar">
-        {isAdmin && (
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="add-shift-btn"
-          >
-            Add Shift
-          </button>
-        )}
-        <FullCalendar
-          eventDidMount={(info) => {
-            const shiftId = info.event.id;
+        {activeTab === "tab1" &&
+          <div className="shifts-calendar">
+            {isAdmin && (
+              <button
+                onClick={() => setIsAddModalOpen(true)}
+                className="add-shift-btn"
+              >
+                Add Shift
+              </button>
+            )}
+            <FullCalendar
+              eventDidMount={(info) => {
+                const shiftId = info.event.id;
 
 
-            //event colorization
-            if (!shiftColorMap.current[shiftId]) {
-              const randomColor = shiftColorPool[Math.floor(Math.random() * shiftColorPool.length)];
-              shiftColorMap.current[shiftId] = randomColor;
-            }
-            const color = shiftColorMap.current[shiftId];
-            info.el.style.backgroundColor = color;
-            info.el.style.color = "#fff";
-            info.el.style.borderColor = color;
+                //event colorization
+                if (!shiftColorMap.current[shiftId]) {
+                  const randomColor = shiftColorPool[Math.floor(Math.random() * shiftColorPool.length)];
+                  shiftColorMap.current[shiftId] = randomColor;
+                }
+                const color = shiftColorMap.current[shiftId];
+                info.el.style.backgroundColor = color;
+                info.el.style.color = "#fff";
+                info.el.style.borderColor = color;
 
 
-            //glare
-            if (window.VanillaTilt && info.el) {
-              window.VanillaTilt.init(info.el, {
-                glare: true,
-                "max-glare": 0.3,
-              });
-            }
-          }}
+                //glare
+                if (window.VanillaTilt && info.el) {
+                  window.VanillaTilt.init(info.el, {
+                    glare: true,
+                    "max-glare": 0.3,
+                  });
+                }
+              }}
 
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          initialView="timeGridWeek"
-          slotDuration="08:00:00"
-          slotLabelInterval={{ hours: 8 }}
-          allDaySlot={false}
-          slotMinTime="00:00:00"
-          slotMaxTime="24:00:00"
-          events={shifts}
-          eventClick={handleEventClick}
-          slotLabelContent={slotLabelContent}
-          slotEventOverlap={false}
-          slotLaneContent={slotLaneContent}
-          headerToolbar={{
-            left: "prev,next,today",
-            center: "title",
-            right: "timeGridDay,timeGridWeek,dayGridMonth",
-          }}
-          height="auto"
-          eventOverlap={false}
-          dayMaxEventRows={true}
-          dayMaxEvents={true}
-          displayEventTime={false}
-          eventOrder={"title"}
-          eventContent={(arg) => {
-            const titleParts = arg.event.title.split(" - ");
-            const shiftTitle = titleParts[0];
-            const employeesRaw = titleParts[1] || "";
-            const employeeList = employeesRaw
-              .split(",")
-              .map((name, index) => `<div>${index + 1}. ${name.trim()}</div>`)
-              .join("");
+              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              initialView="timeGridWeek"
+              slotDuration="08:00:00"
+              slotLabelInterval={{ hours: 8 }}
+              allDaySlot={false}
+              slotMinTime="00:00:00"
+              slotMaxTime="24:00:00"
+              events={shifts}
+              eventClick={handleEventClick}
+              slotLabelContent={slotLabelContent}
+              slotEventOverlap={false}
+              slotLaneContent={slotLaneContent}
+              headerToolbar={{
+                left: "prev,next,today",
+                center: "title",
+                right: "timeGridDay,timeGridWeek,dayGridMonth",
+              }}
+              height="auto"
+              eventOverlap={false}
+              dayMaxEventRows={true}
+              dayMaxEvents={true}
+              displayEventTime={false}
+              eventOrder={"title"}
+              eventContent={(arg) => {
+                const titleParts = arg.event.title.split(" - ");
+                const shiftTitle = titleParts[0];
+                const employeesRaw = titleParts[1] || "";
+                const employeeList = employeesRaw
+                  .split(",")
+                  .map((name, index) => `<div>${index + 1}. ${name.trim()}</div>`)
+                  .join("");
 
-            return {
-              html: `<div style="padding: 2px;">
+                return {
+                  html: `<div style="padding: 2px;">
                 <strong>${shiftTitle}</strong>
                 <div style="margin-top: 4px;">${employeeList}</div>
              </div>`,
-            };
-          }}
-        />
-      </div>
+                };
+              }}
+            />
+          </div>
         }
+
+
+
+
+
+
+
         {activeTab === "tab2" && <div>Shift summary</div>}
         {activeTab === "tab3" && <div>Cab status</div>}
-        {activeTab === "tab4" && <div>Clusters</div>}
+
+
+
+
+
+
+        {activeTab === "tab4" &&
+          <div className="clusters_wrapper">
+            <p><strong>Select Cluster:</strong>
+              <select value={selectedCluster} onChange={e => setSelectedCluster(e.target.value)} className="cluster_picker">
+                <option value="">Choose a Cluster</option>
+                {clusters.map(cluster => (
+                  <option key={cluster} value={cluster}>
+                    Cluster {cluster}
+                  </option>
+                ))}
+              </select></p>
+
+            {selectedCluster && (
+              <div>
+                <table className="cluster_table">
+                  <thead>
+                    <tr><th colSpan="2">Users in Cluster {selectedCluster}</th></tr>
+                    <tr>
+                      <th>Username</th>
+                      {isAdmin && <th>Action</th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((user, index) => (
+                      <tr key={index}>
+                        <td>{user.username}</td>
+                        {isAdmin && (
+                          <td>
+                            <button className="button" onClick={() => handleDeleteUser(user.id)}>Delete</button>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {isAdmin && (
+              <div style={{ marginTop: '20px' }}>
+                <h3>Add User to Cluster</h3>
+                <input
+                  type="text"
+                  placeholder="Username"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                />
+                <input
+                  type="number"
+                  placeholder="Cluster Number"
+                  value={newUserCluster}
+                  onChange={(e) => setNewUserCluster(e.target.value)}
+                />
+                <button onClick={handleCreateUser}>Create</button>
+              </div>
+            )}
+          </div>
+
+        }
       </div>
 
 

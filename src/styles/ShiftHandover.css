@@ -1,7 +1,7 @@
 .handover_wrapper {
     padding: 10px 30px 30px 30px;
     height: 100%;
-    font-family: 'Times New Roman' !important;
+    font-family: Calibri, sans-serif;
     margin: auto;
     background-color: #222222;
 }
@@ -29,6 +29,7 @@
 
 
 .shift_picker {
+    width: 150px;
     padding: 5px;
     font-size: 16px;
     margin-left: 5px;

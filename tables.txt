@@ -112,3 +112,11 @@ CREATE TABLE `escalation_matrix` (
   KEY `client_id` (`client_id`),
   FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`)
 );
+
+--Table clusters
+CREATE TABLE `clusters` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(100) NOT NULL,
+  `cluster` int NOT NULL,
+  PRIMARY KEY (`id`)
+);

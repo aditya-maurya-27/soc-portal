@@ -632,11 +632,7 @@ const Roster = () => {
               <div>
                 <table className="cluster_table">
                   <thead>
-                    <tr><th colSpan="2">Users in Cluster {selectedCluster}</th></tr>
-                    <tr>
-                      <th>Username</th>
-                      {isAdmin && <th>Action</th>}
-                    </tr>
+                    <tr><th colSpan="2">Analysts in Cluster {selectedCluster}</th></tr>
                   </thead>
                   <tbody>
                     {users.map((user, index) => (
@@ -655,21 +651,23 @@ const Roster = () => {
             )}
 
             {isAdmin && (
-              <div style={{ marginTop: '20px' }}>
-                <h3>Add User to Cluster</h3>
+              <div className="add_user">
+                <h4>Add Analyst to Cluster:</h4>
                 <input
                   type="text"
                   placeholder="Username"
+                  className="user_input"
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
                 />
                 <input
                   type="number"
                   placeholder="Cluster Number"
+                  className="cluster_input"
                   value={newUserCluster}
                   onChange={(e) => setNewUserCluster(e.target.value)}
                 />
-                <button onClick={handleCreateUser}>Create</button>
+                <button className="button" onClick={handleCreateUser}>Add Analyst</button>
               </div>
             )}
           </div>

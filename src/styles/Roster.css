@@ -59,19 +59,19 @@
   cursor: pointer;
 }
 
-.tab--1:checked ~ .indicator {
+.tab--1:checked~.indicator {
   left: 2px;
 }
 
-.tab--2:checked ~ .indicator {
+.tab--2:checked~.indicator {
   left: calc(140px + 2px);
 }
 
-.tab--3:checked ~ .indicator {
+.tab--3:checked~.indicator {
   left: calc(140px * 2 + 2px);
 }
 
-.tab--4:checked ~ .indicator {
+.tab--4:checked~.indicator {
   left: calc(140px * 3 + 2px);
 }
 
@@ -211,7 +211,8 @@
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5) !important;
 }
 
-.fc-timegrid-event, .fc-daygrid-event::before {
+.fc-timegrid-event,
+.fc-daygrid-event::before {
   content: '';
   position: absolute;
   top: 0;
@@ -225,7 +226,9 @@
       transparent);
 }
 
-.fc-timegrid-event, .fc-daygrid-event, .fc-timegrid-event::after {
+.fc-timegrid-event,
+.fc-daygrid-event,
+.fc-timegrid-event::after {
   content: '';
   position: relative;
   top: 0;
@@ -476,7 +479,7 @@
   border-top: 1px solid #ccc;
 }
 
-.label1{
+.label1 {
   color: white;
   font-size: 16px;
 }
@@ -784,13 +787,13 @@
   transition: color 0.3s, transform 0.3s;
 }
 
-.custom-checkbox input[type="checkbox"]:checked + .checkmark {
+.custom-checkbox input[type="checkbox"]:checked+.checkmark {
   background-color: #8832ba;
   border-color: #333;
   transform: scale(1.05) rotateZ(360deg) rotateY(360deg);
 }
 
-.custom-checkbox input[type="checkbox"]:checked + .checkmark::before {
+.custom-checkbox input[type="checkbox"]:checked+.checkmark::before {
   color: #fff;
 }
 
@@ -805,7 +808,7 @@
   transform: scale(1.2);
 }
 
-.custom-checkbox input[type="checkbox"]:focus + .checkmark {
+.custom-checkbox input[type="checkbox"]:focus+.checkmark {
   box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.2);
   outline: none;
 }
@@ -840,7 +843,7 @@
 
 
 
-label{
+label {
   color: white;
 }
 
@@ -854,12 +857,14 @@ label{
 }
 
 .left-div {
-  flex: 1; /* smaller portion */
+  flex: 1;
+  /* smaller portion */
   min-width: 200px;
 }
 
 .right-div {
-  flex: 2; /* larger portion */
+  flex: 2;
+  /* larger portion */
   height: 72vh;
   overflow-y: auto;
   border-left: 1px solid #eee;
@@ -871,9 +876,9 @@ label{
 
 .clusters_wrapper {
   display: block;
-  width: 85vw;
+  width: 60vw;
   background-color: #212121;
-  padding: 12px;
+  padding: 15px;
   border-radius: 12px;
   color: #ffffff;
   border: 1px solid #9e9e9e;
@@ -888,13 +893,13 @@ label{
 }
 
 .cluster_picker {
-    padding: 5px;
-    font-size: 16px;
-    margin-left: 7px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    background-color: #353535;
-    color: #ffffff;
+  padding: 5px;
+  font-size: 16px;
+  margin-left: 7px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #353535;
+  color: #ffffff;
 }
 
 
@@ -905,32 +910,64 @@ label{
 
 
 .cluster_table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    color: white;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  color: white;
 }
 
 .cluster_table th {
-    color: white;
-    background-color: #670097 !important;
-    border: 1px solid #b5b5b5;
-    padding: 5px;
-    font-size: 18px;
+  color: white;
+  background-color: #670097 !important;
+  border: 1px solid #b5b5b5;
+  padding: 5px;
+  font-size: 18px;
 }
 
 .cluster_table td {
-    border: 1px solid #b5b5b5;
-    padding: 10px;
-    vertical-align: top;
-    text-align: left;
+  border: 1px solid #b5b5b5;
+  padding: 10px;
+  vertical-align: top;
+  text-align: left;
 }
 
 .cluster_table th {
-    background-color: #222222;
+  background-color: #222222;
 }
 
 .cluster_table td {
-    white-space: pre-wrap;
-    cursor: text;
+  white-space: pre-wrap;
+  cursor: text;
+}
+
+
+
+
+
+
+
+
+.add_user {
+  margin-top: 25px;
+}
+
+.user_input {
+  padding: 6px;
+  font-size: 16px;
+  margin-right: 20px;
+  width: 180px !important;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #353535;
+  color: #ffffff;
+}
+
+.cluster_input {
+  padding: 6px;
+  font-size: 16px;
+  margin-right: 20px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #353535;
+  color: #ffffff;
 }

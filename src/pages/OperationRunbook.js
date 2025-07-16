@@ -3,6 +3,8 @@ import "../styles/OperationRunbook.css";
 
 export default function OperationRunbook() {
   const [clients, setClients] = useState([]);
+  const [activeTab, setActiveTab] = useState("tab1");
+
   const [originalClients, setOriginalClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState(null);
   const [selectedClientName, setSelectedClientName] = useState("");
@@ -10,7 +12,6 @@ export default function OperationRunbook() {
   const [filteredAssets, setFilteredAssets] = useState([]);
   const [filters, setFilters] = useState({ assetType: "", mode: "" });
   const [escalationData, setEscalationData] = useState([]);
-  const [activeTab, setActiveTab] = useState("Assets");
 
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
   const [newClientName, setNewClientName] = useState("");
@@ -147,158 +148,190 @@ export default function OperationRunbook() {
           onChange={handleSearchChange}
         />
         {isAdmin && (
-          <button onClick={() => setIsAddClientModalOpen(true)} className="add-client-btn">
+          <button
+            onClick={() => setIsAddClientModalOpen(true)}
+            className="add-client-btn"
+          >
             Add Client
           </button>
         )}
         <ul className="client-list">
-          {clients.map(client => (
-            <li key={client.id} onClick={() => { setSelectedClient(client.id); setSelectedClientName(client.name); }}>
+          {clients.map((client) => (
+            <li
+              key={client.id}
+              onClick={() => {
+                setSelectedClient(client.id);
+                setSelectedClientName(client.name);
+              }}
+            >
               🟣 {client.name}
             </li>
           ))}
         </ul>
       </div>
+
       <div className="client-details">
-        {selectedClient && (
-          <>
-            <p className="client-text">{selectedClientName}</p>
-            <div className="tab-buttons">
-              <button onClick={() => setActiveTab("Assets")} className={activeTab === "Assets" ? "active" : ""}>Assets</button>
-              <button onClick={() => setActiveTab("Escalation Matrix")} className={activeTab === "Escalation Matrix" ? "active" : ""}>Escalation Matrix</button>
-              {isAdmin && (
-                <button onClick={() => setIsAddEntryModalOpen(true)} className="add-entry-btn">
-                  Add Entry
-                </button>
-              )}
-            </div>
-            {activeTab === "Assets" && (
-              <>
-                <div className="filters">
-                  <select name="assetType" value={filters.assetType} onChange={handleFilterChange}>
-                    <option value="">All Asset Types</option>
-                    <option value="Linux">Linux</option>
-                    <option value="Window">Window</option>
-                    <option value="Network Appliance">Network Appliance</option>
-                  </select>
-                  <select name="mode" value={filters.mode} onChange={handleFilterChange}>
-                    <option value="">All Modes</option>
-                    <option value="RDP">RDP</option>
-                    <option value="SSH">SSH</option>
-                  </select>
-                </div>
-                <table className="asset-table">
-                  <thead>
-                    <tr>
-                      <th>Asset Name</th>
-                      <th>Location</th>
-                      <th>IP Address</th>
-                      <th>Mode</th>
-                      <th>Type</th>
-                      <th>Owner</th>
-                      <th>Remarks</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredAssets.map((asset, idx) => (
-                      <tr key={idx}>
-                        <td>{asset.asset_name}</td>
-                        <td>{asset.location}</td>
-                        <td>{asset.ip_address}</td>
-                        <td>{asset.mode}</td>
-                        <td>{asset.asset_type}</td>
-                        <td>{asset.asset_owner}</td>
-                        <td>{asset.remarks}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </>
-            )}
-            {activeTab === "Escalation Matrix" && (
-              <table className="asset-table">
-                <thead>
+        <div className="tab-frame">
+          <input
+            type="radio"
+            name="tab"
+            id="tab1"
+            className="tab tab--1"
+            defaultChecked
+            onChange={() => setActiveTab("tab1")}
+          />
+          <label
+            className={`tab_label ${activeTab === "tab1" ? "active" : ""}`}
+            htmlFor="tab1"
+          >
+            Scope of Work
+          </label>
+
+
+          <input
+            type="radio"
+            name="tab"
+            id="tab2"
+            className="tab tab--2"
+            onChange={() => setActiveTab("tab2")}
+          />
+          <label
+            className={`tab_label ${activeTab === "tab2" ? "active" : ""}`}
+            htmlFor="tab2"
+          >
+            Service Level Agreement
+          </label>
+
+          <input
+            type="radio"
+            name="tab"
+            id="tab3"
+            className="tab tab--3"
+            onChange={() => setActiveTab("tab3")}
+          />
+          <label
+            className={`tab_label ${activeTab === "tab3" ? "active" : ""}`}
+            htmlFor="tab3"
+          >
+            Escalation Matrix
+          </label>
+
+          <input
+            type="radio"
+            name="tab"
+            id="tab4"
+            className="tab tab--4"
+            onChange={() => setActiveTab("tab4")}
+          />
+          <label
+            className={`tab_label ${activeTab === "tab4" ? "active" : ""}`}
+            htmlFor="tab4"
+          >
+            Passwords List
+          </label>
+
+          <input
+            type="radio"
+            name="tab"
+            id="tab5"
+            className="tab tab--5"
+            onChange={() => setActiveTab("tab5")}
+          />
+          <label
+            className={`tab_label ${activeTab === "tab5" ? "active" : ""}`}
+            htmlFor="tab5"
+          >
+            Assets Inventory
+          </label>
+
+          <div className="indicator"></div>
+        </div>
+
+
+
+
+
+        <div className="tab-content">
+
+
+
+
+
+          {activeTab === "tab1" && <div className="sow">
+
+            <iframe
+              src="/WCGT-360.pdf"
+              width="100%"
+              height="100%"
+              style={{ border: 'none' }}
+              title="PDF Preview"
+            ></iframe>
+
+          </div>}
+
+
+
+
+
+          {activeTab === "tab2" && <div className="sla">??</div>}
+
+
+
+
+
+          {activeTab === "tab3" && <div className="escalation_matrix">
+            <table className="escalation_matrix_table">
+              <thead>
+                <tr><th style={{ justifyContent: "center", width: "10%" }}></th><th colSpan={"4"} style={{ width: "45%" }}>Client Side</th><th colSpan={"4"} style={{ width: "45%" }}>GTBharat Side</th></tr>
+                <tr><th style={{ justifyContent: "center", width: "10%" }}>Level</th><th style={{ width: "11%" }}>Name</th>
+                                                                                      <th style={{ width: "11%" }}>Email</th>
+                                                                                      <th style={{ width: "11%" }}>Contact</th>
+                                                                                      <th style={{ width: "11%" }}>Designation</th>
+                                                                                      <th style={{ width: "11%" }}>Name</th>
+                                                                                      <th style={{ width: "11%" }}>Email</th>
+                                                                                      <th style={{ width: "11%" }}>Contact</th>
+                                                                                      <th style={{ width: "11%" }}>Designation</th></tr>
+              </thead>
+              <tbody>
                   <tr>
-                    <th>Level</th>
-                    <th>Contact Name</th>
-                    <th>Email Address</th>
-                    <th>Phone No.</th>
-                    <th>SLA Response Time</th>
-                    <th>SLA Resolution Time</th>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>
+                      Data
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {escalationData.map((row, i) => (
-                    <tr key={i}>
-                      <td>{row.level}</td>
-                      <td>{row.contact_name}</td>
-                      <td>{row.contact_email}</td>
-                      <td>{row.contact_number}</td>
-                      <td>{row.sla_response_hours}</td>
-                      <td>{row.sla_resolution_hours}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </>
-        )}
+              </tbody>
+            </table>
+
+
+
+          </div>}
+
+
+
+
+
+          {activeTab === "tab4" && <div className="passwords_list">????</div>}
+
+
+
+
+
+          {activeTab === "tab5" && (<div className="assets_inventory"><p>?????</p></div>)}
+
+
+
+
+
+        </div>
       </div>
-
-      {isAddClientModalOpen && (
-        <div className="modal-backdrop">
-          <div className="modal">
-            <h3>Add New Client</h3>
-            <input
-              type="text"
-              value={newClientName}
-              onChange={e => setNewClientName(e.target.value)}
-              placeholder="Client Name"
-            />
-            <div className="modal-buttons">
-              <button onClick={handleAddClient}>Save</button>
-              <button onClick={() => setIsAddClientModalOpen(false)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isAddEntryModalOpen && (
-        <div className="modal-backdrop">
-          <div className="modal">
-            {activeTab === "Assets" ? (
-              <>
-                <h3>Add New Asset</h3>
-                <input value={newAsset.asset_name} onChange={e => setNewAsset(prev => ({ ...prev, asset_name: e.target.value }))} placeholder="Asset Name" />
-                <input value={newAsset.location} onChange={e => setNewAsset(prev => ({ ...prev, location: e.target.value }))} placeholder="Location" />
-                <input value={newAsset.ip_address} onChange={e => setNewAsset(prev => ({ ...prev, ip_address: e.target.value }))} placeholder="IP Address" />
-                <input value={newAsset.mode} onChange={e => setNewAsset(prev => ({ ...prev, mode: e.target.value }))} placeholder="Mode" />
-                <input value={newAsset.asset_type} onChange={e => setNewAsset(prev => ({ ...prev, asset_type: e.target.value }))} placeholder="Asset Type" />
-                <input value={newAsset.asset_owner} onChange={e => setNewAsset(prev => ({ ...prev, asset_owner: e.target.value }))} placeholder="Asset Owner" />
-                <input value={newAsset.remarks} onChange={e => setNewAsset(prev => ({ ...prev, remarks: e.target.value }))} placeholder="Remarks" />
-                <div className="modal-buttons">
-                  <button onClick={handleAddAsset}>Save</button>
-                  <button onClick={() => setIsAddEntryModalOpen(false)}>Cancel</button>
-                </div>
-              </>
-            ) : (
-              <>
-                <h3>Add Escalation Contact</h3>
-                <input value={newEscalation.level} onChange={e => setNewEscalation(prev => ({ ...prev, level: e.target.value }))} placeholder="Level" />
-                <input value={newEscalation.contact_name} onChange={e => setNewEscalation(prev => ({ ...prev, contact_name: e.target.value }))} placeholder="Contact Name" />
-                <input value={newEscalation.contact_email} onChange={e => setNewEscalation(prev => ({ ...prev, contact_email: e.target.value }))} placeholder="Contact Email" />
-                <input value={newEscalation.contact_number} onChange={e => setNewEscalation(prev => ({ ...prev, contact_number: e.target.value }))} placeholder="Contact Number" />
-                <input value={newEscalation.sla_response_hours} onChange={e => setNewEscalation(prev => ({ ...prev, sla_response_hours: e.target.value }))} placeholder="SLA Response Hours" />
-                <input value={newEscalation.sla_resolution_hours} onChange={e => setNewEscalation(prev => ({ ...prev, sla_resolution_hours: e.target.value }))} placeholder="SLA Resolution Hours" />
-                <div className="modal-buttons">
-                  <button onClick={handleAddEscalation}>Save</button>
-                  <button onClick={() => setIsAddEntryModalOpen(false)}>Cancel</button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
+
 }

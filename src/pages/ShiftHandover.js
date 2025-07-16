@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import "../styles/ShiftHandover.css";
 
 function ShiftHandover() {
+    const [clusters, setClusters] = useState([]);
+    const [users, setUsers] = useState([]);
+
     const [handoverData, setHandoverData] = useState({
         date: "06 July 2025",
         shift: "Afternoon Shift (2:30 PM to 09:30 PM)",
         cluster: "Cluster 02",
-        members: "Anant, Jachandeep, Vikas",
+        members: "No Members Found",
         actionPoints: [
             { description: "Keep an eye on various log sources...\n1. moniotor this\n2. monitor that", status: "Informational" },
             { description: "Ticket Delivery Email Address Update", status: "Important" },
@@ -50,6 +54,44 @@ function ShiftHandover() {
         ]
     });
 
+    useEffect(() => {
+        fetch("http://localhost:5000/api/clusters")
+            .then(res => res.json())
+            .then(data => {
+                setClusters(data);
+                if (data.length > 0) {
+                    const defaultCluster = `Cluster ${data[0]}`;
+                    setHandoverData(prev => ({ ...prev, cluster: defaultCluster }));
+
+                    // Fetch users for default cluster
+                    fetch(`http://localhost:5000/api/clusters/${data[0]}`)
+                        .then(res => res.json())
+                        .then(usersData => {
+                            setUsers(usersData);
+                            const memberNames = usersData.map(user => user.username).join(", ");
+                            setHandoverData(prev => ({ ...prev, members: memberNames }));
+                        })
+                        .catch(err => console.error("Failed to fetch users:", err));
+                }
+            })
+            .catch(err => console.error("Failed to fetch clusters:", err));
+    }, []);
+
+
+    useEffect(() => {
+        const clusterNumber = handoverData.cluster.replace("Cluster ", "");
+        if (clusterNumber) {
+            fetch(`http://localhost:5000/api/clusters/${clusterNumber}`)
+                .then(res => res.json())
+                .then(data => {
+                    setUsers(data);
+                    const memberNames = data.map(user => user.username).join(", ");
+                    setHandoverData(prev => ({ ...prev, members: memberNames }));
+                })
+                .catch(err => console.error("Failed to fetch users:", err));
+        }
+    }, [handoverData.cluster]);
+
     const handleCellEdit = (index, field, value) => {
         const updated = [...handoverData.actionPoints];
         updated[index][field] = value;
@@ -64,7 +106,6 @@ function ShiftHandover() {
 
     const handleIncidentEdit = (index, field, value, subIndex = null) => {
         const updatedIncidents = [...handoverData.lastIncidents];
-
         if (subIndex !== null) {
             if (field === "timing") {
                 updatedIncidents[index].timings[subIndex] = value;
@@ -86,66 +127,71 @@ function ShiftHandover() {
                 updatedIncidents[index].value.timestamp = value;
             }
         }
-
         setHandoverData({ ...handoverData, lastIncidents: updatedIncidents });
     };
 
     return (
         <div className="handover_wrapper">
+            <div className="shift_info">
+                <p><strong>Date:</strong>
+                    <input
+                        type="date"
+                        value={handoverData.date}
+                        onChange={(e) => setHandoverData({ ...handoverData, date: e.target.value })}
+                        className="date_picker"
+                    />
+                </p>
+                <p><strong>Shift:</strong>
+                    <select
+                        className="shift_picker"
+                        value={handoverData.shift}
+                        onChange={(e) => setHandoverData({ ...handoverData, shift: e.target.value })}
+                    >
+                        <option value="Morning">Morning Shift</option>
+                        <option value="Afternoon">Afternoon Shift</option>
+                        <option value="Night">Night Shift</option>
+                        <option value="General">General Shift</option>
+                    </select>
+                </p>
+                <p><strong>Cluster:</strong>
+                    <select
+                        className="cluster_picker"
+                        value={handoverData.cluster}
+                        onChange={e => setHandoverData({ ...handoverData, cluster: e.target.value })}
+                    >
+                        <option value="">Choose a Cluster</option>
+                        {clusters.map(cluster => (
+                            <option key={cluster} value={`Cluster ${cluster}`}>
+                                Cluster {cluster}
+                            </option>
+                        ))}
+                    </select>
+                </p>
+                <p className="team_members"><strong>Team Members:</strong> {handoverData.members}</p>
+            </div>
             <div className="handover_display">
-                {/* Basic Info */}
-                <div className="shift_info">
-                    <p><strong>Date:</strong>
-                        <input
-                            type="date"
-                            value={handoverData.date}
-                            onChange={(e) => setHandoverData({ ...handoverData, date: e.target.value })}
-                            className="date_picker"
-                        />
-                    </p>
-                    <p><strong>Shift:</strong>
-                        <select className="shift_picker" value={handoverData.shift} onChange={(e) => setHandoverData({ ...handoverData, shift: e.target.value })}>
-                            <option value="Morning">Morning Shift</option>
-                            <option value="Afternoon">Afternoon Shift</option>
-                            <option value="Night">Night Shift</option>
-                            <option value="General">General Shift</option>
-                        </select>
-                    </p>
-                    <p><strong>Cluster:</strong>
-                        <select className="cluster_picker" value={handoverData.cluster} onChange={(e) => setHandoverData({ ...handoverData, cluster: e.target.value })}>
-                            <option value="Cluster1">Cluster 1</option>
-                            <option value="Cluster2">Cluster 2</option>
-                            <option value="Cluster3">Cluster 3</option>
-                            <option value="Cluster4">Cluster 4</option>
-                            <option value="Cluster5">Cluster 5</option>
-                        </select>
-                    </p>
-                </div>
-
-                <p><strong>Team Members:</strong> {handoverData.members}</p>
                 <div className="disclaimer">
                     <p>
                         ALL INCIDENTS AND REPORTS HAVE BEEN READ OUT AND VALIDATED
                     </p>
                 </div>
-                <br />
                 {/* Previous Shift Table */}
                 <table className="handover_table">
                     <thead>
                         <tr><th colSpan="3">Action Points from Previous Shift</th></tr>
-                        <tr><th style={{ width: "10%" }}>S.No.</th><th style={{ width: "75%" }}>Description</th><th style={{ width: "15%" }}>Status</th></tr>
+                        <tr><th style={{ justifyContent:"center", width: "10%" }}>S.No.</th><th style={{ width: "75%" }}>Description</th><th style={{ width: "15%" }}>Status</th></tr>
                     </thead>
                     <tbody>
                         {handoverData.actionPoints.map((item, index) => (
                             <tr key={index}>
-                                <td>{index + 1}</td>
+                                <td style={{ textAlign: "center", verticalAlign: "middle" }}>{index + 1}</td>
                                 <td contentEditable suppressContentEditableWarning onBlur={(e) => handleCellEdit(index, "description", e.target.innerText)}>
                                     {item.description}
                                 </td>
                                 <td
                                     contentEditable
                                     suppressContentEditableWarning
-
+                                    style={{ textAlign: "center", verticalAlign: "middle" }}
                                     className={
                                         item.status.trim().toLowerCase() === "important"
                                             ? "status-important"
@@ -162,8 +208,6 @@ function ShiftHandover() {
                         ))}
                     </tbody>
                 </table>
-                <br />
-                <br />
                 {/* Current Shift Table */}
                 <table className="handover_table">
                     <thead>
@@ -173,14 +217,14 @@ function ShiftHandover() {
                     <tbody>
                         {handoverData.currentShiftPoints.map((item, index) => (
                             <tr key={index}>
-                                <td>{index + 1}</td>
+                                <td style={{ textAlign: "center", verticalAlign: "middle" }}>{index + 1}</td>
                                 <td contentEditable suppressContentEditableWarning onBlur={(e) => handleCurrentCellEdit(index, "description", e.target.innerText)}>
                                     {item.description}
                                 </td>
                                 <td
                                     contentEditable
                                     suppressContentEditableWarning
-
+                                    style={{ textAlign: "center", verticalAlign: "middle" }}
                                     className={
                                         item.status.trim().toLowerCase() === "important"
                                             ? "status-important"
@@ -198,8 +242,6 @@ function ShiftHandover() {
                         ))}
                     </tbody>
                 </table>
-                <br />
-                <br />
                 {/* Last Incident Raised Table */}
                 <table className="handover_table">
                     <thead>
@@ -283,8 +325,6 @@ function ShiftHandover() {
                         </tr>
                     </tbody>
                 </table>
-                <br />
-                <br />
                 {/* Shift Activity Tracker Table */}
                 <table className="handover_table">
                     <thead>

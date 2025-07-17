@@ -2,6 +2,11 @@ import React, { useEffect, useState } from "react";
 import "../styles/OperationRunbook.css";
 
 export default function OperationRunbook() {
+  const [clientPDF, setClientPDF] = useState(null);
+
+  const [showUploadModal, setShowUploadModal] = useState(false);
+
+
   const [clients, setClients] = useState([]);
   const [activeTab, setActiveTab] = useState("tab1");
 
@@ -26,6 +31,48 @@ export default function OperationRunbook() {
     contact_number: "", sla_response_hours: "", sla_resolution_hours: ""
   });
 
+
+  const handlePDFUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !selectedClient) return;
+
+    const formData = new FormData();
+    formData.append("pdf", file);
+    formData.append("clientId", selectedClient);
+
+    const res = await fetch("http://localhost:5000/api/upload-pdf", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (res.ok) {
+      const { fileName } = await res.json();
+      setClientPDF(fileName);
+    } else {
+      console.error("PDF upload failed");
+    }
+  };
+
+
+
+  const handleDeletePDF = async () => {
+    if (!selectedClient) return;
+
+    const res = await fetch(`http://localhost:5000/api/delete-client-pdf?clientId=${selectedClient}`, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      setClientPDF(null);
+      setShowUploadModal(false);
+      alert("PDF deleted successfully.");
+    } else {
+      alert("Failed to delete PDF.");
+    }
+  };
+
+
+
   const isAdmin = localStorage.getItem("isAdmin") === "true";
 
   useEffect(() => {
@@ -39,18 +86,36 @@ export default function OperationRunbook() {
       .catch(console.error);
   }, []);
 
+
+
+
+
+
   useEffect(() => {
     if (selectedClient) {
       fetchAssetsAndEscalation(selectedClient);
+
+      fetch(`http://localhost:5000/api/get-client-pdf?clientId=${selectedClient}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.fileName) {
+            setClientPDF(data.fileName);
+          } else {
+            setClientPDF(null);
+          }
+        })
+        .catch(console.error);
     }
   }, [selectedClient]);
+
 
   const fetchAssetsAndEscalation = (clientId) => {
     fetch(`http://localhost:5000/api/assets?client=${clientId}`)
       .then(res => res.json())
       .then(data => {
-        setAssetData(data);
-        setFilteredAssets(data);
+        const safeData = Array.isArray(data) ? data : []
+        setAssetData(safeData);
+        setFilteredAssets(safeData);
       })
       .catch(error => {
         console.error("Error fetching assets:", error);
@@ -170,129 +235,153 @@ export default function OperationRunbook() {
         </ul>
       </div>
 
-      <div className="client-details">
-        <div className="tab-frame">
-          <input
-            type="radio"
-            name="tab"
-            id="tab1"
-            className="tab tab--1"
-            defaultChecked
-            onChange={() => setActiveTab("tab1")}
-          />
-          <label
-            className={`tab_label ${activeTab === "tab1" ? "active" : ""}`}
-            htmlFor="tab1"
-          >
-            Scope of Work
-          </label>
+      {selectedClient && (
+
+        <div className="client-details">
+          <div className="tab-frame">
+            <input
+              type="radio"
+              name="tab"
+              id="tab1"
+              className="tab tab--1"
+              defaultChecked
+              onChange={() => setActiveTab("tab1")}
+            />
+            <label
+              className={`tab_label ${activeTab === "tab1" ? "active" : ""}`}
+              htmlFor="tab1"
+            >
+              Scope of Work
+            </label>
 
 
-          <input
-            type="radio"
-            name="tab"
-            id="tab2"
-            className="tab tab--2"
-            onChange={() => setActiveTab("tab2")}
-          />
-          <label
-            className={`tab_label ${activeTab === "tab2" ? "active" : ""}`}
-            htmlFor="tab2"
-          >
-            Service Level Agreement
-          </label>
+            <input
+              type="radio"
+              name="tab"
+              id="tab2"
+              className="tab tab--2"
+              onChange={() => setActiveTab("tab2")}
+            />
+            <label
+              className={`tab_label ${activeTab === "tab2" ? "active" : ""}`}
+              htmlFor="tab2"
+            >
+              Service Level Agreement
+            </label>
 
-          <input
-            type="radio"
-            name="tab"
-            id="tab3"
-            className="tab tab--3"
-            onChange={() => setActiveTab("tab3")}
-          />
-          <label
-            className={`tab_label ${activeTab === "tab3" ? "active" : ""}`}
-            htmlFor="tab3"
-          >
-            Escalation Matrix
-          </label>
+            <input
+              type="radio"
+              name="tab"
+              id="tab3"
+              className="tab tab--3"
+              onChange={() => setActiveTab("tab3")}
+            />
+            <label
+              className={`tab_label ${activeTab === "tab3" ? "active" : ""}`}
+              htmlFor="tab3"
+            >
+              Escalation Matrix
+            </label>
 
-          <input
-            type="radio"
-            name="tab"
-            id="tab4"
-            className="tab tab--4"
-            onChange={() => setActiveTab("tab4")}
-          />
-          <label
-            className={`tab_label ${activeTab === "tab4" ? "active" : ""}`}
-            htmlFor="tab4"
-          >
-            Passwords List
-          </label>
+            <input
+              type="radio"
+              name="tab"
+              id="tab4"
+              className="tab tab--4"
+              onChange={() => setActiveTab("tab4")}
+            />
+            <label
+              className={`tab_label ${activeTab === "tab4" ? "active" : ""}`}
+              htmlFor="tab4"
+            >
+              Passwords List
+            </label>
 
-          <input
-            type="radio"
-            name="tab"
-            id="tab5"
-            className="tab tab--5"
-            onChange={() => setActiveTab("tab5")}
-          />
-          <label
-            className={`tab_label ${activeTab === "tab5" ? "active" : ""}`}
-            htmlFor="tab5"
-          >
-            Assets Inventory
-          </label>
+            <input
+              type="radio"
+              name="tab"
+              id="tab5"
+              className="tab tab--5"
+              onChange={() => setActiveTab("tab5")}
+            />
+            <label
+              className={`tab_label ${activeTab === "tab5" ? "active" : ""}`}
+              htmlFor="tab5"
+            >
+              Assets Inventory
+            </label>
 
-          <div className="indicator"></div>
-        </div>
-
-
-
-
-
-        <div className="tab-content">
+            <div className="indicator"></div>
+          </div>
 
 
 
 
 
-          {activeTab === "tab1" && <div className="sow">
 
-            <iframe
-              src="/WCGT-360.pdf"
-              width="100%"
-              height="100%"
-              style={{ border: 'none' }}
-              title="PDF Preview"
-            ></iframe>
-
-          </div>}
+          <div className="tab-content">
 
 
 
 
 
-          {activeTab === "tab2" && <div className="sla">??</div>}
+            {activeTab === "tab1" && (
+              <div className="sow">
+                {isAdmin && (
+                  <div className="sow-buttons-frame">
+                    <button className="upload-sow-pdf-button" onClick={() => setShowUploadModal(true)} style={{ marginRight: "10px" }}>
+                      Upload SOW PDF
+                    </button>
+                    <button className="delete-sow-pdf-button" onClick={handleDeletePDF}>
+                      Delete SOW PDF
+                    </button>
+                  </div>
+                )}
 
 
 
 
 
-          {activeTab === "tab3" && <div className="escalation_matrix">
-            <table className="escalation_matrix_table">
-              <thead>
-                <tr><th style={{ justifyContent: "center", width: "10%" }}></th><th colSpan={"4"} style={{ width: "45%" }}>Client Side</th><th colSpan={"4"} style={{ width: "45%" }}>GTBharat Side</th></tr>
-                <tr><th style={{ justifyContent: "center", width: "10%" }}>Level</th><th style={{ width: "11%" }}>Name</th>
-                                                                                      <th style={{ width: "11%" }}>Email</th>
-                                                                                      <th style={{ width: "11%" }}>Contact</th>
-                                                                                      <th style={{ width: "11%" }}>Designation</th>
-                                                                                      <th style={{ width: "11%" }}>Name</th>
-                                                                                      <th style={{ width: "11%" }}>Email</th>
-                                                                                      <th style={{ width: "11%" }}>Contact</th>
-                                                                                      <th style={{ width: "11%" }}>Designation</th></tr>
-              </thead>
-              <tbody>
+
+                {clientPDF ? (
+                  <iframe
+                    src={`http://localhost:5000/pdfs/client_${selectedClient}.pdf#toolbar=0`}
+                    width="100%"
+                    height="600px"
+                    style={{ border: 'none', backgroundColor: "#fff" }}
+                    title="PDF Preview"
+                  />
+                ) : (
+                  <p>No PDF uploaded for this client.</p>
+                )}
+              </div>
+            )}
+
+
+
+
+
+
+            {activeTab === "tab2" && <div className="sla">??</div>}
+
+
+
+
+
+            {activeTab === "tab3" && <div className="escalation_matrix">
+              <table className="escalation_matrix_table">
+                <thead>
+                  <tr><th style={{ justifyContent: "center", width: "10%" }}></th><th colSpan={"4"} style={{ width: "45%" }}>Client Side</th><th colSpan={"4"} style={{ width: "45%" }}>GTBharat Side</th></tr>
+                  <tr><th style={{ justifyContent: "center", width: "10%" }}>Level</th><th style={{ width: "11%" }}>Name</th>
+                    <th style={{ width: "11%" }}>Email</th>
+                    <th style={{ width: "11%" }}>Contact</th>
+                    <th style={{ width: "11%" }}>Designation</th>
+                    <th style={{ width: "11%" }}>Name</th>
+                    <th style={{ width: "11%" }}>Email</th>
+                    <th style={{ width: "11%" }}>Contact</th>
+                    <th style={{ width: "11%" }}>Designation</th></tr>
+                </thead>
+                <tbody>
                   <tr>
                     <td>Data</td>
                     <td>Data</td>
@@ -306,31 +395,158 @@ export default function OperationRunbook() {
                       Data
                     </td>
                   </tr>
-              </tbody>
-            </table>
+                  <tr>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>
+                      Data
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
 
 
 
-          </div>}
+            </div>}
 
 
 
 
 
-          {activeTab === "tab4" && <div className="passwords_list">????</div>}
+            {activeTab === "tab4" && <div className="passwords_list">????</div>}
 
 
 
 
 
-          {activeTab === "tab5" && (<div className="assets_inventory"><p>?????</p></div>)}
+            {activeTab === "tab5" && (<div className="assets_inventory">
+
+
+              {isAdmin && (
+                <button
+                  onClick={() => setIsAddEntryModalOpen(true)}
+                  className="add-asset-btn"
+                >
+                  Add Asset
+                </button>
+              )}
 
 
 
 
 
+              <table className="assets-inventory-table">
+                <thead>
+                  <tr>
+                    <th>Asset Name</th>
+                    <th>Location</th>
+                    <th>IP Address</th>
+                    <th>Mode</th>
+                    <th>Asset Type</th>
+                    <th>Asset Owner</th>
+                    <th>Remarks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {assetData.map((asset, index) => (
+                    <tr key={index}>
+                      <td>{asset.asset_name}</td>
+                      <td>{asset.location}</td>
+                      <td>{asset.ip_address}</td>
+                      <td>{asset.mode}</td>
+                      <td>{asset.asset_type}</td>
+                      <td>{asset.asset_owner}</td>
+                      <td>{asset.remarks}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+
+
+
+
+            </div>)}
+
+
+
+
+
+          </div>
         </div>
-      </div>
+
+      )}
+
+
+
+
+      {isAddClientModalOpen && (
+        <div className="add-client-modal">
+          <div className="add-client-modal-content">
+            <h3>Add New Client</h3>
+            <input
+              type="text"
+              value={newClientName}
+              onChange={(e) => setNewClientName(e.target.value)}
+              placeholder="Enter client name"
+            />
+            <div className="add-client-modal-actions">
+              <button onClick={handleAddClient}>Submit</button>
+              <button onClick={() => setIsAddClientModalOpen(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {isAddEntryModalOpen && (
+        <div className="add-asset-modal">
+          <div className="add-asset-modal-content">
+            <h3>Add New Asset</h3>
+            <input type="text" placeholder="Asset Name" value={newAsset.asset_name} onChange={(e) => setNewAsset({ ...newAsset, asset_name: e.target.value })} />
+            <input type="text" placeholder="Location" value={newAsset.location} onChange={(e) => setNewAsset({ ...newAsset, location: e.target.value })} />
+            <input type="text" placeholder="IP Address" value={newAsset.ip_address} onChange={(e) => setNewAsset({ ...newAsset, ip_address: e.target.value })} />
+            <select
+              value={newAsset.mode}
+              onChange={(e) => setNewAsset({ ...newAsset, mode: e.target.value })}
+            >
+              <option value="">Select Mode</option>
+              <option value="RDP">RDP</option>
+              <option value="SSH">SSH</option>
+            </select>
+            <input type="text" placeholder="Asset Type" value={newAsset.asset_type} onChange={(e) => setNewAsset({ ...newAsset, asset_type: e.target.value })} />
+            <input type="text" placeholder="Asset Owner" value={newAsset.asset_owner} onChange={(e) => setNewAsset({ ...newAsset, asset_owner: e.target.value })} />
+            <input type="text" placeholder="Remarks" value={newAsset.remarks} onChange={(e) => setNewAsset({ ...newAsset, remarks: e.target.value })} />
+            <div className="add-asset-modal-actions">
+              <button onClick={handleAddAsset}>Submit</button>
+              <button onClick={() => setIsAddEntryModalOpen(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {showUploadModal && (
+        <div className="upload-sow-modal">
+          <div className="modal-content">
+            <h3>Upload SOW PDF</h3>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={handlePDFUpload}
+            />
+            <button onClick={() => setShowUploadModal(false)}>Close</button>
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 

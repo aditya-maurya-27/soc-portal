@@ -54,7 +54,7 @@ function Layout() {
     } else if (location.pathname === "/login" || location.pathname === "/register") {
       setNavbarColor("#222222"); // white for login/register
     } else {
-      setNavbarColor("#332042"); // light gray or any color for other pages
+      setNavbarColor("#202e42ff"); // light gray or any color for other pages
     }
   }, [location.pathname]);
 

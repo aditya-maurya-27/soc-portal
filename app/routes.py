@@ -3,11 +3,18 @@ from app.auth import authenticate_user
 from app.db import get_db_connection
 from datetime import datetime, timedelta
 import bcrypt
+import os
+from flask import send_from_directory
 import mysql.connector
 import pandas as pd
 from app.token_utils import generate_token
 from app.token_utils import validate_token as verify_token
 from datetime import datetime
+
+
+PDF_DIR = os.path.join(os.getcwd(), "pdfs")
+os.makedirs(PDF_DIR, exist_ok=True)
+
 
 def setup_routes(app):
     @app.route("/")
@@ -652,14 +659,15 @@ def setup_routes(app):
             data = request.get_json()
             name = data.get("name")
 
-        if not name:
-            return jsonify({"error": "Client name is required"}), 400
+            if not name:
+                return jsonify({"error": "Client name is required"}), 400
 
-        cursor.execute("INSERT INTO clients (name) VALUES (%s)", (name,))
-        conn.commit()
+            cursor.execute("INSERT INTO clients (name) VALUES (%s)", (name,))
+            conn.commit()
 
-        client_id = cursor.lastrowid
-        return jsonify({"id": client_id, "name": name}), 201
+            client_id = cursor.lastrowid
+            return jsonify({"id": client_id, "name": name}), 201
+
     
     @app.route("/api/assets", methods=["GET", "POST"])
     def assets():
@@ -814,4 +822,76 @@ def setup_routes(app):
             return jsonify({'message': 'User deleted from cluster successfully'}), 200
         except Exception as e:
             return jsonify({'error': str(e)}), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @app.route('/api/upload-pdf', methods=['POST'])
+    def upload_pdf():
+        if 'pdf' not in request.files or 'clientId' not in request.form:
+            return jsonify({"error": "Missing file or clientId"}), 400
+
+        file = request.files['pdf']
+        client_id = request.form['clientId']
+
+        if file.filename == '':
+            return jsonify({"error": "No selected file"}), 400
+
+        filename = f"client_{client_id}.pdf"
+        filepath = os.path.join(PDF_DIR, filename)
+        file.save(filepath)
+
+        return jsonify({"fileName": filename}), 200
+
+
+    @app.route('/api/get-client-pdf', methods=['GET'])
+    def get_client_pdf():
+        client_id = request.args.get('clientId')
+        if not client_id:
+            return jsonify({"error": "Missing clientId"}), 400
+
+        filename = f"client_{client_id}.pdf"
+        filepath = os.path.join(PDF_DIR, filename)
+
+        if os.path.exists(filepath):
+            return jsonify({"fileName": filename}), 200
+        else:
+            return jsonify({"fileName": None}), 200
+        
+    
+    
+    @app.route('/api/delete-client-pdf', methods=['DELETE'])
+    def delete_client_pdf():
+        client_id = request.args.get('clientId')
+        if not client_id:
+            return jsonify({"error": "Missing clientId"}), 400
+
+        filename = f"client_{client_id}.pdf"
+        filepath = os.path.join(PDF_DIR, filename)
+
+        if os.path.exists(filepath):
+            os.remove(filepath)
+            return jsonify({"message": "PDF deleted successfully"}), 200
+        else:
+            return jsonify({"error": "PDF not found"}), 404
+
+
+    @app.route('/pdfs/<path:filename>')
+    def serve_pdf(filename):
+        return send_from_directory(PDF_DIR, filename)
 

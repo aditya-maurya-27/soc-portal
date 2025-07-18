@@ -60,7 +60,7 @@
 }
 
 .logo-image {
-  width: 40px;
+  width: 38px;
   height: auto;
   margin-right: 10px;
 }
@@ -68,7 +68,7 @@
 .logo-text {
   font-family: Calibri, sans-serif;
   font-weight: lighter;
-  font-size: 28px;
+  font-size: 25px;
   padding: 0;
   margin: 0;
 }
@@ -87,7 +87,7 @@
 
 
 .logout-btn {
-  background: rgb(160, 0, 0);
+  background: rgb(182, 0, 0);
   color: white;
   font-size: 18px;
   margin-top: 0;
@@ -95,19 +95,12 @@
   cursor: pointer;
   border-radius: 7px;
   height: 36px;
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.8),
-    inset 0 3px 2px rgba(255, 255, 255, 0.2),
-    inset 0 -3px 2px rgba(255, 255, 255, 0.1),
-    inset 0 0 0px 0px rgba(255, 255, 255, 0) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5) !important;
   transition: all 0.3s ease-in-out;
 }
 
 .logout-btn:hover {
   background: red;
-  box-shadow: 0 0 20px red !important;
 }
 
 .content {
@@ -129,7 +122,7 @@
 .nav-links {
   list-style: none;
   display: flex;
-  gap: 15px;
+  gap: 16px;
   padding: 0;
   align-items: center;
 }
@@ -145,10 +138,10 @@
   font-size: 18px;
   background: none;
   border: None;
-  padding: 0;
+  padding: 0px 0px 5px 0px;
 }
 
 .nav-links a.active {
-  color: rgb(227, 223, 20);
-  transition: all 0.3s ease-in-out;
+  transition: all 0.2s ease-in-out;
+  border-bottom: 4px solid #DE002E;
 }

@@ -6,7 +6,7 @@
     align-items: center;
     font-size: 22px;
     height: 30px;
-    background-color: #257b7e;
+    background-color: #008fd6;
     padding-left: 15px;
 }
 
@@ -22,7 +22,7 @@ h3{
     font-family: Calibri, sans-serif;
     flex-direction: column;
     color: white;
-    background-color: #222222;
+    background-color: white;
     height: 100%;
 }
 

@@ -24,15 +24,15 @@
   padding: 15px;
   border: 1px solid #bcbcbc;
   background-color: #efefef;
-  height: 100vh;
+  height: auto;
 }
 
 .sla {
-  display: flex;
+  display: block;
   width: 80vw;
   border: 1px solid #bcbcbc;
   background-color: #efefef;
-  height: 88vh;
+  height: auto;
 }
 
 .escalation_matrix {
@@ -44,11 +44,11 @@
 }
 
 .passwords_list {
-  display: flex;
+  display: block;
   width: 80vw;
   border: 1px solid #bcbcbc;
   background-color: #efefef;
-  height: 88vh;
+  height: auto;
 }
 
 .assets_inventory {
@@ -323,6 +323,126 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+.add-escalation-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* semi-transparent background */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.add-escalation-modal-content {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  width: 70%;
+  max-width: 90%;
+  text-align: center;
+}
+
+.add-escalation-modal-content h3 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #333;
+}
+
+.add-escalation-modal-content input {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.add-aescalation-modal-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.add-escalation-modal-actions button {
+  padding: 8px 12px;
+  margin: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-escalation-modal-actions button:first-child {
+  background-color: #007bff;
+  color: white;
+}
+
+.add-escalation-modal-actions button:last-child {
+  background-color: #ccc;
+  color: #333;
+}
+
+
+
+
+.escalation_modal_div{
+  display: flex;
+  gap: 15px;
+  padding: 9px;
+  border-radius: 5px;
+
+  flex-direction: row;
+  background-color: #e9e9e9;
+}
+
+
+.client_side{
+  display: block;
+}
+
+.gt_side{
+  display: block;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .add-asset-modal {
   position: fixed;
   top: 0;
@@ -408,6 +528,29 @@
 
 
 
+.add-escalation-button {
+  background-color: #ffffff;
+  border: 1px solid #7700aa;
+  color: #7700aa;
+  width: 200px;
+  margin: 5px;
+  height: 35px;
+  padding: 0;
+  border-radius: 7px;
+}
+
+.add-escalation-button:hover {
+  background-color: #7700aa;
+  color: #ffff;
+  border: 1px solid #7700aa;
+
+}
+
+
+
+
+
+
 
 
 
@@ -434,7 +577,7 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: auto;
   background: rgba(0, 0, 0, 0.5); /* semi-transparent background */
   display: flex;
   justify-content: center;
@@ -466,7 +609,26 @@
 
 
 
+.sla_table {
+  width: 100%;
+  border-collapse: collapse;
+  color: black;
+}
 
+.sla_table th {
+  color: white;
+  background-color: #37548d !important;
+  border: 1px solid #b5b5b5;
+  padding: 5px;
+  font-size: 18px;
+}
+
+.sla_table td {
+  border: 1px solid #b5b5b5;
+  padding: 5px;
+  text-align: left;
+
+}
 
 
 
@@ -505,6 +667,42 @@
   text-align: left;
 
 }
+
+
+
+
+
+
+
+.passwords_list_table {
+  width: 100%;
+  border-collapse: collapse;
+  color: black;
+}
+
+.passwords_list_table th {
+  color: white;
+  background-color: #37548d !important;
+  border: 1px solid #b5b5b5;
+  padding: 5px;
+  font-size: 18px;
+}
+
+.passwords_list_table td {
+  border: 1px solid #b5b5b5;
+  padding: 5px;
+  text-align: left;
+
+}
+
+
+
+
+
+
+
+
+
 
 
 

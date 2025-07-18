@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../styles/OperationRunbook.css";
 
 export default function OperationRunbook() {
+  const [isAddEscalationModalOpen, setIsAddEscalationModalOpen] = useState(false);
   const [clientPDF, setClientPDF] = useState(null);
 
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -26,10 +27,20 @@ export default function OperationRunbook() {
     asset_name: "", location: "", ip_address: "",
     mode: "", asset_type: "", asset_owner: "", remarks: ""
   });
+
+
   const [newEscalation, setNewEscalation] = useState({
-    level: "", contact_name: "", contact_email: "",
-    contact_number: "", sla_response_hours: "", sla_resolution_hours: ""
+    level: "",
+    client_name: "",
+    client_email: "",
+    client_contact: "",
+    client_designation: "",
+    gtb_name: "",
+    gtb_email: "",
+    gtb_contact: "",
+    gtb_designation: ""
   });
+
 
 
   const handlePDFUpload = async (e) => {
@@ -196,12 +207,38 @@ export default function OperationRunbook() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ client_id: selectedClient, ...newEscalation }),
     });
+
     if (res.ok) {
       fetchAssetsAndEscalation(selectedClient);
-      setNewEscalation({ level: "", contact_name: "", contact_email: "", contact_number: "", sla_response_hours: "", sla_resolution_hours: "" });
-      setIsAddEntryModalOpen(false);
+      setNewEscalation({
+        level: "",
+        client_name: "",
+        client_email: "",
+        client_contact: "",
+        client_designation: "",
+        gtb_name: "",
+        gtb_email: "",
+        gtb_contact: "",
+        gtb_designation: ""
+      });
+      setIsAddEscalationModalOpen(false);
+    } else {
+      console.error("Error adding escalation entry");
     }
   };
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   return (
     <div className="operation-runbook-container">
@@ -362,13 +399,53 @@ export default function OperationRunbook() {
 
 
 
-            {activeTab === "tab2" && <div className="sla">??</div>}
+            {activeTab === "tab2" && <div className="sla">
+              <table className="sla_table">
+                <thead>
+                  <tr>
+                    <th style={{ justifyContent: "center", width: "8%" }}>S.No</th>
+                    <th style={{ justifyContent: "center", width: "30.6%" }}>Priority</th>
+                    <th style={{ justifyContent: "center", width: "30.6%" }}>Response Time</th>
+                    <th style={{ justifyContent: "center", width: "30.6%" }}>???</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                  </tr>
+                  <tr>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                  </tr>
+                </tbody>
+              </table>
+
+
+            </div>}
 
 
 
 
 
             {activeTab === "tab3" && <div className="escalation_matrix">
+              {isAdmin && (
+                <button
+                  onClick={() => setIsAddEscalationModalOpen(true)}
+                  className="add-escalation-button"
+                >
+                  Add Escalation Entry
+                </button>
+              )}
+
+
+
+
+
               <table className="escalation_matrix_table">
                 <thead>
                   <tr><th style={{ justifyContent: "center", width: "10%" }}></th><th colSpan={"4"} style={{ width: "45%" }}>Client Side</th><th colSpan={"4"} style={{ width: "45%" }}>GTBharat Side</th></tr>
@@ -419,7 +496,42 @@ export default function OperationRunbook() {
 
 
 
-            {activeTab === "tab4" && <div className="passwords_list">????</div>}
+            {activeTab === "tab4" && <div className="passwords_list">
+              <table className="passwords_list_table">
+                <thead>
+                  <tr>
+                    <th style={{ justifyContent: "center", width: "8%" }}>S.No</th>
+                    <th style={{ justifyContent: "center", width: "23%" }}>Asset ID</th>
+                    <th style={{ justifyContent: "center", width: "23%" }}>Mode</th>
+                    <th style={{ justifyContent: "center", width: "23%" }}>Username</th>
+                    <th style={{ justifyContent: "center", width: "23%" }}>Password</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                  </tr>
+                  <tr>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td style={{ justifyContent: "center" }}>Data</td>
+                  </tr>
+                </tbody>
+              </table>
+
+
+            </div>
+            }
+
+
+
+
 
 
 
@@ -505,6 +617,45 @@ export default function OperationRunbook() {
       )}
 
 
+
+
+
+
+
+      {isAddEscalationModalOpen && (
+        <div className="add-escalation-modal">
+          <div className="add-escalation-modal-content">
+            <h3>Add Escalation Entry</h3>
+
+            <input type="text" placeholder="Level" value={newEscalation.level} onChange={(e) => setNewEscalation({ ...newEscalation, level: e.target.value })} />
+            <div className="escalation_modal_div">
+              <div className="client_side">
+                <h4>Client Side</h4>
+                <input type="text" placeholder="Name" value={newEscalation.client_name} onChange={(e) => setNewEscalation({ ...newEscalation, client_name: e.target.value })} />
+                <input type="email" placeholder="Email" value={newEscalation.client_email} onChange={(e) => setNewEscalation({ ...newEscalation, client_email: e.target.value })} />
+                <input type="text" placeholder="Contact" value={newEscalation.client_contact} onChange={(e) => setNewEscalation({ ...newEscalation, client_contact: e.target.value })} />
+                <input type="text" placeholder="Designation" value={newEscalation.client_designation} onChange={(e) => setNewEscalation({ ...newEscalation, client_designation: e.target.value })} />
+              </div>
+              <div className="gt_side">
+                <h4>GTBharat Side</h4>
+                <input type="text" placeholder="Name" value={newEscalation.gtb_name} onChange={(e) => setNewEscalation({ ...newEscalation, gtb_name: e.target.value })} />
+                <input type="email" placeholder="Email" value={newEscalation.gtb_email} onChange={(e) => setNewEscalation({ ...newEscalation, gtb_email: e.target.value })} />
+                <input type="text" placeholder="Contact" value={newEscalation.gtb_contact} onChange={(e) => setNewEscalation({ ...newEscalation, gtb_contact: e.target.value })} />
+                <input type="text" placeholder="Designation" value={newEscalation.gtb_designation} onChange={(e) => setNewEscalation({ ...newEscalation, gtb_designation: e.target.value })} />
+              </div>
+            </div>
+            <div className="add-escalation-modal-actions">
+              <button onClick={handleAddEscalation}>Submit</button>
+              <button onClick={() => setIsAddEscalationModalOpen(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
+
+
       {isAddEntryModalOpen && (
         <div className="add-asset-modal">
           <div className="add-asset-modal-content">
@@ -529,25 +680,31 @@ export default function OperationRunbook() {
             </div>
           </div>
         </div>
-      )}
+
+      )
+      }
 
 
-      {showUploadModal && (
-        <div className="upload-sow-modal">
-          <div className="modal-content">
-            <h3>Upload SOW PDF</h3>
-            <input
-              type="file"
-              accept="application/pdf"
-              onChange={handlePDFUpload}
-            />
-            <button onClick={() => setShowUploadModal(false)}>Close</button>
+
+
+      {
+        showUploadModal && (
+          <div className="upload-sow-modal">
+            <div className="modal-content">
+              <h3>Upload SOW PDF</h3>
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={handlePDFUpload}
+              />
+              <button onClick={() => setShowUploadModal(false)}>Close</button>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
 
-    </div>
+    </div >
   );
 
 }

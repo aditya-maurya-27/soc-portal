@@ -266,7 +266,7 @@ export default function OperationRunbook() {
                 setSelectedClientName(client.name);
               }}
             >
-              🟣 {client.name}
+              <img src="/logo.png" className="company-logo" alt="Logo" />{client.name}
             </li>
           ))}
         </ul>

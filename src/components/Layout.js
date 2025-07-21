@@ -47,6 +47,8 @@ function Layout() {
     }
   }, [isAuthenticated, location.pathname, navigate]);
 
+
+  
   useEffect(() => {
     // Set navbar color based on route
     if (location.pathname === "/") {
@@ -54,7 +56,7 @@ function Layout() {
     } else if (location.pathname === "/login" || location.pathname === "/register") {
       setNavbarColor("#333333"); // white for login/register
     } else {
-      setNavbarColor("#003854"); // light gray or any color for other pages
+      setNavbarColor("#004263ff"); // light gray or any color for other pages
     }
   }, [location.pathname]);
 

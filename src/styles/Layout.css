@@ -29,8 +29,8 @@
 }
 
 .button:hover {
-  background: rgb(168, 46, 255) !important;
-  box-shadow: 0 0 20px rgb(168, 46, 255) !important;
+  background: rgb(180, 74, 255) !important;
+  box-shadow: 0 0 20px rgb(180, 74, 255) !important;
 }
 
 .button span {
@@ -138,7 +138,7 @@
   font-size: 18px;
   background: none;
   border: None;
-  padding: 0px 0px 5px 0px;
+  padding: 0px 0px 4px 0px;
 }
 
 .nav-links a.active {

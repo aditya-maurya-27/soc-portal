@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../styles/OperationRunbook.css";
-import {Briefcase, ClipboardList, GitFork, Key, HardDrive, Search, Upload, Download, Filter} from "lucide-react";
+import { Briefcase, ClipboardList, GitFork, Key, HardDrive, Search, Upload, Download, Filter } from "lucide-react";
 
 export default function OperationRunbook() {
   const [isAddEscalationModalOpen, setIsAddEscalationModalOpen] = useState(false);
@@ -128,6 +128,7 @@ export default function OperationRunbook() {
         const safeData = Array.isArray(data) ? data : []
         setAssetData(safeData);
         setFilteredAssets(safeData);
+
       })
       .catch(error => {
         console.error("Error fetching assets:", error);
@@ -139,10 +140,17 @@ export default function OperationRunbook() {
       .then(res => res.json())
       .then(data => {
         const formattedEscalations = data.map(e => ({
-          id: e[0], client_id: e[1], level: e[2],
-          contact_name: e[3], contact_email: e[4],
-          contact_number: e[5], sla_response_hours: e[6],
-          sla_resolution_hours: e[7],
+          id: e[0],
+          client_id: e[1],
+          level: e[2],
+          client_name: e[3],
+          client_email: e[4],
+          client_contact: e[5],
+          client_designation: e[6],
+          gtb_name: e[7],
+          gtb_email: e[8],
+          gtb_contact: e[9],
+          gtb_designation: e[10]
         }));
         setEscalationData(formattedEscalations);
       });
@@ -206,7 +214,18 @@ export default function OperationRunbook() {
     const res = await fetch("http://localhost:5000/api/escalation-matrix", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ client_id: selectedClient, ...newEscalation }),
+      body: JSON.stringify({
+        client_id: selectedClient,
+        level: newEscalation.level,
+        client_name: newEscalation.client_name,
+        client_email: newEscalation.client_email,
+        client_contact: newEscalation.client_contact,
+        client_designation: newEscalation.client_designation,
+        gtb_name: newEscalation.gtb_name,
+        gtb_email: newEscalation.gtb_email,
+        gtb_contact: newEscalation.gtb_contact,
+        gtb_designation: newEscalation.gtb_designation
+      }),
     });
 
     if (res.ok) {
@@ -241,15 +260,10 @@ export default function OperationRunbook() {
 
 
 
+
   return (
     <div className="operation-runbook-container">
       <div className="sidebar">
-        <input
-          type="text"
-          className="search-box"
-          placeholder="Search clients..."
-          onChange={handleSearchChange}
-        />
         {isAdmin && (
           <button
             onClick={() => setIsAddClientModalOpen(true)}
@@ -258,6 +272,12 @@ export default function OperationRunbook() {
             Add Client
           </button>
         )}
+        <input
+          type="text"
+          className="search-box"
+          placeholder="Search clients..."
+          onChange={handleSearchChange}
+        />
         <ul className="client-list">
           {clients.map((client) => (
             <li
@@ -268,7 +288,13 @@ export default function OperationRunbook() {
               }}
               className={selectedClient === client.id ? "active-client" : ""}
             >
-              <img src="/logo.png" className="company-logo" alt="Logo" />{client.name}
+              <img
+                src={`/logos/${client.name.replace(/ /g, "_")}.png`}
+                className="company-logo"
+                alt={`${client.name} Logo`}
+                onError={(e) => { e.target.src = "/logos/default.png"; }}
+              />
+              {client.name}
             </li>
           ))}
         </ul>
@@ -277,20 +303,23 @@ export default function OperationRunbook() {
       {selectedClient && (
 
         <div className="client-details">
+          <div className="client-header">
+            <label className="client-name-display">{selectedClientName}</label>
+          </div>
           <div className="tab-navigation">
             <button
               className={`tab-button ${activeTab === "tab1" ? "active" : ""}`}
               onClick={() => setActiveTab("tab1")}
             >
               <Briefcase size={20} />
-              <span>Scope of Work</span>
+              <span>Scope Of Work</span>
             </button>
             <button
               className={`tab-button ${activeTab === "tab2" ? "active" : ""}`}
               onClick={() => setActiveTab("tab2")}
             >
               <ClipboardList size={20} />
-              <span>SLA</span>
+              <span>Service Level Agreement</span>
             </button>
             <button
               className={`tab-button ${activeTab === "tab3" ? "active" : ""}`}
@@ -304,14 +333,14 @@ export default function OperationRunbook() {
               onClick={() => setActiveTab("tab4")}
             >
               <Key size={20} />
-              <span>Password List</span>
+              <span>Passwords List</span>
             </button>
             <button
               className={`tab-button ${activeTab === "tab5" ? "active" : ""}`}
               onClick={() => setActiveTab("tab5")}
             >
               <HardDrive size={20} />
-              <span>Asset Inventory</span>
+              <span>Assets Inventory</span>
             </button>
           </div>
 
@@ -342,7 +371,7 @@ export default function OperationRunbook() {
                   <iframe
                     src={`http://localhost:5000/pdfs/client_${selectedClient}.pdf#toolbar=0`}
                     width="100%"
-                    height="600px"
+                    height="700px"
                     style={{ border: 'none', backgroundColor: "#fff" }}
                     title="PDF Preview"
                   />
@@ -417,33 +446,22 @@ export default function OperationRunbook() {
                     <th style={{ width: "11%" }}>Designation</th></tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>
-                      Data
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>
-                      Data
-                    </td>
-                  </tr>
+                  {escalationData.map((entry, index) => (
+                    <tr key={entry.id || index}>
+                      <td>{entry.level}</td>
+                      <td>{entry.client_name}</td>
+                      <td>{entry.client_email}</td>
+                      <td>{entry.client_contact}</td>
+                      <td>{entry.client_designation}</td>
+                      <td>{entry.gtb_name}</td>
+                      <td>{entry.gtb_email}</td>
+                      <td>{entry.gtb_contact}</td>
+                      <td>{entry.gtb_designation}</td>
+                    </tr>
+                  ))}
                 </tbody>
+
+
               </table>
 
 

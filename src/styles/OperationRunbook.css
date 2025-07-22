@@ -9,7 +9,10 @@
 
 .client-details {
   display: flex;
+  flex: 1;
+  overflow-y: auto;
   width: 84%;
+  height: auto;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
@@ -162,7 +165,7 @@
   color: #7700aa;
   height: 35px;
   padding: 0;
-  margin: 0;
+  margin: 5px 0px 2px 0px ;
   border-radius: 7px;
 }
 
@@ -759,7 +762,7 @@
 .tab-navigation {
   display: flex;
   gap: 8px;
-  margin: -10px 0px 10px 0px;
+  margin: -8px 0px 10px 0px;
   flex-wrap: wrap; /* Allow tabs to wrap on smaller screens */
   width: 95%; /* Ensure tabs cover the area */
 }
@@ -800,4 +803,30 @@
 
 .tab-button.active .lucide {
   color: white; /* Active icon color */
+}
+
+
+
+
+
+
+
+
+.client-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+  width: 100%;
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 7px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  margin-bottom: 5px; /* Reduced space at the top */
+}
+
+.client-name-display {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
 }

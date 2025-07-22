@@ -728,7 +728,7 @@ def setup_routes(app):
             cursor.close()
             conn.close()
 
-    @app.route("/api/escalation-matrix", methods=["GET", "POST"])
+    @app.route('/api/escalation-matrix', methods=['GET', 'POST'])
     def escalation_matrix():
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -744,20 +744,28 @@ def setup_routes(app):
             data = request.get_json()
             client_id = data.get("client_id")
             level = data.get("level")
-            engineer_name = data.get("contact_name")
-            email = data.get("contact_email")
-            phone = data.get("contact_number")
-            sla_response = data.get("sla_response_hours")
-            sla_resolution = data.get("sla_resolution_hours")
+            client_name = data.get("client_name")
+            client_email = data.get("client_email")
+            client_contact = data.get("client_contact")
+            client_designation = data.get("client_designation")
+            gtb_name = data.get("gtb_name")
+            gtb_email = data.get("gtb_email")
+            gtb_contact = data.get("gtb_contact")
+            gtb_designation = data.get("gtb_designation")
 
-            cursor.execute(
-                """
-                INSERT INTO escalation_matrix 
-                (client_id, level, contact_name, contact_email, contact_number, sla_response_hours, sla_resolution_hours)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """,
-                (client_id, level, engineer_name, email, phone, sla_response, sla_resolution)
-            )
+            cursor.execute("""
+                INSERT INTO escalation_matrix (
+                    client_id, level,
+                    client_name, client_email, client_contact, client_designation,
+                    gtb_name, gtb_email, gtb_contact, gtb_designation
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                client_id, level,
+                client_name, client_email, client_contact, client_designation,
+                gtb_name, gtb_email, gtb_contact, gtb_designation
+            ))
+
             conn.commit()
             conn.close()
             return jsonify({"message": "Escalation matrix entry added successfully"}), 201

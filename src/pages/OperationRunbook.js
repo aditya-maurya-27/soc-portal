@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../styles/OperationRunbook.css";
+import {Briefcase, ClipboardList, GitFork, Key, HardDrive, Search, Upload, Download, Filter} from "lucide-react";
 
 export default function OperationRunbook() {
   const [isAddEscalationModalOpen, setIsAddEscalationModalOpen] = useState(false);
@@ -265,6 +266,7 @@ export default function OperationRunbook() {
                 setSelectedClient(client.id);
                 setSelectedClientName(client.name);
               }}
+              className={selectedClient === client.id ? "active-client" : ""}
             >
               <img src="/logo.png" className="company-logo" alt="Logo" />{client.name}
             </li>
@@ -275,93 +277,49 @@ export default function OperationRunbook() {
       {selectedClient && (
 
         <div className="client-details">
-          <div className="tab-frame">
-            <input
-              type="radio"
-              name="tab"
-              id="tab1"
-              className="tab tab--1"
-              defaultChecked
-              onChange={() => setActiveTab("tab1")}
-            />
-            <label
-              className={`tab_label ${activeTab === "tab1" ? "active" : ""}`}
-              htmlFor="tab1"
+          <div className="tab-navigation">
+            <button
+              className={`tab-button ${activeTab === "tab1" ? "active" : ""}`}
+              onClick={() => setActiveTab("tab1")}
             >
-              Scope of Work
-            </label>
-
-
-            <input
-              type="radio"
-              name="tab"
-              id="tab2"
-              className="tab tab--2"
-              onChange={() => setActiveTab("tab2")}
-            />
-            <label
-              className={`tab_label ${activeTab === "tab2" ? "active" : ""}`}
-              htmlFor="tab2"
+              <Briefcase size={20} />
+              <span>Scope of Work</span>
+            </button>
+            <button
+              className={`tab-button ${activeTab === "tab2" ? "active" : ""}`}
+              onClick={() => setActiveTab("tab2")}
             >
-              Service Level Agreement
-            </label>
-
-            <input
-              type="radio"
-              name="tab"
-              id="tab3"
-              className="tab tab--3"
-              onChange={() => setActiveTab("tab3")}
-            />
-            <label
-              className={`tab_label ${activeTab === "tab3" ? "active" : ""}`}
-              htmlFor="tab3"
+              <ClipboardList size={20} />
+              <span>SLA</span>
+            </button>
+            <button
+              className={`tab-button ${activeTab === "tab3" ? "active" : ""}`}
+              onClick={() => setActiveTab("tab3")}
             >
-              Escalation Matrix
-            </label>
-
-            <input
-              type="radio"
-              name="tab"
-              id="tab4"
-              className="tab tab--4"
-              onChange={() => setActiveTab("tab4")}
-            />
-            <label
-              className={`tab_label ${activeTab === "tab4" ? "active" : ""}`}
-              htmlFor="tab4"
+              <GitFork size={20} />
+              <span>Escalation Matrix</span>
+            </button>
+            <button
+              className={`tab-button ${activeTab === "tab4" ? "active" : ""}`}
+              onClick={() => setActiveTab("tab4")}
             >
-              Passwords List
-            </label>
-
-            <input
-              type="radio"
-              name="tab"
-              id="tab5"
-              className="tab tab--5"
-              onChange={() => setActiveTab("tab5")}
-            />
-            <label
-              className={`tab_label ${activeTab === "tab5" ? "active" : ""}`}
-              htmlFor="tab5"
+              <Key size={20} />
+              <span>Password List</span>
+            </button>
+            <button
+              className={`tab-button ${activeTab === "tab5" ? "active" : ""}`}
+              onClick={() => setActiveTab("tab5")}
             >
-              Assets Inventory
-            </label>
-
-            <div className="indicator"></div>
+              <HardDrive size={20} />
+              <span>Asset Inventory</span>
+            </button>
           </div>
 
 
 
 
 
-
           <div className="tab-content">
-
-
-
-
-
             {activeTab === "tab1" && (
               <div className="sow">
                 {isAdmin && (

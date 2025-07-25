@@ -54,9 +54,9 @@ function Layout() {
     if (location.pathname === "/") {
       setNavbarColor("#121212"); // dark for landing page
     } else if (location.pathname === "/login" || location.pathname === "/register") {
-      setNavbarColor("#333333"); // white for login/register
+      setNavbarColor("#2f004cff"); // white for login/register
     } else {
-      setNavbarColor("#004263ff"); // light gray or any color for other pages
+      setNavbarColor("#2E3A59"); // light gray or any color for other pages
     }
   }, [location.pathname]);
 

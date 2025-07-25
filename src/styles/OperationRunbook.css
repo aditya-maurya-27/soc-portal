@@ -125,8 +125,7 @@
 .active-client {
   background-color: #007bff; /* Active client background */
   color: white;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+  box-shadow: 0 0px 8px rgba(0, 123, 255, 0.2);
 }
 
 
@@ -565,8 +564,6 @@
 .sla_table td {
   border: 1px solid #b5b5b5;
   padding: 5px;
-  text-align: left;
-
 }
 
 
@@ -603,8 +600,8 @@
 .escalation_matrix_table td {
   border: 1px solid #b5b5b5;
   padding: 5px;
-  text-align: left;
-
+  text-align: center;
+  justify-content: center;
 }
 
 
@@ -669,7 +666,7 @@
 .assets-inventory-table td {
   border: 1px solid #b5b5b5;
   padding: 5px;
-  text-align: left;
+  text-align: center;
 
 }
 

@@ -273,7 +273,7 @@ export default function OperationRunbook() {
           </button>
         )}
         <input
-          type="text"
+          type="search"
           className="search-box"
           placeholder="Search clients..."
           onChange={handleSearchChange}
@@ -362,11 +362,6 @@ export default function OperationRunbook() {
                   </div>
                 )}
 
-
-
-
-
-
                 {clientPDF ? (
                   <iframe
                     src={`http://localhost:5000/pdfs/client_${selectedClient}.pdf#toolbar=0`}
@@ -381,11 +376,6 @@ export default function OperationRunbook() {
               </div>
             )}
 
-
-
-
-
-
             {activeTab === "tab2" && <div className="sla">
               <table className="sla_table">
                 <thead>
@@ -398,16 +388,16 @@ export default function OperationRunbook() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td style={{ justifyContent: "center" }}>Data</td>
-                    <td style={{ justifyContent: "center" }}>Data</td>
-                    <td style={{ justifyContent: "center" }}>Data</td>
-                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
                   </tr>
                   <tr>
-                    <td style={{ justifyContent: "center" }}>Data</td>
-                    <td style={{ justifyContent: "center" }}>Data</td>
-                    <td style={{ justifyContent: "center" }}>Data</td>
-                    <td style={{ justifyContent: "center" }}>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
+                    <td>Data</td>
                   </tr>
                 </tbody>
               </table>
@@ -491,13 +481,6 @@ export default function OperationRunbook() {
                     <td style={{ justifyContent: "center" }}>Data</td>
                     <td style={{ justifyContent: "center" }}>Data</td>
                   </tr>
-                  <tr>
-                    <td style={{ justifyContent: "center" }}>Data</td>
-                    <td style={{ justifyContent: "center" }}>Data</td>
-                    <td style={{ justifyContent: "center" }}>Data</td>
-                    <td style={{ justifyContent: "center" }}>Data</td>
-                    <td style={{ justifyContent: "center" }}>Data</td>
-                  </tr>
                 </tbody>
               </table>
 
@@ -544,13 +527,13 @@ export default function OperationRunbook() {
                 <tbody>
                   {assetData.map((asset, index) => (
                     <tr key={index}>
-                      <td>{asset.asset_name}</td>
-                      <td>{asset.location}</td>
-                      <td>{asset.ip_address}</td>
-                      <td>{asset.mode}</td>
-                      <td>{asset.asset_type}</td>
-                      <td>{asset.asset_owner}</td>
-                      <td>{asset.remarks}</td>
+                      <td style={{ justifyContent: "center"}}>{asset.asset_name}</td>
+                      <td style={{ justifyContent: "center"}}>{asset.location}</td>
+                      <td style={{ justifyContent: "center"}}>{asset.ip_address}</td>
+                      <td style={{ justifyContent: "center"}}>{asset.mode}</td>
+                      <td style={{ justifyContent: "center"}}>{asset.asset_type}</td>
+                      <td style={{ justifyContent: "center"}}>{asset.asset_owner}</td>
+                      <td style={{ justifyContent: "center"}}>{asset.remarks}</td>
                     </tr>
                   ))}
                 </tbody>

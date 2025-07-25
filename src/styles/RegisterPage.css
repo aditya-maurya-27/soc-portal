@@ -1,6 +1,21 @@
 /* RegisterPage.css */
-
 .register-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  background-image: url('C:\OfficeData\Projects\soc-portal\public\register-background.jpeg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+
+}
+
+
+
+
+.register-panel {
     max-width: 400px;
     margin: 50px auto;
     padding: 20px;

@@ -1,5 +1,4 @@
 .header-container{
-    font-family: Calibri, sans-serif;
     display: flex;
     width: 100%;
     justify-content: left;
@@ -12,14 +11,12 @@
 
 
 h3{
-    font-family: Calibri, sans-serif;
     font-size: 20px;
     margin: 0 0 3px 0;
 }
 
 .dashboard-container{
     display: flex;
-    font-family: Calibri, sans-serif;
     flex-direction: column;
     color: white;
     background-color: white;

@@ -488,21 +488,21 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: auto;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.5); /* semi-transparent background */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1;
 }
 
-.upload-sow-modal .modal-content {
+.upload-modal-content {
   display: block;
   background: white;
+  max-height: 30vh; 
   padding: 20px;
   border-radius: 8px;
-  width: 50%;
-  height: 20%;
+  width: 500px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   text-align: center;
 }
@@ -701,13 +701,27 @@
 
 
 .upload-sow-pdf-button{
-  padding: 10px 10px;
+  border-radius: 7px;
+  gap: 10px;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 8px;
   margin: 0px 0px 10px 0px;
+  cursor: pointer;
 }
 
 .delete-sow-pdf-button{
-  padding: 10px 10px;
+  border-radius: 7px;
+  gap: 10px;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 8px;
   margin: 0px 0px 10px 0px;
+  cursor: pointer;
 }
 
 
@@ -732,21 +746,21 @@
 .tab-navigation {
   display: flex;
   gap: 8px;
-  margin: -8px 0px 10px 0px;
-  flex-wrap: wrap; /* Allow tabs to wrap on smaller screens */
-  width: 95%; /* Ensure tabs cover the area */
+  margin: 0px 0px 8px 0px;
+  flex-wrap: nowrap; /* Allow tabs to wrap on smaller screens */
+  width: 98%; /* Ensure tabs cover the area */
 }
 
 .tab-button {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 20px;
+  padding: 8px 15px;
   border: 1px solid #dee2e6; /* Lighter border for tabs */
   border-radius: 7px;
   background-color: #ffffff;
   color: #555;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;

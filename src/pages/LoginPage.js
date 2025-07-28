@@ -28,8 +28,8 @@ function LoginPage() {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-panel">
+    <div className="login-container" style={{backgroundImage: "url('/assets/login-background.jpeg')"}}>
+      <div className="login-panel" >
         <label className="login-text">Login</label>
         <form onSubmit={handleSubmit}>
           <input

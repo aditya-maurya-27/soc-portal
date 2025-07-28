@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../styles/OperationRunbook.css";
-import { Briefcase, ClipboardList, GitFork, Key, HardDrive, Search, Upload, Download, Filter } from "lucide-react";
+import { BriefcaseBusiness, ClipboardList, GitFork, Key, Server, Search, Upload, Trash2, Filter } from "lucide-react";
 
 export default function OperationRunbook() {
   const [isAddEscalationModalOpen, setIsAddEscalationModalOpen] = useState(false);
@@ -311,35 +311,35 @@ export default function OperationRunbook() {
               className={`tab-button ${activeTab === "tab1" ? "active" : ""}`}
               onClick={() => setActiveTab("tab1")}
             >
-              <Briefcase size={20} />
+              <BriefcaseBusiness size={18} />
               <span>Scope Of Work</span>
             </button>
             <button
               className={`tab-button ${activeTab === "tab2" ? "active" : ""}`}
               onClick={() => setActiveTab("tab2")}
             >
-              <ClipboardList size={20} />
+              <ClipboardList size={18} />
               <span>Service Level Agreement</span>
             </button>
             <button
               className={`tab-button ${activeTab === "tab3" ? "active" : ""}`}
               onClick={() => setActiveTab("tab3")}
             >
-              <GitFork size={20} />
+              <GitFork size={18} />
               <span>Escalation Matrix</span>
             </button>
             <button
               className={`tab-button ${activeTab === "tab4" ? "active" : ""}`}
               onClick={() => setActiveTab("tab4")}
             >
-              <Key size={20} />
+              <Key size={18} />
               <span>Passwords List</span>
             </button>
             <button
               className={`tab-button ${activeTab === "tab5" ? "active" : ""}`}
               onClick={() => setActiveTab("tab5")}
             >
-              <HardDrive size={20} />
+              <Server size={18} />
               <span>Assets Inventory</span>
             </button>
           </div>
@@ -354,10 +354,12 @@ export default function OperationRunbook() {
                 {isAdmin && (
                   <div className="sow-buttons-frame">
                     <button className="upload-sow-pdf-button" onClick={() => setShowUploadModal(true)} style={{ marginRight: "10px" }}>
-                      Upload SOW PDF
+                      <Upload size={20} />
+                      <span>Upload PDF</span>
                     </button>
                     <button className="delete-sow-pdf-button" onClick={handleDeletePDF}>
-                      Delete SOW PDF
+                      <Trash2 size={20} />
+                      <span>Delete PDF</span>
                     </button>
                   </div>
                 )}
@@ -649,7 +651,7 @@ export default function OperationRunbook() {
       {
         showUploadModal && (
           <div className="upload-sow-modal">
-            <div className="modal-content">
+            <div className="upload-modal-content">
               <h3>Upload SOW PDF</h3>
               <input
                 type="file"

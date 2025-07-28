@@ -45,8 +45,8 @@ function RegisterPage() {
   };
 
   return (
-    <div className="register-container">
-      <div className="register-panel">
+    <div className="register-container" style={{backgroundImage: "url('/assets/register-background.jpeg')"}}>
+      <div className="register-panel" >
         <h2>Register</h2>
         <form onSubmit={handleSubmit}>
           <input

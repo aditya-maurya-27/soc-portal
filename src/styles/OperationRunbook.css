@@ -11,7 +11,7 @@
   display: flex;
   flex: 1;
   overflow-y: auto;
-  width: 84%;
+  width: 100%;
   height: auto;
   flex-direction: column;
   justify-content: flex-start;
@@ -20,7 +20,7 @@
   background-color: white;
   margin: 0;
   min-height: 100% !important;
-  
+
 }
 
 .sow {
@@ -78,7 +78,7 @@
 
 
 .sidebar {
-  width: 16%;
+  width: 15%;
   border-right: 1px solid #ccc;
   background-color: white;
   display: flex;
@@ -88,10 +88,20 @@
 
 .search-box {
   border-radius: 7px;
-  border: 1px solid #007eed;
+  border: 1px solid blue;
   padding: 8px;
   margin: 5px 0px 10px 0px;
 }
+
+
+.search-box:focus {
+  outline: none;
+  border: 1px solid rgb(0, 214, 0); /* or any color you prefer */
+  box-shadow: none; /* optional: removes any shadow */
+}
+
+
+
 
 .client-list {
   display: flex;
@@ -105,7 +115,7 @@
 }
 
 
-.company-logo{
+.company-logo {
   width: 24px;
   height: 24px;
   margin-right: 8px;
@@ -137,7 +147,7 @@
   color: #7700aa;
   height: 35px;
   padding: 0;
-  margin: 5px 0px 2px 0px ;
+  margin: 5px 0px 2px 0px;
   border-radius: 7px;
 }
 
@@ -172,7 +182,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* semi-transparent background */
+  background: rgba(0, 0, 0, 0.5);
+  /* semi-transparent background */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -250,7 +261,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* semi-transparent background */
+  background: rgba(0, 0, 0, 0.5);
+  /* semi-transparent background */
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -308,7 +320,7 @@
 
 
 
-.escalation_modal_div{
+.escalation_modal_div {
   display: flex;
   gap: 15px;
   padding: 9px;
@@ -319,11 +331,11 @@
 }
 
 
-.client_side{
+.client_side {
   display: block;
 }
 
-.gt_side{
+.gt_side {
   display: block;
 }
 
@@ -360,7 +372,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* semi-transparent background */
+  background: rgba(0, 0, 0, 0.5);
+  /* semi-transparent background */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -489,7 +502,8 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5); /* semi-transparent background */
+  background: rgba(0, 0, 0, 0.5);
+  /* semi-transparent background */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -499,7 +513,7 @@
 .upload-modal-content {
   display: block;
   background: white;
-  max-height: 30vh; 
+  max-height: 30vh;
   padding: 20px;
   border-radius: 8px;
   width: 500px;
@@ -528,15 +542,16 @@
 
 .sla_table th {
   color: white;
-  background-color: #37548d !important;
+  background-color: #2e4575 !important;
   border: 1px solid #b5b5b5;
   padding: 5px;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .sla_table td {
   border: 1px solid #b5b5b5;
   padding: 5px;
+  font-size: 16px;
 }
 
 
@@ -564,15 +579,16 @@
 
 .escalation_matrix_table th {
   color: white;
-  background-color: #37548d !important;
+  background-color: #2e4575 !important;
   border: 1px solid #b5b5b5;
   padding: 5px;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .escalation_matrix_table td {
   border: 1px solid #b5b5b5;
   padding: 5px;
+  font-size: 16px;
   text-align: center;
   justify-content: center;
 }
@@ -591,17 +607,17 @@
 
 .passwords_list_table th {
   color: white;
-  background-color: #37548d !important;
+  background-color: #2e4575 !important;
   border: 1px solid #b5b5b5;
   padding: 5px;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .passwords_list_table td {
   border: 1px solid #b5b5b5;
   padding: 5px;
   text-align: left;
-
+  font-size: 16px;
 }
 
 
@@ -630,17 +646,17 @@
 
 .assets-inventory-table th {
   color: white;
-  background-color: #37548d !important;
+  background-color: #2e4575 !important;
   border: 1px solid #b5b5b5;
   padding: 5px;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .assets-inventory-table td {
   border: 1px solid #b5b5b5;
   padding: 5px;
   text-align: center;
-
+  font-size: 16px;
 }
 
 
@@ -691,7 +707,7 @@
 
 
 
-.sow-buttons-frame{
+.sow-buttons-frame {
   display: flex;
 }
 
@@ -700,7 +716,7 @@
 
 
 
-.upload-sow-pdf-button{
+.upload-sow-pdf-button {
   border-radius: 7px;
   gap: 10px;
   display: flex;
@@ -712,7 +728,7 @@
   cursor: pointer;
 }
 
-.delete-sow-pdf-button{
+.delete-sow-pdf-button {
   border-radius: 7px;
   gap: 10px;
   display: flex;
@@ -747,8 +763,10 @@
   display: flex;
   gap: 8px;
   margin: 0px 0px 8px 0px;
-  flex-wrap: nowrap; /* Allow tabs to wrap on smaller screens */
-  width: 98%; /* Ensure tabs cover the area */
+  flex-wrap: nowrap;
+  /* Allow tabs to wrap on smaller screens */
+  width: 100%;
+  /* Ensure tabs cover the area */
 }
 
 .tab-button {
@@ -756,7 +774,8 @@
   align-items: center;
   gap: 8px;
   padding: 8px 15px;
-  border: 1px solid #dee2e6; /* Lighter border for tabs */
+  border: 1px solid #dee2e6;
+  /* Lighter border for tabs */
   border-radius: 7px;
   background-color: #ffffff;
   color: #555;
@@ -764,29 +783,36 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  flex-grow: 1; /* Allow tabs to grow and fill space */
-  justify-content: center; /* Center content within tabs */
+  flex-grow: 1;
+  /* Allow tabs to grow and fill space */
+  justify-content: center;
+  /* Center content within tabs */
 }
 
 .tab-button:hover {
-  background-color: #e9ecef; /* Light grey on hover */
+  background-color: #e9ecef;
+  /* Light grey on hover */
   border-color: #ced4da;
-  color: #007bff; /* Blue on hover */
+  color: #DE002E;
+  /* Blue on hover */
 }
 
 .tab-button.active {
-  background-color: #007bff; /* Professional blue for active tab */
+  background-color: #DE002E;
+  /* Professional blue for active tab */
   color: white;
-  border-color: #007bff;
+  border-color: #DE002E;
   box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
 }
 
 .tab-button .lucide {
-  color: #777; /* Default icon color */
+  color: #777;
+  /* Default icon color */
 }
 
 .tab-button.active .lucide {
-  color: white; /* Active icon color */
+  color: white;
+  /* Active icon color */
 }
 
 
@@ -806,7 +832,8 @@
   padding: 5px;
   border-radius: 7px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-  margin-bottom: 5px; /* Reduced space at the top */
+  margin-bottom: 5px;
+  /* Reduced space at the top */
 }
 
 .client-name-display {

@@ -1,12 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { KeyRound } from "lucide-react";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null); // user = { id, username, role }
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const validateToken = async (retry = false) => {
@@ -25,29 +24,20 @@ export function AuthProvider({ children }) {
       try {
         const response = await fetch("http://localhost:5000/api/validate", {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (response.ok) {
           setIsAuthenticated(true);
           setUser({ id: user_id, username, role });
         } else {
-          if (!retry) {
-            console.warn("Validation failed, retrying...");
-            return validateToken(true); // Retry once
-          }
+          if (!retry) return validateToken(true);
           localStorage.clear();
           setIsAuthenticated(false);
           setUser(null);
         }
       } catch (error) {
-        console.error("Token validation error:", error);
-        if (!retry) {
-          console.warn("Retrying after error...");
-          return validateToken(true); // Retry once
-        }
+        if (!retry) return validateToken(true);
         localStorage.clear();
         setIsAuthenticated(false);
         setUser(null);
@@ -56,11 +46,7 @@ export function AuthProvider({ children }) {
       }
     };
 
-    const timer = setTimeout(() => {
-      validateToken();
-    }, 100); // 100ms debounce delay
-
-    return () => clearTimeout(timer);
+    validateToken();
   }, []);
 
   const login = async (username, password) => {
@@ -81,11 +67,7 @@ export function AuthProvider({ children }) {
         localStorage.setItem("isAdmin", data.role === "admin" ? "true" : "false");
 
         setIsAuthenticated(true);
-        setUser({
-          id: data.user_id,
-          username: data.username,
-          role: data.role,
-        });
+        setUser({ id: data.user_id, username: data.username, role: data.role });
 
         return true;
       } else {
@@ -104,26 +86,8 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  if (loading) return (
-    <div style={{
-      width: "100vw",
-      height: "100vh",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      textAlign: "center"
-    }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <KeyRound />
-        <span>Authenticating User...</span>
-      </div>
-    </div>
-  );
-
-
-
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, user }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, user, loading }}>
       {children}
     </AuthContext.Provider>
   );

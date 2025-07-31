@@ -134,7 +134,7 @@
 .active-client {
   color: #DE002E;
   border-left: 5px solid #DE002E;
-  margin-left: 25px;
+  margin-left: 20px;
 }
 
 
@@ -551,7 +551,9 @@
 .sla_table td {
   border: 1px solid #b5b5b5;
   padding: 5px;
-  font-size: 16px;
+  font-size: 14px;
+  text-align: center;
+  justify-content: center;
 }
 
 
@@ -588,7 +590,7 @@
 .escalation_matrix_table td {
   border: 1px solid #b5b5b5;
   padding: 5px;
-  font-size: 16px;
+  font-size: 14px;
   text-align: center;
   justify-content: center;
 }

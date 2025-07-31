@@ -382,24 +382,36 @@ export default function OperationRunbook() {
               <table className="sla_table">
                 <thead>
                   <tr>
-                    <th style={{ justifyContent: "center", width: "8%" }}>S.No</th>
-                    <th style={{ justifyContent: "center", width: "30.6%" }}>Priority</th>
-                    <th style={{ justifyContent: "center", width: "30.6%" }}>Response Time</th>
-                    <th style={{ justifyContent: "center", width: "30.6%" }}>???</th>
+                    <th style={{ justifyContent: "center", width: "33%" }}>Priority</th>
+                    <th style={{ justifyContent: "center", width: "33%" }}>Response Time</th>
+                    <th style={{ justifyContent: "center", width: "33%" }}>Incident Raising Notification</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
+                    <td>Critical</td>
+                    <td>30 Minutes</td>
+                    <td>45 Minutes</td>
                   </tr>
                   <tr>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
-                    <td>Data</td>
+                    <td>High</td>
+                    <td>45 Minutes</td>
+                    <td>1 Hour</td>
+                  </tr>
+                  <tr>
+                    <td>Medium</td>
+                    <td>90 Minutes</td>
+                    <td>2 Hours</td>
+                  </tr>
+                  <tr>
+                    <td>Low</td>
+                    <td>245 Minutes</td>
+                    <td>4 Hours</td>
+                  </tr>
+                  <tr>
+                    <td>Informational</td>
+                    <td>480 Minutes</td>
+                    <td>8 Hours</td>
                   </tr>
                 </tbody>
               </table>

@@ -311,35 +311,35 @@ export default function OperationRunbook() {
               className={`tab-button ${activeTab === "tab1" ? "active" : ""}`}
               onClick={() => setActiveTab("tab1")}
             >
-              <BriefcaseBusiness size={18} />
+              <BriefcaseBusiness size={20} />
               <span>Scope Of Work</span>
             </button>
             <button
               className={`tab-button ${activeTab === "tab2" ? "active" : ""}`}
               onClick={() => setActiveTab("tab2")}
             >
-              <ClipboardList size={18} />
+              <ClipboardList size={20} />
               <span>Service Level Agreement</span>
             </button>
             <button
               className={`tab-button ${activeTab === "tab3" ? "active" : ""}`}
               onClick={() => setActiveTab("tab3")}
             >
-              <GitFork size={18} />
+              <GitFork size={20} />
               <span>Escalation Matrix</span>
             </button>
             <button
               className={`tab-button ${activeTab === "tab4" ? "active" : ""}`}
               onClick={() => setActiveTab("tab4")}
             >
-              <Key size={18} />
+              <Key size={20} />
               <span>Passwords List</span>
             </button>
             <button
               className={`tab-button ${activeTab === "tab5" ? "active" : ""}`}
               onClick={() => setActiveTab("tab5")}
             >
-              <Server size={18} />
+              <Server size={20} />
               <span>Assets Inventory</span>
             </button>
           </div>
@@ -382,36 +382,42 @@ export default function OperationRunbook() {
               <table className="sla_table">
                 <thead>
                   <tr>
-                    <th style={{ justifyContent: "center", width: "33%" }}>Priority</th>
-                    <th style={{ justifyContent: "center", width: "33%" }}>Response Time</th>
-                    <th style={{ justifyContent: "center", width: "33%" }}>Incident Raising Notification</th>
+                    <th style={{ justifyContent: "center", width: "25%" }}>Incident Severity</th>
+                    <th style={{ justifyContent: "center", width: "25%" }}>Threat Event<br/>(Acknoeledge Time)</th>
+                    <th style={{ justifyContent: "center", width: "25%" }}>Incident Raising<br/>SLA/Notification</th>
+                    <th style={{ justifyContent: "center", width: "25%" }}>Resolution<br/>(Bank Responsibility)</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td>Critical</td>
-                    <td>30 Minutes</td>
+                    <td>15 Minutes</td>
                     <td>45 Minutes</td>
+                    <td>2 Hours</td>
                   </tr>
                   <tr>
                     <td>High</td>
-                    <td>45 Minutes</td>
+                    <td>30 Minutes</td>
                     <td>1 Hour</td>
+                    <td>4 Hours</td>
                   </tr>
                   <tr>
                     <td>Medium</td>
                     <td>90 Minutes</td>
                     <td>2 Hours</td>
+                    <td>8 Hours</td>
                   </tr>
                   <tr>
                     <td>Low</td>
-                    <td>245 Minutes</td>
+                    <td>240 Minutes</td>
                     <td>4 Hours</td>
+                    <td>48 Hours</td>
                   </tr>
                   <tr>
                     <td>Informational</td>
                     <td>480 Minutes</td>
                     <td>8 Hours</td>
+                    <td>72 Hours</td>
                   </tr>
                 </tbody>
               </table>

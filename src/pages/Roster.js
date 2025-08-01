@@ -6,6 +6,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import Modal from "react-modal";
 import { useAuth } from "../context/AuthContext";
 import "../styles/Roster.css";
+import { CarTaxiFront, CalendarDays, SquareStack, Boxes } from "lucide-react";
 
 Modal.setAppElement("#root");
 
@@ -507,20 +508,41 @@ const Roster = () => {
   return (
     <div className="wrapper">
 
-      <div className="tab-container">
-        <input type="radio" name="tab" id="tab1" className="tab tab--1" defaultChecked onChange={() => setActiveTab("tab1")} />
-        <label className="tab_label" htmlFor="tab1">Shifts</label>
+      <div className="roster-navigation">
+        <button
+          className={`navigation-button ${activeTab === "tab1" ? "active" : ""}`}
+          onClick={() => setActiveTab("tab1")}
+        >
+          <CalendarDays size={20} />
 
-        <input type="radio" name="tab" id="tab2" className="tab tab--2" onChange={() => setActiveTab("tab2")} />
-        <label className="tab_label" htmlFor="tab2">Shift Summary</label>
 
-        <input type="radio" name="tab" id="tab3" className="tab tab--3" onChange={() => setActiveTab("tab3")} />
-        <label className="tab_label" htmlFor="tab3">Cab Status</label>
+          <span>Detailed Roster</span>
+        </button>
+        <button
+          className={`navigation-button ${activeTab === "tab2" ? "active" : ""}`}
+          onClick={() => setActiveTab("tab2")}
+        >
 
-        <input type="radio" name="tab" id="tab4" className="tab tab--4" onChange={() => setActiveTab("tab4")} />
-        <label className="tab_label" htmlFor="tab4">Clusters</label>
+          <SquareStack size={20} />
 
-        <div className="indicator"></div>
+          <span>Domain Division</span>
+        </button>
+        <button
+          className={`navigation-button ${activeTab === "tab3" ? "active" : ""}`}
+          onClick={() => setActiveTab("tab3")}
+        >
+          <CarTaxiFront size={20} />
+          <span>Cab Status</span>
+        </button>
+        <button
+          className={`navigation-button ${activeTab === "tab4" ? "active" : ""}`}
+          onClick={() => setActiveTab("tab4")}
+        >
+
+
+          <Boxes size={20} />
+          <span>Clusters</span>
+        </button>
       </div>
 
       <div className="tab-content">
@@ -538,7 +560,7 @@ const Roster = () => {
               eventDidMount={(info) => {
                 const shiftId = info.event.id;
 
-
+                /*
                 //event colorization
                 if (!shiftColorMap.current[shiftId]) {
                   const randomColor = shiftColorPool[Math.floor(Math.random() * shiftColorPool.length)];
@@ -546,18 +568,13 @@ const Roster = () => {
                 }
                 const color = shiftColorMap.current[shiftId];
                 info.el.style.backgroundColor = color;
-                info.el.style.color = "#fff";
-                info.el.style.borderColor = color;
-
-
-                //glare
-                if (window.VanillaTilt && info.el) {
-                  window.VanillaTilt.init(info.el, {
-                    glare: true,
-                    "max-glare": 0.3,
-                  });
-                }
+                */
+                info.el.style.color = "#222222";
+                info.el.style.borderColor = "#bcbcbc";
               }}
+
+
+
 
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
               initialView="timeGridWeek"

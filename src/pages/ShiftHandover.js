@@ -143,9 +143,8 @@ function ShiftHandover() {
                 </div>
 
                 <div className="timeline_label">
-                    {React.createElement(clockIcons[clockIndex], { size: 24 })}
                     <span className="dot green"></span> 13:30 —
-                    <span className="dot yellow"></span> {currentTime} —
+                    <span className="dot yellow"></span> {currentTime} {React.createElement(clockIcons[clockIndex], { size: 22 })} —
                     <span className="dot red"></span> 18:30
                 </div>
 
@@ -162,9 +161,9 @@ function ShiftHandover() {
 
                         <tr>
                             <th style={{ width: "7.6%" }}>Shift</th>
-                            <th style={{ width: "14.6%" }}>Name of Analyst</th>
-                            <th style={{ width: "45.6%" }}>Remarks</th>
-                            <th style={{ width: "14.6%" }}>Handover to</th> {/* New column */}
+                            <th style={{ width: "12.6%" }}>Name of Analyst</th>
+                            <th style={{ width: "49.6%"}}>Remarks</th>
+                            <th style={{ width: "12.6%" }}>Handover to</th> {/* New column */}
                             <th style={{ width: "10.6%" }}>Attachment</th>
                             <th style={{ width: "6.6%" }}>Action</th>
                         </tr>

@@ -843,3 +843,27 @@
   font-weight: 550;
   color: #333;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.client-details-placeholder {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  
+  background-color: #f9f9f9;
+  border-left: 1px solid #ddd;
+}

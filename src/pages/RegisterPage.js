@@ -14,7 +14,12 @@ function RegisterPage() {
     }
   }, [isAuthenticated, navigate]);
 
-  const [formData, setFormData] = useState({ username: "", password: "", confirmPassword: "" });
+  const [formData, setFormData] = useState({
+    fullName: "",
+    username: "",
+    password: "",
+    confirmPassword: ""
+  });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,7 +37,11 @@ function RegisterPage() {
     const response = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: formData.username, password: formData.password }),
+      body: JSON.stringify({
+        fullName: formData.fullName,
+        username: formData.username,
+        password: formData.password
+      }),
     });
 
     const data = await response.json();
@@ -45,10 +54,18 @@ function RegisterPage() {
   };
 
   return (
-    <div className="register-container" style={{backgroundImage: "url('/assets/register-background.jpeg')"}}>
-      <div className="register-panel" >
+    <div className="register-container" style={{ backgroundImage: "url('/assets/register-background.jpeg')" }}>
+      <div className="register-panel">
         <h2>Register</h2>
         <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="fullName"
+            placeholder="Full Name"
+            value={formData.fullName}
+            onChange={handleChange}
+            required
+          />
           <input
             type="text"
             name="username"

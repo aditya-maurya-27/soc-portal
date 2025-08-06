@@ -37,8 +37,13 @@ function Dashboard() {
   return (
     <div className="dashboard-container">
       <div className="header-container">
-        <p>Welcome{user?.username ? `, ${user.username}` : ""}!</p>
+        <p>
+          Welcome
+          {user?.fullName ? `, ${user.fullName.split(" ")[0]}` : ""}!
+        </p>
       </div>
+
+
 
       {!isAdmin && (
         <div className="upcoming-shifts">

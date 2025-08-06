@@ -2,7 +2,6 @@ from flask import request, Flask, jsonify
 from app.auth import authenticate_user
 from app.db import get_db_connection
 from datetime import datetime, timedelta
-import bcrypt
 import os
 from flask import send_from_directory
 import mysql.connector
@@ -177,10 +176,13 @@ def setup_routes(app):
     @app.route("/api/register", methods=["POST"])
     def register():
         data = request.get_json()
+        full_name = data.get("fullName")
         username = data.get("username")
         password = data.get("password")
-        if not username or not password:
-            return jsonify({"error": "Username and password are required"}), 400
+
+        if not full_name or not username or not password:
+            return jsonify({"error": "Full name, username, and password are required"}), 400
+
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
@@ -189,12 +191,17 @@ def setup_routes(app):
         if existing_user:
             conn.close()
             return jsonify({"error": "Username already taken"}), 409
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8') 
-        cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
+
+        # Directly store the password without hashing
+        cursor.execute(
+            "INSERT INTO users (full_name, username, password) VALUES (%s, %s, %s)",
+            (full_name, username, password)
+        )
         conn.commit()
         conn.close()
 
         return jsonify({"message": "Registration successful!"}), 201
+
 
     @app.route("/api/users", methods=["GET"])
     def get_users():
@@ -215,9 +222,25 @@ def setup_routes(app):
         username = verify_token(token)
 
         if username:
-            return jsonify({"message": "Token is valid", "username": username}), 200
-        else:
-            return jsonify({"error": "Invalid or expired token"}), 401
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, username, full_name, role FROM users WHERE username = %s", (username,))
+            user = cursor.fetchone()
+            conn.close()
+
+            if user:
+                return jsonify({
+                    "message": "Token is valid",
+                    "user": {
+                        "id": user[0],
+                        "username": user[1],
+                        "full_name": user[2],
+                        "role": user[3]
+                    }
+                }), 200
+
+        return jsonify({"error": "Invalid or expired token"}), 401
+
 
 
     @app.route('/api/shifts', methods=['GET'])

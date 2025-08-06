@@ -300,7 +300,7 @@ export default function OperationRunbook() {
         </ul>
       </div>
 
-      {selectedClient && (
+      {selectedClient ? (
 
         <div className="client-details">
           <div className="client-header">
@@ -383,9 +383,9 @@ export default function OperationRunbook() {
                 <thead>
                   <tr>
                     <th style={{ justifyContent: "center", width: "25%" }}>Incident Severity</th>
-                    <th style={{ justifyContent: "center", width: "25%" }}>Threat Event<br/>(Acknoeledge Time)</th>
-                    <th style={{ justifyContent: "center", width: "25%" }}>Incident Raising<br/>SLA/Notification</th>
-                    <th style={{ justifyContent: "center", width: "25%" }}>Resolution<br/>(Bank Responsibility)</th>
+                    <th style={{ justifyContent: "center", width: "25%" }}>Threat Event<br />(Acknoeledge Time)</th>
+                    <th style={{ justifyContent: "center", width: "25%" }}>Incident Raising<br />SLA/Notification</th>
+                    <th style={{ justifyContent: "center", width: "25%" }}>Resolution<br />(Bank Responsibility)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -547,13 +547,13 @@ export default function OperationRunbook() {
                 <tbody>
                   {assetData.map((asset, index) => (
                     <tr key={index}>
-                      <td style={{ justifyContent: "center"}}>{asset.asset_name}</td>
-                      <td style={{ justifyContent: "center"}}>{asset.location}</td>
-                      <td style={{ justifyContent: "center"}}>{asset.ip_address}</td>
-                      <td style={{ justifyContent: "center"}}>{asset.mode}</td>
-                      <td style={{ justifyContent: "center"}}>{asset.asset_type}</td>
-                      <td style={{ justifyContent: "center"}}>{asset.asset_owner}</td>
-                      <td style={{ justifyContent: "center"}}>{asset.remarks}</td>
+                      <td style={{ justifyContent: "center" }}>{asset.asset_name}</td>
+                      <td style={{ justifyContent: "center" }}>{asset.location}</td>
+                      <td style={{ justifyContent: "center" }}>{asset.ip_address}</td>
+                      <td style={{ justifyContent: "center" }}>{asset.mode}</td>
+                      <td style={{ justifyContent: "center" }}>{asset.asset_type}</td>
+                      <td style={{ justifyContent: "center" }}>{asset.asset_owner}</td>
+                      <td style={{ justifyContent: "center" }}>{asset.remarks}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -564,15 +564,17 @@ export default function OperationRunbook() {
 
 
             </div>)}
-
-
-
-
-
           </div>
         </div>
 
-      )}
+      ) : (
+          <div className="client-details-placeholder">
+            <p style={{ textAlign: "center", marginTop: "50px", fontSize: "18px", color: "#666" }}>
+              Please select a client to view details.
+            </p>
+          </div>
+        )}
+
 
 
 
